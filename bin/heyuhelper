@@ -38,9 +38,9 @@ if ($ENV{X10_Source} ne "") {
 		$data->{action}=$3;
 		$data->{x10_Source}='args';
 	}else{
-		foreach my $e (keys %ENV) {
-			$data->{$e} = $ENV{$e};
-		}
+#		foreach my $e (keys %ENV) {
+#			$data->{$e} = $ENV{$e};
+#		}
 		$data->{source}="HEYU_OTHER_TRIGGER";
 		$data->{_ARGS}=join(",",@ARGV);
 		$data->{_PARENT}=getppid();
@@ -48,20 +48,16 @@ if ($ENV{X10_Source} ne "") {
 	}
 }
 
-#if ($mode eq 'log') {
-	my $json = JSON->new->utf8->canonical->encode($data);
-	if ( open(my $LOG,">>",$log) ) {
-		print $LOG $json."\n";
-		close $LOG;
-	}else{
-		print "Couldn't write to $log : $!\n";
-	}	
-#}
-#if ($mode eq 'url') {
-	$::HA->sendDataToHub("eventHandler",$data);
-#	my $url = "http://pawz.cattech.org/pw/homeAutomation/eventHandler.cgi?event=".uri_escape($json);
-#	my $content = get $url;
-#}
+my $json = JSON->new->utf8->canonical->encode($data);
+if ( open(my $LOG,">>",$log) ) {
+	print $LOG $json."\n";
+	close $LOG;
+}else{
+	print "Couldn't write to $log : $!\n";
+}	
+
+$::HA->registerToHub('transient.heyuhelper',[]);
+$::HA->sendDataToHub(['eventHandler'],$data);
 
 my $example = <<EOB;
 2017-06-14 00:45:30 b9On 
