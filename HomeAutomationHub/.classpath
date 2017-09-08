@@ -7,7 +7,7 @@
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="CommonLibraries/lib"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/CommonLibraries"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/CommonLibraries"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="D:/@Projects/homeAutomation/CommonLibraries/lib/java-json.jar"/>
 	<classpathentry kind="lib" path="D:/@Projects/homeAutomation/CommonLibraries/lib/test/hamcrest-core-1.3.jar"/>
