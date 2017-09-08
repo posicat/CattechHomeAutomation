@@ -14,7 +14,7 @@ public class EventHandlerWebRelay implements Runnable {
 
 		private String urlPrefix;
 		private NodeInterfaceString hubInterface;
-		private boolean running = true;
+		private boolean running = true; 
 
 		public EventHandlerWebRelay(ChannelController controller, String urlPrefix) {
 			this.urlPrefix = urlPrefix;
