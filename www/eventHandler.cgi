@@ -38,15 +38,7 @@ print "Content-type:text/html\n\n";
 
 #$input{eventLogID}=1015;
 
-print <<EOB;
-<style>
-	.runningActions	{
-		margin:2em;
-		border:1px solid blue;
-		background-color:#AAA;
-	}
-</style>
-EOB
+#$input{eventLogID}=1902;
 
 my $packet={};
 if (exists $input{event}) {
@@ -54,36 +46,47 @@ if (exists $input{event}) {
 	$packet = JSON->new->utf8->decode($input{event});
 }
 
-
-if ($packet->{destination} eq 'eventHandler') {
+if ($packet->{source} eq 'eventHandler') {
 	my @actions = findActions($packet->{data});
 	executeActions(\@actions,$packet->{data});
+	print "{\"status\":\"processed\"}\n";
 }else{
+	print <<EOB;
+	<style>
+		.runningActions	{
+			margin:2em;
+			border:1px solid blue;
+			background-color:#AAA;
+	}
+	</style>
+EOB
 	my $eventLogID = $input{eventLogID};
-	print "<h2>Selected event : $eventLogID @ $date</h2>\n";
-
-	my $event="{}";
 	if ($eventLogID ne "") {
+		my $event="{}";
 		(undef,$event,$date) = getEventFromDB($eventLogID);
+
+		print "<h2>Selected event : $eventLogID @ $date</h2>\n";
+
+		$packet = JSON->new->utf8->decode($event);
+		$packet->{data}->{debug}='console';
+		my @actions=();
+
+		if ($packet->{destination}='eventHandler') {
+			@actions = findActions($packet->{data});
+		}
+
+		print "<h3>Event : $event</h3>\n";
+
+		print "Triggers [" . join(',',@actions) . "]<br>\n";
+
+		print "<h4>Simulating triggers</h4>\n";
+
+		executeActions(\@actions,$packet->{data});
 	}
-	$packet = JSON->new->utf8->decode($event);
-	$packet->{data}->{debug}='console';
-	my @actions=();
 
-	if ($packet->{destination}='eventHandler') {
-		@actions = findActions($packet->{data});
+	if (! exists $input{event}) {
+		displayLastXEvents(30);
 	}
-
-	print "<h3>Event : $event</h3>\n";
-
-	print "Triggers [" . join(',',@actions) . "]<br>\n";
-
-
-	print "<h4>Simulating triggers</h4>\n";
-
-	executeActions(\@actions,$packet->{data});
-
-	displayLastXEvents(30);
 }
 
 #================================================================================
@@ -139,9 +142,9 @@ sub findActions {
 
 	while ($::HA->{SH}->next_row($actionData)) {
 		my $triggerHash = decode_json($actionData->{event});
-		print "R :".Dumper($actionData)."<br>\n";
-		print "ED:".Dumper($data)."<br>\n";
-		print "T :".Dumper($triggerHash)."<br>\n";
+#		print "R :".Dumper($actionData)."<br>\n";
+#		print "ED:".Dumper($data)."<br>\n";
+#		print "T :".Dumper($triggerHash)."<br>\n";
 
 		if (matchTrigger($data,$triggerHash)) {
 			push @actions,$actionData->{action};
@@ -159,14 +162,14 @@ sub matchTrigger {
 	my $match=1;
 
 	foreach my $key (keys %$th) {
-		print "TH[$key] $th->{$key} =~m/ $eh->{$key} /<br>\n";
+#		print "TH[$key] $th->{$key} =~m/ $eh->{$key} /<br>\n";
 
 		if (! ($eh->{$key} =~ m/$th->{$key}/)) {
-			print "No regex match<br>\n";
+#			print "No regex match<br>\n";
 			$match=0;
 		}
 		if (! exists $eh->{$key}) {
-			print "No key $key<br>\n";
+#			print "No key $key<br>\n";
 			$match=0;
 		}
 	}
@@ -212,27 +215,34 @@ sub executeActions {
 	# This will live in the data hub eventually!!!!
 	my ($actions,$data)=@_;
 
-	foreach my $action (@$actions) { 
+	foreach my $actionJson (@$actions) { 
+		print "<h4>Evaluating action : $actionJson</h4>\n";
+		my $action = JSON->new->utf8->canonical->decode($actionJson);
+		$action->{_event}=$data;
+
 		print "<div class=\"runningActions\">\n";
 		if ($data->{debug} ne "") {
-			print "<h4>Processing action: $action</h4>\n";
-		}else{
-			print "<h4>Simulating action: $action</h4>\n";
+			$action->{debug} = $data->{debug};
+			print "<div>Debug mode, only simulating</div>\n";
 		}
 
-		my $e = decode_json($event);
 		my $known=0;
-		if (defined $data->{reactions} ) {
+		if (defined $action->{reactions} ) {
 			$known=1;
-			loadReactions($data->{reactions},$actions);
+			loadReactions($action->{reactions},$actions);
 		}
 
-		if (defined $data->{watchcat} ) {
+		if (defined $action->{destination} ) {
 			$known=1;
-			
+			if ($data->{debug} eq "") {
+				$::HA->registerToHub('transient.eventHandler',[]);
+				$::HA->sendDataToHub($action->{destination},$action->{data});
+			}else{
+				print "Would have forwarded action on to hub on channel(s): ".join(',',@{$action->{destination}})."<br>\n";
+			}
 		}
 
-		if (lc $data->{reactions} eq "heyu") {
+		if (lc $action->{reactions} eq "heyu") {
 			$known=1;
 			my $cmd = "/usr/local/bin/heyu";
 			my $module = $data->{house}.$data->{unit};
@@ -243,37 +253,37 @@ sub executeActions {
 				$cmd .= " $data->{action} $module $data->{level}";
 			}
 
-			if ($execute) {
+			if ($data->{debug} eq "") {
 				print `$cmd`;
 			}else{
 				print "CMD : $cmd<br>\n";
 			}
 		}
-		if (lc $data->{reaction} eq "send_phone_email") {
+		if (lc $action->{reaction} eq "send_phone_email") {
 			$known=1;
-			sendPhoneEmail($data,$e,$execute);
+			sendPhoneEmail($action);
 		}
 		
 		if (!$known) {
-			print "Don't understand action : $action<br>\n";
+			print "Don't understand action : $action->{reaction}<br>\n";
 		}
 		print "</div>\n";
 	}
 }
 #================================================================================
 sub sendPhoneEmail { 
-	my ($react,$event,$execute)=@_;
+	my ($action)=@_;
 
 	my $mail="";
-	$mail .= "To: ".$react->{to}."\n";
+	$mail .= "To: ".$action->{to}."\n";
 	$mail .= "From: ha\@cattech.org\n";
-	$mail .= "Subject: ".$react->{subject}."\n";
+	$mail .= "Subject: ".$action->{subject}."\n";
 	$mail .= "\n";
 	$mail .= "\@ $date\n";
 	$mail .= "\n";
 	$mail .= "\n.\n";
 
-	if ($execute) {
+	if ($action->{debug} eq "") {
 		my $res= open(OUT,"|/usr/sbin/sendmail -f 'ha\@cattech.org' -t");
 		if ($res) {
 			print OUT $mail;
