@@ -33,7 +33,7 @@ public class NodeSocketConnectionManager implements Runnable {
 				}
 				throw new RuntimeException("Error accepting client connection", e);
 			}
-			new Thread(new NodeInterfaceSocket(clientSocket, controller)).start();
+			new Thread(new NodeInterfaceSocket(clientSocket, controller),"Client "+clientSocket.getInetAddress()).start();
 		}
 		System.out.println("Server Stopped.");
 		this.stop();

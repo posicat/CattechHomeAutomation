@@ -91,6 +91,7 @@ public class ChannelController {
 
 			if (json.has(NODE_DATA_DESTINATION) && json.has(NODE_DATA_BLOCK)) {
 				JSONArray channels = json.getJSONArray(NODE_DATA_DESTINATION);
+				channels.put("all"); // Also send to channel all
 				JSONObject channelData = json.getJSONObject(NODE_DATA_BLOCK);
 				for (int i = 0; i < channels.length(); i++) {
 					String channel = channels.getString(i);
@@ -118,14 +119,18 @@ public class ChannelController {
 
 	private void sendToChannel(String channel, String data) throws Exception {
 		ArrayList<NodeInterface> nodes;
-		if (NODE_SEND_TO_ALL_ADDRESS.equals(channel)) {
-			nodes = allNodes;
-		} else {
+//		if (NODE_SEND_TO_ALL_ADDRESS.equals(channel)) {
+//			nodes = allNodes;
+//		} else {
 			nodes = channels.get(channel);
-		}
+//		}
 		if (nodes != null) {
 			for (NodeInterface node : nodes) {
 				node.sendDataToNode(data);
+			}
+		}else{
+			if (NODE_SEND_TO_ALL_ADDRESS !=channel) {
+				System.out.println("No node registered for channel : "+channel);
 			}
 		}
 	}
