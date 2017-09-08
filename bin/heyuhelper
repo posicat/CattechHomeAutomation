@@ -1,12 +1,19 @@
 #!/usr/bin/perl
+BEGIN {
+        unshift @INC,'./lib';
+        unshift @INC,'/home/websites/lib';
+        unshift @INC,'/usr/local/homeAutomation/lib';
+}
 use strict;
 use POSIX; 
 use JSON;
 use LWP::Simple;
 use URI::Escape;
+use Cattech::HomeAutomation;
+
+$::HA=Cattech::HomeAutomation->new();
 
 my $log = "/etc/heyu/x10_events.log";
-
 
 my $date = strftime("%Y-%m-%d %H:%M:%S", localtime(time));
 
@@ -41,9 +48,8 @@ if ($ENV{X10_Source} ne "") {
 	}
 }
 
-my $json = JSON->new->utf8->canonical->encode($data);
-
 #if ($mode eq 'log') {
+	my $json = JSON->new->utf8->canonical->encode($data);
 	if ( open(my $LOG,">>",$log) ) {
 		print $LOG $json."\n";
 		close $LOG;
@@ -52,8 +58,9 @@ my $json = JSON->new->utf8->canonical->encode($data);
 	}	
 #}
 #if ($mode eq 'url') {
-	my $url = "http://pawz.cattech.org/pw/homeAutomation/eventHandler.cgi?event=".uri_escape($json);
-	my $content = get $url;
+	$::HA->sendDataToHub("eventHandler",$data);
+#	my $url = "http://pawz.cattech.org/pw/homeAutomation/eventHandler.cgi?event=".uri_escape($json);
+#	my $content = get $url;
 #}
 
 my $example = <<EOB;

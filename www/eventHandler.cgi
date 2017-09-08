@@ -3,10 +3,13 @@ use strict;
 BEGIN { 
 	unshift @INC,'./lib';
 	unshift @INC,'/home/websites/lib';
+	unshift @INC,'/usr/local/homeAutomation/lib';
 }
 use File::Copy;
 use URI::Escape;
 use Cattech::SQLHelper;
+use Cattech::WatchCat;
+use Cattech::HomeAutomation;
 use JSON;
 use Data::Dumper;
 require "cgi-lib.pm";
@@ -26,41 +29,62 @@ $cgi_lib'maxdata    = 1000000;
 my %input;
 ReadParse(\%input);
 
-my $homeautoSH=Cattech::SQLHelper->new('HomeAutomation','homeauto','6C5a3PtSqtNHAACD');
+my $date="";
+
+$::HA=Cattech::HomeAutomation->new();
+$::HA->connectToSQLDatabase();
 
 print "Content-type:text/html\n\n";
 
 #$input{eventLogID}=1015;
 
-my $eventLogID = $input{eventLogID};
-my $event = {};
-my $date = "";
-if ($eventLogID eq "") {
-	($eventLogID,$event,$date) = getLastEventFromDB();
-}else{
-	(undef,$event,$date) = getEventFromDB($eventLogID);
-}
-print "<h2>Selected event : $eventLogID @ $date</h2>\n";
-print "<h3>$event</h3>\n";
+print <<EOB;
+<style>
+	.runningActions	{
+		margin:2em;
+		border:1px solid blue;
+		background-color:#AAA;
+	}
+</style>
+EOB
 
-if ($input{event} ne "") {
-
+my $packet={};
+if (exists $input{event}) {
 	logEventToDB($input{event});
-	my @reactions = findReactions($input{event});
-	print "Triggers [" . join(',',@reactions) . "]<br>\n";
-
-	executeReactions(\@reactions,$input{event},1);
-
-}else{
-
-	my @reactions = findReactions($event);
-	print "Would have matched triggers [<br>&nbsp;&nbsp;" . join("<br>&nbsp;&nbsp;",@reactions) . "<br>]<br>\n";
-
-	executeReactions(\@reactions,$event,0);
-
+	$packet = JSON->new->utf8->decode($input{event});
 }
 
-displayLastXEvents(20);
+
+if ($packet->{destination} eq 'eventHandler') {
+	my @actions = findActions($packet->{data});
+	executeActions(\@actions,$packet->{data});
+}else{
+	my $eventLogID = $input{eventLogID};
+	print "<h2>Selected event : $eventLogID @ $date</h2>\n";
+
+	my $event="{}";
+	if ($eventLogID ne "") {
+		(undef,$event,$date) = getEventFromDB($eventLogID);
+	}
+	$packet = JSON->new->utf8->decode($event);
+	$packet->{data}->{debug}='console';
+	my @actions=();
+
+	if ($packet->{destination}='eventHandler') {
+		@actions = findActions($packet->{data});
+	}
+
+	print "<h3>Event : $event</h3>\n";
+
+	print "Triggers [" . join(',',@actions) . "]<br>\n";
+
+
+	print "<h4>Simulating triggers</h4>\n";
+
+	executeActions(\@actions,$packet->{data});
+
+	displayLastXEvents(30);
+}
 
 #================================================================================
 sub logEventToDB {
@@ -68,7 +92,7 @@ sub logEventToDB {
 
 	if ($event ne "") {
 		my $eventData = { event=>$event };
-	        $homeautoSH->addupdate_data($eventData,'eventLog');
+	        $::HA->{SH}->addupdate_data($eventData,'eventLog');
 	}
 }
 
@@ -76,8 +100,8 @@ sub logEventToDB {
 sub getLastEventFromDB {
 	my $eventData={};
 	my $event="";
-        $homeautoSH->execute_raw_sql($eventData,"SELECT * FROM eventLog ORDER BY time DESC LIMIT 1");
-	$homeautoSH->next_row($eventData);
+        $::HA->{SH}->execute_raw_sql($eventData,"SELECT * FROM eventLog ORDER BY time DESC LIMIT 1");
+	$::HA->{SH}->next_row($eventData);
 
 	return ($eventData->{eventLog_id},$eventData->{event},$eventData->{time});
 }
@@ -86,8 +110,8 @@ sub getEventFromDB {
 	my ($eventLogID)=@_;
 	my $eventData={};
 	my $event="";
-        $homeautoSH->execute_raw_sql($eventData,"SELECT * FROM eventLog WHERE eventLog_id=$eventLogID");
-	$homeautoSH->next_row($eventData);
+        $::HA->{SH}->execute_raw_sql($eventData,"SELECT * FROM eventLog WHERE eventLog_id=$eventLogID");
+	$::HA->{SH}->next_row($eventData);
 
 	return ($eventData->{eventLog_id},$eventData->{event},$eventData->{time});
 }
@@ -96,44 +120,37 @@ sub displayLastXEvents {
 	my ($limit)=@_;
 	my $eventData={};
 	my $event="";
-        $homeautoSH->execute_raw_sql($eventData,"SELECT * FROM eventLog ORDER BY time DESC LIMIT $limit");
+        $::HA->{SH}->execute_raw_sql($eventData,"SELECT * FROM eventLog ORDER BY time DESC LIMIT $limit");
 
-	while ($homeautoSH->next_row($eventData)) {
+	while ($::HA->{SH}->next_row($eventData)) {
 		print "<a href=\"?eventLogID=$eventData->{eventLog_id}\">$eventData->{event} \@ $eventData->{time}</a><br>\n";
 	}
 }
 
 #================================================================================
-sub findReactions {
-	my ($event)=@_;
-	my @reactions;
-	my $eventHash = decode_json($event);
+sub findActions {
+	my ($data)=@_;
+	my @actions;
 
-	my $reactionData={};
-	my $sql =
-		"SELECT t.event,t.triggers_id,reaction FROM triggers t "
-		." LEFT JOIN actions a ON t.triggers_id=a.triggers_id "
-		." LEFT JOIN reactions r ON a.reactions_id=r.reactions_id "
-		." WHERE earliestNext <= NOW() ";
+	my $actionData={};
+	my $sql = "SELECT event,action FROM triggers WHERE earliestNext <= NOW()";
 #	print "SQL : $sql<br>\n";
-        $homeautoSH->execute_raw_sql($reactionData,$sql);
+        $::HA->{SH}->execute_raw_sql($actionData,$sql);
 
-#	print "<hr>\n";
-	while ($homeautoSH->next_row($reactionData)) {
-		my $triggerHash = decode_json($reactionData->{event});
-#		print "R:".Dumper($reactionData)."<br>\n";
-#		print "E:".Dumper($eventHash)."<br>\n";
-#		print "T:".Dumper($triggerHash)."<br>\n";
+	while ($::HA->{SH}->next_row($actionData)) {
+		my $triggerHash = decode_json($actionData->{event});
+		print "R :".Dumper($actionData)."<br>\n";
+		print "ED:".Dumper($data)."<br>\n";
+		print "T :".Dumper($triggerHash)."<br>\n";
 
-		if (matchTrigger($eventHash,$triggerHash)) {
-			push @reactions,split(/\0/,$reactionData->{reaction});
-			setTriggerEarliestNext($reactionData->{triggers_id});
+		if (matchTrigger($data,$triggerHash)) {
+			push @actions,$actionData->{action};
+			setTriggerEarliestNext($actionData->{triggers_id});
 		}
 	}		
 	#print "<hr>\n";
 
-
-	return @reactions;
+	return @actions;
 }
 
 #================================================================================
@@ -142,14 +159,14 @@ sub matchTrigger {
 	my $match=1;
 
 	foreach my $key (keys %$th) {
-#		print "TH[$key] $th->{$key} =~m/ $eh->{$key} /<br>\n";
+		print "TH[$key] $th->{$key} =~m/ $eh->{$key} /<br>\n";
 
 		if (! ($eh->{$key} =~ m/$th->{$key}/)) {
-#			print "No regex match<br>\n";
+			print "No regex match<br>\n";
 			$match=0;
 		}
 		if (! exists $eh->{$key}) {
-#			print "No key $key<br>\n";
+			print "No key $key<br>\n";
 			$match=0;
 		}
 	}
@@ -161,13 +178,13 @@ sub setTriggerEarliestNext {
 	my ($triggers_id)=@_;
 
 	my $triggers={triggers_id=>$triggers_id};
-	$homeautoSH->select_data($triggers,'triggers');
-        $homeautoSH->next_row($triggers);
+	$::HA->{SH}->select_data($triggers,'triggers');
+        $::HA->{SH}->next_row($triggers);
 
-	print Dumper($triggers);
+#	print Dumper($triggers);
 
 	if (defined $triggers->{frequency}) {
-	        $homeautoSH->execute_raw_sql(my $db,
+	        $::HA->{SH}->execute_raw_sql(my $db,
 			"UPDATE triggers SET earliestNext =NOW() + INTERVAL ".$triggers->{frequency}
 			." WHERE triggers_id=".$triggers_id
 		);
@@ -175,28 +192,55 @@ sub setTriggerEarliestNext {
 
 }
 #================================================================================
-sub executeReactions {
-	my ($reactions,$event,$execute)=@_;
+sub loadReactions { 
+	my ($list,$actions)=@_;
 
-	foreach my $reaction (@$reactions) { 
-		if ($execute) {
-			print "Processing reaction: $reaction<br>\n";
+	my $reactionData={};
+	my $reactions=join(',',@$list);
+	my $sql="SELECT action FROM reactions WHERE reactions_id in ($reactions)";
+	print "SQL : $sql<br>\n";
+        $::HA->{SH}->execute_raw_sql($reactionData,$sql);
+
+	while ($::HA->{SH}->next_row($reactionData)) {
+		print "Adding : $reactionData->{action}<br>\n";
+		push @$actions,$reactionData->{action};
+	}
+	
+}
+#================================================================================
+sub executeActions {
+	# This will live in the data hub eventually!!!!
+	my ($actions,$data)=@_;
+
+	foreach my $action (@$actions) { 
+		print "<div class=\"runningActions\">\n";
+		if ($data->{debug} ne "") {
+			print "<h4>Processing action: $action</h4>\n";
 		}else{
-			print "Simulating reaction: $reaction<br>\n";
+			print "<h4>Simulating action: $action</h4>\n";
 		}
 
-		my $r = decode_json($reaction);
 		my $e = decode_json($event);
 		my $known=0;
-		if (lc $r->{reaction} eq "heyu") {
+		if (defined $data->{reactions} ) {
+			$known=1;
+			loadReactions($data->{reactions},$actions);
+		}
+
+		if (defined $data->{watchcat} ) {
+			$known=1;
+			
+		}
+
+		if (lc $data->{reactions} eq "heyu") {
 			$known=1;
 			my $cmd = "/usr/local/bin/heyu";
-			my $module = $r->{house}.$r->{unit};
-			if (lc $r->{action}=~m/(on|off)/) {
-				$cmd .= " turn $module $r->{action}";
+			my $module = $data->{house}.$data->{unit};
+			if (lc $data->{action}=~m/(on|off)/) {
+				$cmd .= " turn $module $data->{action}";
 			}
-			if (lc $r->{action}=~m/(dim|bright)/) {
-				$cmd .= " $r->{action} $module $r->{level}";
+			if (lc $data->{action}=~m/(dim|bright)/) {
+				$cmd .= " $data->{action} $module $data->{level}";
 			}
 
 			if ($execute) {
@@ -205,14 +249,15 @@ sub executeReactions {
 				print "CMD : $cmd<br>\n";
 			}
 		}
-		if (lc $r->{reaction} eq "send_phone_email") {
+		if (lc $data->{reaction} eq "send_phone_email") {
 			$known=1;
-			sendPhoneEmail($r,$e,$execute);
+			sendPhoneEmail($data,$e,$execute);
 		}
 		
 		if (!$known) {
-			print "Don't understand reaction : $r->{reaction}<br>\n";
+			print "Don't understand action : $action<br>\n";
 		}
+		print "</div>\n";
 	}
 }
 #================================================================================
