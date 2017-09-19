@@ -11,53 +11,26 @@ use LWP::Simple;
 use URI::Escape;
 use Cattech::HomeAutomation;
 
-$::HA=Cattech::HomeAutomation->new();
+use Device::Nest;
 
-my $log = "/etc/heyu/x10_events.log";
+$my_Nest = Device::Nest->new($ClientID,$ClientSecret,$code,$phrase,$debug);
 
-my $date = strftime("%Y-%m-%d %H:%M:%S", localtime(time));
+$my_Nest->connect();
+  
+undef $my_Nest;
 
-#my $helper = $ENV{helper};
 
-#my ($address,$action) = $helper=~m/([a-z0-9]*)([A-Z].*)/;
+exit;
 
 my $data={};
-
-my $mode='url';
-if ($ENV{X10_Source} ne "") {
-	$data->{source}="X10";
-	$data->{unit}=$ENV{X10_Unit};
-	$data->{house}=$ENV{X10_Housecode};
-	$data->{action}=$ENV{X10_Function};
-	$data->{x10_Source}=$ENV{X10_Source};
-}else{
-	if ($ARGV[0]=~m/([a-p])([1-9]|0[1-9]|1[0-6])(On|Off|Dim|Bri)/) {
-		$data->{source}="X10";
-		$data->{unit}=$1;
-		$data->{house}=$2;
-		$data->{action}=$3;
-		$data->{x10_Source}='args';
-	}else{
-#		foreach my $e (keys %ENV) {
-#			$data->{$e} = $ENV{$e};
-#		}
-		$data->{source}="HEYU_OTHER_TRIGGER";
-		$data->{_ARGS}=join(",",@ARGV);
-		$data->{_PARENT}=getppid();
-		$mode='log';
-	}
-}
-
-my $json = JSON->new->utf8->canonical->encode($data);
-if ( open(my $LOG,">>",$log) ) {
-	print $LOG $json."\n";
-	close $LOG;
-}else{
-	print "Couldn't write to $log : $!\n";
-}	
+$data->{source}="X10";
+$data->{location}='hallway';
+$data->{house}=$ENV{X10_Housecode};
+$data->{action}=$ENV{X10_Function};
+$data->{x10_Source}=$ENV{X10_Source};
 
 $::HA->registerToHub('transient.heyuhelper',[]);
-$::HA->sendDataToHub(['eventHandler'],$data);
+$::HA->sendDataToHub(['eventHandler,temperature'],$data);
 
 my $example = <<EOB;
 2017-06-14 00:45:30 b9On 

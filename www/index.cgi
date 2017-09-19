@@ -1,8 +1,15 @@
 #!/usr/bin/perl
 use strict;
+BEGIN {
+        unshift @INC,'./lib';
+        unshift @INC,'/home/websites/lib';
+        unshift @INC,'/usr/local/homeAutomation/lib';
+}
+
 use Cattech::HTMLHelper;
 use Cattech::WebSession;
 use Cattech::SQLHelper;
+use Cattech::HomeAutomation;
 use URI::Escape;
 use JSON;
 use Carp;
@@ -83,7 +90,11 @@ sub displaySetupScreen {
 	print "<div class=titlebar>Setup</div>\n";
 	print "<hr>\n";
         print "<div class=\"ha_groups\">\n";
-	print "	<a href=\"userImages.cgi\" class=\"groupitem\" $ocll target=\"setupScreen\">Update User Images</a>\n";	
+	print "	<a href=\"userImages.cgi\" class=\"groupitem\" $ocll target=\"setupScreen\">User Images</a>\n";	
+	print "	<a href=\"userImages.cgi\" class=\"groupitem\" $ocll target=\"setupScreen\">Triggers</a>\n";	
+	print "	<a href=\"userImages.cgi\" class=\"groupitem\" $ocll target=\"setupScreen\">Watchcat</a>\n";	
+	print "	<a href=\"userImages.cgi\" class=\"groupitem\" $ocll target=\"setupScreen\">Schedule</a>\n";	
+	print "	<a href=\"userImages.cgi\" class=\"groupitem\" $ocll target=\"setupScreen\">Reactions</a>\n";	
         print "</div>\n";
 	print "<div id=\"setupScreen\"></div>\n";
 }
