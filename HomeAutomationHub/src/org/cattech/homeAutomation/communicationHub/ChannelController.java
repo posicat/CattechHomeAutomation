@@ -1,7 +1,10 @@
 package org.cattech.homeAutomation.communicationHub;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Properties;
 import java.util.UUID;
 
 import org.json.JSONArray;
@@ -27,7 +30,21 @@ public class ChannelController {
 
 	Hashtable<String, ArrayList<NodeInterface>> channels = new Hashtable<String, ArrayList<NodeInterface>>();
 	ArrayList<NodeInterface> allNodes = new ArrayList<NodeInterface>();
+	Properties props = new Properties();
 
+	public Properties getProps() {
+		return props;
+	}
+
+	public ChannelController() throws IOException {
+		String configFile = System.getenv("HOMEAUTOCONFIG"); 
+		if (null==configFile) {
+			configFile = "/etc/homeAutomation/";
+		}
+		FileInputStream input = new FileInputStream(configFile);
+		props.load(input);
+	}
+	
 	public void addNodeToChannel(String channel, NodeInterface node) {
 		ArrayList<NodeInterface> nodes = channels.get(channel);
 		nodes = addNodeToList(nodes, node);

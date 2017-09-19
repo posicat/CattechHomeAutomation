@@ -2,6 +2,8 @@ package org.cattech.homeAutomation.communicationHubTest;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.IOException;
+
 import org.cattech.homeAutomation.communicationHub.ChannelController;
 import org.cattech.homeAutomation.communicationHub.NodeInterfaceString;
 import org.junit.Before;
@@ -14,7 +16,11 @@ public class ChannelControllerTest {
 
 	@Before
 	public void setUp() {
-		controller = new ChannelController();
+		try {
+			controller = new ChannelController();
+		} catch (IOException e) {
+			// Doesn't matter if we can't load properties.
+		}
 	}
 
 	@Test
