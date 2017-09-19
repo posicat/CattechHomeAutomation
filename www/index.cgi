@@ -1,5 +1,11 @@
 #!/usr/bin/perl
 use strict;
+BEGIN {
+        unshift @INC,'./lib';
+        unshift @INC,'/home/websites/lib';
+        unshift @INC,'/usr/local/homeAutomation/lib';
+}
+
 use Cattech::HTMLHelper;
 use Cattech::WebSession;
 use Cattech::SQLHelper;
