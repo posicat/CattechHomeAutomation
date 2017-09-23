@@ -1,4 +1,4 @@
-package org.cattech.homeAutomation.channelHandlers;
+package org.cattech.homeAutomation.EventHandlerWebRelay;
 
 import java.io.BufferedReader;
 import java.io.IOException;

@@ -1,5 +1,6 @@
 package org.cattech.homeAutomation.moduleBase;
 
+import java.sql.Connection;
 import java.util.logging.Logger;
 
 import org.cattech.homeAutomation.communicationHub.ChannelController;
@@ -26,7 +27,7 @@ public abstract class HomeAutomationModule implements Runnable {
 	}
 
 	public String getModuleChannelName() {
-		return "eventHandler";
+		return this.getClass().getSimpleName();
 	}
 
 	public void sleepNoThrow(int delay) {
@@ -43,5 +44,10 @@ public abstract class HomeAutomationModule implements Runnable {
 
 	public void setRunning(boolean running) {
 		this.running = running;
+	}
+
+	protected Connection getHomeAutomationDBConnection() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
