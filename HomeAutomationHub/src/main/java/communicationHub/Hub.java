@@ -68,10 +68,14 @@ public class Hub {
 		}
 		
 		System.out.println("Loading "+total+" modules from "+modulesFolder);
+		String classPath = System.getProperty("java.class.path");
+		classPath+=";./lib/*";
+		System.setProperty("java.class.path",classPath);
+		System.out.println("Classpath : "+classPath);
 		
 		if (null!=listOfFiles)
 			for (File jarName : listOfFiles) {
-				System.out.println("Jar : " + jarName);
+				System.out.println("Found Jar : " + jarName);
 	
 				JarFile jarFile;
 				URLClassLoader classLoader;
@@ -94,8 +98,10 @@ public class Hub {
 						try {
 							Object clazz = classLoader.loadClass(className).getConstructor(ChannelController.class).newInstance(controller);
 							if (clazz instanceof HomeAutomationModule) {
-								System.out.println("Loading module : " + clazz.getClass().getName());
+								System.out.println("	Jar has a HomeAutomationModule, Loading : " + clazz.getClass().getName());
 								modules.add((HomeAutomationModule) clazz);
+							}else{
+								System.err.println("	Jar is not a HomeAutomationModule");
 							}
 						} catch (ClassNotFoundException
 								|NoSuchMethodException
@@ -104,13 +110,14 @@ public class Hub {
 								|IllegalAccessException
 								|IllegalArgumentException
 								|InvocationTargetException e1) {
-							System.out.println("Could not load class : "+ className );
+							System.err.println("	Could not load class : "+ className );
 							e1.printStackTrace();
 						}
 					}
 				} catch (IOException e2) {
-					System.out.println("Could not load jar : "+ rawURL+ "("+e2.getMessage()+")");
+					System.err.println("	Could not load jar : "+ rawURL+ "("+e2.getMessage()+")");
 				}
+				System.out.println(".\r\n\r\n");
 			}
 		return modules;
 	}

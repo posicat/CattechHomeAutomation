@@ -13,12 +13,6 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.cattech.homeAutomation</groupId>
-			<artifactId>CommonLibraries</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
 			<scope>runtime</scope>
