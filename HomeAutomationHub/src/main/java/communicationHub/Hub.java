@@ -1,6 +1,7 @@
 package communicationHub;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
@@ -8,6 +9,7 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Properties;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -15,16 +17,23 @@ import moduleBase.HomeAutomationModule;
 
 public class Hub {
 
+	static final String HOMEAUTOMATION_HOME = "HOMEAUTOMATION_HOME";
+	
 	private static ChannelController controller = null;
+	private static Properties props = new Properties();
 
 	public static void main(String[] args) throws IOException {
-		controller = new ChannelController();
+		loadConfiguration();
+		controller = new ChannelController(props);
+		
 		NodeSocketConnectionManager server = new NodeSocketConnectionManager(10042, controller);
 		new Thread(server, "Connection Manager").start();
 
-		String modulesFolder = System.getenv("HOMEAUTOMODULES");
+		String modulesFolder = System.getenv(HOMEAUTOMATION_HOME);
 		if (null == modulesFolder) {
 			modulesFolder = "./modules";
+		}else{
+			modulesFolder +="/modules/";
 		}
 		List<HomeAutomationModule> modules = loadModules(controller, modulesFolder);
 		
@@ -50,7 +59,16 @@ public class Hub {
 		List<HomeAutomationModule> modules = new ArrayList<HomeAutomationModule>();
 		File folder = new File(modulesFolder);
 		File[] listOfFiles = folder.listFiles((dir, name) -> name.endsWith(".jar"));
-
+		
+		int total;
+		if (null == listOfFiles) {
+			total = 0;
+		}else{
+			total = listOfFiles.length;
+		}
+		
+		System.out.println("Loading "+total+" modules from "+modulesFolder);
+		
 		if (null!=listOfFiles)
 			for (File jarName : listOfFiles) {
 				System.out.println("Jar : " + jarName);
@@ -96,6 +114,36 @@ public class Hub {
 			}
 		return modules;
 	}
+//================================================================================
+private static void loadConfiguration() throws IOException {
+	String homePath = getHomePath().replace("\\", "/");
+	FileInputStream input;
+	try {
+		input = new FileInputStream(homePath+"/etc/settings.conf");
+		props.load(input);
+	} catch (IOException e) {
+		throw new IOException("Could not find configuration file, please set "+HOMEAUTOMATION_HOME,e);
+	}
+}
+//================================================================================
+//================================================================================
+ 
+private static String getHomePath() {
+	String home = System.getenv(HOMEAUTOMATION_HOME);
+	
+	if (null==home) {
+		String os = System.getProperty("os.name");
+		if (os.matches(".*Windows.*")) {
+			home = "C:/homeAutomation/";
+		}
+		if (os.matches(".*Linux.*")) {
+			home = "/etc/homeAutomation/";
+		}
+	}
+	return home;
+}
+//================================================================================
+
 	//================================================================================
 	//================================================================================
 

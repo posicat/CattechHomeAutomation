@@ -1,0 +1,27 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>org.cattech.homeAutomation.HomeAutomationModules</groupId>
+	<artifactId>DeviceResolver</artifactId>
+	<name>DeviceResolver</name>
+	<parent>
+		<groupId>org.cattech.homeAutomation</groupId>
+		<artifactId>HomeAutomationModules</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.cattech.homeAutomation</groupId>
+			<artifactId>CommonLibraries</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+	</dependencies>
+</project>

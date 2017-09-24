@@ -3,6 +3,7 @@ package communicationHubTest;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
+import java.util.Properties;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -17,7 +18,7 @@ public class ChannelControllerTest {
 
 	@Before
 	public void setUp() throws IOException {
-		controller = new ChannelController();
+		controller = new ChannelController(new Properties());
 	}
 
 	@Test

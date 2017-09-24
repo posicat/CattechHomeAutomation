@@ -1,6 +1,5 @@
 package communicationHub;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -15,7 +14,6 @@ import org.json.JSONObject;
 
 public class ChannelController {
 
-	private static final String HOMEAUTOMATION_HOME = "HOMEAUTOMATION_HOME";
 	// Data packet field names
 	public static final String NODE_CHANNEL_IDENTIFIER 	= "source";
 	public static final String NODE_DATA_DESTINATION 	= "destination";
@@ -37,30 +35,8 @@ public class ChannelController {
 		return props;
 	}
 
-	public ChannelController() throws IOException {
-		String configFile = getHomePath();
-		FileInputStream input;
-		try {
-			input = new FileInputStream(configFile+"/settings.conf");
-			props.load(input);
-		} catch (IOException e) {
-			throw new IOException("Could not find configuration file, please set "+HOMEAUTOMATION_HOME,e);
-		}
-	}
-
-	private String getHomePath() {
-		String home = System.getenv(HOMEAUTOMATION_HOME);
-		
-		if (null==home) {
-			String os = System.getProperty("os.name");
-			if (os.matches(".*Windows.*")) {
-				home = "C:/homeAutomation/";
-			}
-			if (os.matches(".*Linux.*")) {
-				home = "/etc/homeAutomation/";
-			}
-		}
-		return home;
+	public ChannelController(Properties props2) throws IOException {
+		this.props = props2;
 	}
 	
 	public void addNodeToChannel(String channel, NodeInterface node) {
