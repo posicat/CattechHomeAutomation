@@ -15,7 +15,7 @@ public abstract class HomeAutomationModule implements Runnable {
 		log = Logger.getLogger( this.getClass().getSimpleName() );
 		
 		this.hubInterface = new NodeInterfaceString(controller);
-		System.out.println(getModuleChannelName());
+//		System.out.println(getModuleChannelName());
 		hubInterface.sendDataToController("{\"register\":[\""+getModuleChannelName()+"\"]}");
 
 		String response = null;

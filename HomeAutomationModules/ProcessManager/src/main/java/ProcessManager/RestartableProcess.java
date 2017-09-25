@@ -1,4 +1,4 @@
-package RestartableProcess;
+package ProcessManager;
 
 import java.io.IOException;
 

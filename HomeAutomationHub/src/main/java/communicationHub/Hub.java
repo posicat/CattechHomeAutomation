@@ -17,28 +17,27 @@ import moduleBase.HomeAutomationModule;
 
 public class Hub {
 
-	static final String HOMEAUTOMATION_HOME = "HOMEAUTOMATION_HOME";
-	
-	private static ChannelController controller = null;
-	private static Properties props = new Properties();
+	public static final String			HOMEAUTOMATION_HOME	= "HOMEAUTOMATION_HOME";
+	private static ChannelController	controller			= null;
+	private static Properties			props				= new Properties();
 
 	public static void main(String[] args) throws IOException {
 		loadConfiguration();
 		controller = new ChannelController(props);
-		
+
 		NodeSocketConnectionManager server = new NodeSocketConnectionManager(10042, controller);
-		new Thread(server, "Connection Manager").start();
+		new Thread(server, "Socket Connection Manager").start();
 
 		String modulesFolder = System.getenv(HOMEAUTOMATION_HOME);
 		if (null == modulesFolder) {
 			modulesFolder = "./modules";
-		}else{
-			modulesFolder +="/modules/";
+		} else {
+			modulesFolder += "/modules/";
 		}
 		List<HomeAutomationModule> modules = loadModules(controller, modulesFolder);
-		
+
 		for (HomeAutomationModule mod : modules) {
-			new Thread(mod,"Module : "+mod.getModuleChannelName()).start();
+			new Thread(mod, "Module : " + mod.getModuleChannelName()).start();
 		}
 
 		System.out.println("Listening...");
@@ -54,102 +53,103 @@ public class Hub {
 	}
 
 	//================================================================================
-	
 	private static List<HomeAutomationModule> loadModules(ChannelController controller, String modulesFolder) {
 		List<HomeAutomationModule> modules = new ArrayList<HomeAutomationModule>();
 		File folder = new File(modulesFolder);
 		File[] listOfFiles = folder.listFiles((dir, name) -> name.endsWith(".jar"));
-		
+
 		int total;
 		if (null == listOfFiles) {
 			total = 0;
-		}else{
+		} else {
 			total = listOfFiles.length;
 		}
-		
-		System.out.println("Loading "+total+" modules from "+modulesFolder);
+
+		System.out.println("| Loading " + total + " modules from " + modulesFolder);
 		String classPath = System.getProperty("java.class.path");
-		classPath+=";./lib/*";
-		System.setProperty("java.class.path",classPath);
-		System.out.println("Classpath : "+classPath);
-		
-		if (null!=listOfFiles)
-			for (File jarName : listOfFiles) {
-				System.out.println("Found Jar : " + jarName);
-	
-				JarFile jarFile;
-				URLClassLoader classLoader;
-				String rawURL = null;
-				try {
-					rawURL = "jar:file:" + jarName.getAbsolutePath() + "!/";
-					URL[] url = { new URL(rawURL) };
-					classLoader = URLClassLoader.newInstance(url);
-					jarFile = new JarFile(jarName);
-					Enumeration<JarEntry> e = jarFile.entries();
-	
-					while (e.hasMoreElements()) {
-						JarEntry je = e.nextElement();
-						if (je.isDirectory() || !je.getName().endsWith(".class")) {
-							continue;
-						}
-						// -6 because of .class
-						String className = je.getName().substring(0, je.getName().length() - 6);
-						className = className.replace('/', '.');
+		classPath += ";./lib/*";
+		System.setProperty("java.class.path", classPath);
+		System.out.println("| Classpath : " + classPath);
+
+		if (null != listOfFiles) for (File jarName : listOfFiles) {
+			System.out.println("| Found Jar : " + jarName);
+
+			JarFile jarFile;
+			URLClassLoader classLoader;
+			String rawURL = null;
+			try {
+				rawURL = "jar:file:" + jarName.getAbsolutePath() + "!/";
+				URL[] url = { new URL(rawURL) };
+				classLoader = URLClassLoader.newInstance(url);
+				jarFile = new JarFile(jarName);
+				Enumeration<JarEntry> e = jarFile.entries();
+
+				while (e.hasMoreElements()) {
+					JarEntry je = e.nextElement();
+					if (je.isDirectory() || !je.getName().endsWith(".class")) {
+						continue;
+					}
+					// -6 because of .class
+					String className = je.getName().substring(0, je.getName().length() - 6);
+					className = className.replace('/', '.');
+					Object clazz = null;
+					try {
+						clazz = classLoader.loadClass(className);
+					} catch (ClassNotFoundException e1) {
+						System.err.println("	| Class we found was not found - should never happen");
+						e1.printStackTrace();
+					}
+					if (HomeAutomationModule.class.isAssignableFrom((Class<?>) clazz)) {
+						System.out.println("	| " + ((Class<?>) clazz).getName()
+								+ " is a HomeAutomationModule, Loading : " + ((Class<?>) clazz).getName());
 						try {
-							Object clazz = classLoader.loadClass(className).getConstructor(ChannelController.class).newInstance(controller);
-							if (clazz instanceof HomeAutomationModule) {
-								System.out.println("	Jar has a HomeAutomationModule, Loading : " + clazz.getClass().getName());
-								modules.add((HomeAutomationModule) clazz);
-							}else{
-								System.err.println("	Jar is not a HomeAutomationModule");
-							}
-						} catch (ClassNotFoundException
-								|NoSuchMethodException
-								|SecurityException
-								|InstantiationException
-								|IllegalAccessException
-								|IllegalArgumentException
-								|InvocationTargetException e1) {
-							System.err.println("	Could not load class : "+ className );
+							clazz = ((Class<?>) clazz).getConstructor(ChannelController.class).newInstance(controller);
+							modules.add((HomeAutomationModule) clazz);
+						} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+								| InvocationTargetException | NoSuchMethodException | SecurityException e1) {
+							System.err.println("	| Could not create instance of " + clazz.getClass().getName());
 							e1.printStackTrace();
 						}
+					} else {
+						System.err.println("	| " + ((Class<?>) clazz).getName() + " is not a HomeAutomationModule");
 					}
-				} catch (IOException e2) {
-					System.err.println("	Could not load jar : "+ rawURL+ "("+e2.getMessage()+")");
 				}
-				System.out.println(".\r\n\r\n");
+			} catch (IOException e2) {
+				System.err.println("	| Could not load jar : " + rawURL + "(" + e2.getMessage() + ")");
 			}
+			System.out.println(".\r\n\r\n");
+		}
 		return modules;
 	}
-//================================================================================
-private static void loadConfiguration() throws IOException {
-	String homePath = getHomePath().replace("\\", "/");
-	FileInputStream input;
-	try {
-		input = new FileInputStream(homePath+"/etc/settings.conf");
-		props.load(input);
-	} catch (IOException e) {
-		throw new IOException("Could not find configuration file, please set "+HOMEAUTOMATION_HOME,e);
-	}
-}
-//================================================================================
-//================================================================================
- 
-private static String getHomePath() {
-	String home = System.getenv(HOMEAUTOMATION_HOME);
-	
-	if (null==home) {
-		String os = System.getProperty("os.name");
-		if (os.matches(".*Windows.*")) {
-			home = "C:/homeAutomation/";
-		}
-		if (os.matches(".*Linux.*")) {
-			home = "/etc/homeAutomation/";
+
+	//================================================================================
+	private static void loadConfiguration() throws IOException {
+		String homePath = getHomePath().replace("\\", "/");
+		FileInputStream input;
+		try {
+			input = new FileInputStream(homePath + "/etc/settings.conf");
+			props.load(input);
+		} catch (IOException e) {
+			throw new IOException("Could not find configuration file, please set " + HOMEAUTOMATION_HOME, e);
 		}
 	}
-	return home;
-}
-//================================================================================
+
+	//================================================================================
+	private static String getHomePath() {
+		String home = System.getenv(HOMEAUTOMATION_HOME);
+
+		if (null == home) {
+			String os = System.getProperty("os.name");
+			if (os.matches(".*Windows.*")) {
+				home = "C:/homeAutomation/";
+			}
+			if (os.matches(".*Linux.*")) {
+				home = "/etc/homeAutomation/";
+			}
+		}
+		return home;
+	}
+	//================================================================================
 
 	//================================================================================
 	//================================================================================

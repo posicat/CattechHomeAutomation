@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Properties;
 
-import RestartableProcess.RestartableProcess;
-import RestartableProcess.RestartableProcessException;
 import communicationHub.ChannelController;
 import moduleBase.HomeAutomationModule;
 

@@ -1,4 +1,4 @@
-package RestartableProcess;
+package ProcessManager;
 
 public class RestartableProcessException extends Exception {
 	private static final long serialVersionUID = 1L;
