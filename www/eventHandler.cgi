@@ -30,20 +30,23 @@ my %input;
 ReadParse(\%input);
 
 my $date="";
+my $event="{}";
+
 
 $::HA=Cattech::HomeAutomation->new();
 $::HA->connectToSQLDatabase();
 
 print "Content-type:text/html\n\n";
+print "<body>\n";
 
-#$input{eventLogID}=1015;
-
-#$input{eventLogID}=1902;
+#$input{eventLogID}=2448;
 
 my $packet={};
 if (exists $input{event}) {
-	logEventToDB($input{event});
+	my $id = logEventToDB($input{event});
 	$packet = JSON->new->utf8->decode($input{event});
+
+	(undef,$event,$date) = getEventFromDB($id);
 }
 
 if ($packet->{source} eq 'eventHandler') {
@@ -53,16 +56,30 @@ if ($packet->{source} eq 'eventHandler') {
 }else{
 	print <<EOB;
 	<style>
-		.runningActions	{
-			margin:2em;
-			border:1px solid blue;
-			background-color:#AAA;
+	body {
+		background-color:#AAA;
+	}
+	.runningActions	{
+		margin:2em;
+		border:1px solid blue;
+		background-color:#FFF;
+	}
+	.halfpage {
+		width:49%;
+		float:right;
+		overflow-wrap: break-word;
+	}
+	.eventLine {
+		font-size:1vmin;
+		background-color:#CCC;
+		margin-top:5px;
+		display:inline-block;
 	}
 	</style>
 EOB
 	my $eventLogID = $input{eventLogID};
+	print "<div class=\"halfpage\">\n<hr>";
 	if ($eventLogID ne "") {
-		my $event="{}";
 		(undef,$event,$date) = getEventFromDB($eventLogID);
 
 		print "<h2>Selected event : $eventLogID @ $date</h2>\n";
@@ -83,9 +100,12 @@ EOB
 
 		executeActions(\@actions,$packet->{data});
 	}
+	print "</div>\n";
 
 	if (! exists $input{event}) {
-		displayLastXEvents(30);
+		print "<div class=\"halfpage\">\n";
+		displayLastXEvents(40);
+		print "</div>\n";
 	}
 }
 
@@ -96,6 +116,7 @@ sub logEventToDB {
 	if ($event ne "") {
 		my $eventData = { event=>$event };
 	        $::HA->{SH}->addupdate_data($eventData,'eventLog');
+		return $eventData->{eventLog_id};
 	}
 }
 
@@ -126,7 +147,7 @@ sub displayLastXEvents {
         $::HA->{SH}->execute_raw_sql($eventData,"SELECT * FROM eventLog ORDER BY time DESC LIMIT $limit");
 
 	while ($::HA->{SH}->next_row($eventData)) {
-		print "<a href=\"?eventLogID=$eventData->{eventLog_id}\">$eventData->{event} \@ $eventData->{time}</a><br>\n";
+		print "<a class=\"eventLine\" href=\"?eventLogID=$eventData->{eventLog_id}\">$eventData->{event} \@ $eventData->{time}</a><br>\n";
 	}
 }
 
@@ -135,20 +156,38 @@ sub findActions {
 	my ($data)=@_;
 	my @actions;
 
-	my $actionData={};
-	my $sql = "SELECT event,action FROM triggers WHERE earliestNext <= NOW()";
-#	print "SQL : $sql<br>\n";
-        $::HA->{SH}->execute_raw_sql($actionData,$sql);
 
-	while ($::HA->{SH}->next_row($actionData)) {
-		my $triggerHash = decode_json($actionData->{event});
-#		print "R :".Dumper($actionData)."<br>\n";
-#		print "ED:".Dumper($data)."<br>\n";
-#		print "T :".Dumper($triggerHash)."<br>\n";
+	print "Parsing : " . Dumper($data) . "<br>\n";
 
-		if (matchTrigger($data,$triggerHash)) {
-			push @actions,$actionData->{action};
-			setTriggerEarliestNext($actionData->{triggers_id});
+	if (exists $data->{reaction}) {
+		my $json = encode_json($data);
+		push @actions,$json;
+	}
+
+	if ($data->{source} eq "X10") {
+		my $actionData={};
+		my $sql = "SELECT event,action,triggers_id FROM triggers";
+
+		if ($data->{debug} eq "") {
+			$sql .=" WHERE earliestNext <= NOW()";
+		}
+		print "SQL : $sql<br>\n";
+	        $::HA->{SH}->execute_raw_sql($actionData,$sql);
+
+		while ($::HA->{SH}->next_row($actionData)) {
+			my $triggerHash = decode_json($actionData->{event});
+
+#			print "R :".Dumper($actionData)."<br>\n";
+#			print "ED:".Dumper($data)."<br>\n";
+#			print "T :".Dumper($triggerHash)."<br>\n";
+
+			if (matchTrigger($data,$triggerHash)) {
+				push @actions,$actionData->{action};
+#				print "ATI:$actionData->{triggers_id}<br>\n";
+				if ($data->{debug} eq "") {
+					setTriggerEarliestNext($actionData->{triggers_id});
+				}
+			}
 		}
 	}		
 	#print "<hr>\n";
@@ -184,13 +223,12 @@ sub setTriggerEarliestNext {
 	$::HA->{SH}->select_data($triggers,'triggers');
         $::HA->{SH}->next_row($triggers);
 
-#	print Dumper($triggers);
+	print Dumper($triggers);
 
 	if (defined $triggers->{frequency}) {
-	        $::HA->{SH}->execute_raw_sql(my $db,
-			"UPDATE triggers SET earliestNext =NOW() + INTERVAL ".$triggers->{frequency}
-			." WHERE triggers_id=".$triggers_id
-		);
+		my $sql = "UPDATE triggers SET earliestNext =NOW() + INTERVAL ".$triggers->{frequency}." WHERE triggers_id=".$triggers_id;
+		print "SQL : $sql<br>\n";
+	        $::HA->{SH}->execute_raw_sql(my $db,$sql);
 	}
 
 }
@@ -278,7 +316,12 @@ sub sendPhoneEmail {
 	$mail .= "To: ".$action->{to}."\n";
 	$mail .= "From: ha\@cattech.org\n";
 	$mail .= "Subject: ".$action->{subject}."\n";
+	$mail .= "Date: $date\n";
 	$mail .= "\n";
+	if ($action->{message}) {
+		$mail .= $action->{message}."\n";
+	}
+		
 	$mail .= "\@ $date\n";
 	$mail .= "\n";
 	$mail .= "\n.\n";
