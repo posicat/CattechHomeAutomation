@@ -49,7 +49,7 @@ if (exists $input{event}) {
 	(undef,$event,$date) = getEventFromDB($id);
 }
 
-if ($packet->{source} eq 'eventHandler') {
+if ($packet->{source} eq 'eventHandler' || $packet->{source} eq 'AmazonEchoBridge' ) {
 	my @actions = findActions($packet->{data});
 	executeActions(\@actions,$packet->{data});
 	print "{\"status\":\"processed\"}\n";
@@ -164,14 +164,14 @@ sub findActions {
 		push @actions,$json;
 	}
 
-	if ($data->{source} eq "X10") {
+#	if ($data->{source} eq "X10" || ) {
 		my $actionData={};
 		my $sql = "SELECT event,action,triggers_id FROM triggers";
 
 		if ($data->{debug} eq "") {
 			$sql .=" WHERE earliestNext <= NOW()";
 		}
-		print "SQL : $sql<br>\n";
+#		print "SQL : $sql<br>\n";
 	        $::HA->{SH}->execute_raw_sql($actionData,$sql);
 
 		while ($::HA->{SH}->next_row($actionData)) {
@@ -189,7 +189,7 @@ sub findActions {
 				}
 			}
 		}
-	}		
+#	}		
 	#print "<hr>\n";
 
 	return @actions;
@@ -227,7 +227,7 @@ sub setTriggerEarliestNext {
 
 	if (defined $triggers->{frequency}) {
 		my $sql = "UPDATE triggers SET earliestNext =NOW() + INTERVAL ".$triggers->{frequency}." WHERE triggers_id=".$triggers_id;
-		print "SQL : $sql<br>\n";
+#		print "SQL : $sql<br>\n";
 	        $::HA->{SH}->execute_raw_sql(my $db,$sql);
 	}
 
@@ -239,7 +239,7 @@ sub loadReactions {
 	my $reactionData={};
 	my $reactions=join(',',@$list);
 	my $sql="SELECT action FROM reactions WHERE reactions_id in ($reactions)";
-	print "SQL : $sql<br>\n";
+#	print "SQL : $sql<br>\n";
         $::HA->{SH}->execute_raw_sql($reactionData,$sql);
 
 	while ($::HA->{SH}->next_row($reactionData)) {
@@ -280,18 +280,21 @@ sub executeActions {
 			}
 		}
 
-		if (lc $action->{reactions} eq "heyu") {
+		if (lc $action->{reaction} eq "heyu") {
 			$known=1;
 			my $cmd = "/usr/local/bin/heyu";
-			my $module = $data->{house}.$data->{unit};
-			if (lc $data->{action}=~m/(on|off)/) {
-				$cmd .= " turn $module $data->{action}";
+
+#			print Dumper $action;
+
+			my $module = $action->{house}.$action->{unit};
+			if (lc $action->{action}=~m/(on|off)/) {
+				$cmd .= " turn $module $action->{action}";
 			}
-			if (lc $data->{action}=~m/(dim|bright)/) {
-				$cmd .= " $data->{action} $module $data->{level}";
+			if (lc $action->{action}=~m/(dim|bright)/) {
+				$cmd .= " $action->{action} $module $action->{level}";
 			}
 
-			if ($data->{debug} eq "") {
+			if ($action->{debug} eq "") {
 				print `$cmd`;
 			}else{
 				print "CMD : $cmd<br>\n";
