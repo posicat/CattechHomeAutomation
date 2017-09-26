@@ -9,18 +9,21 @@ import communicationHub.NodeInterfaceString;
 
 public class HomeAutomationModeuleTestBase {
 
+	private static final String TESTCHANNEL = "testResult";
 	protected ChannelController controller;
 	protected NodeInterfaceString testInterface;
-	protected String testPacketSource="\"source\":\"TestResult\"";
+	protected String testPacketSource="\"source\":\""+TESTCHANNEL+"\"";
 
 	@Before
 	protected void setUp() throws Exception {
 		controller = new ChannelController(new Properties());
 		testInterface = new NodeInterfaceString(controller);
-		
-		testInterface.sendDataToController("{\"register\":[\"testResult\"]}");
+		registerChannel(TESTCHANNEL);
+	}
+
+	protected void registerChannel(String channel) {
+		testInterface.sendDataToController("{\"register\":[\""+channel+"\"],data:{\"testrunner\":\"true\"}}");
 		String result = waitforResult(1000*10);
-		System.out.println(result);
 	}
 	
 	protected void addTranslationToResolver(String nativeDevice, String commonDevice) {

@@ -7,10 +7,10 @@ public class HomeAutomationPacket {
 	private static final String PACKET_DATA = "data";
 	private static final String PACKET_SOURCE = "source";
 	private static final String PACKET_DESTINATION = "destination";
-	JSONObject jsonIn = null;
-	JSONObject jsonOut = null;
-	JSONObject jsonDataIn = null;
-	JSONObject jsonDataOut = null;
+	private JSONObject jsonIn = null;
+	private JSONObject jsonOut = null;
+	private JSONObject jsonDataIn = null;
+	private JSONObject jsonDataOut = null;
 	
 	public HomeAutomationPacket(String returnPacketSource,String packet) {
 		jsonIn= new JSONObject(packet);
@@ -51,8 +51,11 @@ public class HomeAutomationPacket {
 	}
 
 	public boolean hasReturnData() {
-		// TODO Auto-generated method stub
 		return jsonDataOut.length() > 0;
+	}
+
+	public void setDataOut(JSONObject newJson) {
+		jsonOut = newJson;
 	}
 	
 }
