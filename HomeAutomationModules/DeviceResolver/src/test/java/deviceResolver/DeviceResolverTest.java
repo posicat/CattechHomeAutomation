@@ -16,6 +16,8 @@ public class DeviceResolverTest extends HomeAutomationModeuleTestBase {
 	public void setUp() throws Exception {
 		super.setUp();
 		
+		testInterface.setFullTrace(true);
+		
 		deviceResolver = new DeviceResolver(controller);
 		new Thread(deviceResolver, "Testing DeviceResolver").start();
 				
@@ -23,6 +25,7 @@ public class DeviceResolverTest extends HomeAutomationModeuleTestBase {
 				"{\"source\":\"heyu\",\"house\":\"B\",\"unit\":\"9\"}",
 				"[\"upstairs\",\"posi's bedroom\",\"nightstand\",\"lamp\"]"
 		);
+		registerChannel("EventHandler");
 	}
 
 
@@ -33,7 +36,7 @@ public class DeviceResolverTest extends HomeAutomationModeuleTestBase {
 
 	@Test
 	public void test() {
-		
+
 		testInterface.sendDataToController("{\"destination\":[\"DeviceResolver\"],"+testPacketSource+","+
 		"\"data\":{\"resolution\":\"toCommon\",\"PostResolv\":\"EventHandler\",\"nativeDevice\":{\"source\":\"heyu\",\"house\":\"B\",\"unit\":\"9\"},\"action\":\"on\"}}");
 		

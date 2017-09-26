@@ -5,7 +5,8 @@ import java.util.ArrayList;
 // Mainly for testing this implements a string based node controller.
 
 public class NodeInterfaceString extends NodeInterface {
-
+    boolean fullTrace = false;
+    
 	private ArrayList<String> dataFromController;
 	public NodeInterfaceString(ChannelController controller) {
 		super(controller);
@@ -28,13 +29,20 @@ public class NodeInterfaceString extends NodeInterface {
 
 	@Override
 	public void sendDataToNode(String data) throws Exception {
+		if (fullTrace) {
+			System.out.println(">>>TO NODE>>>"+data);
+		}
 		dataFromController.add(data);
 	}
 	
 	
 	public String getDataFromController() {
 		if (dataFromController.size() > 0) {
-			return dataFromController.remove(0);
+			String data = dataFromController.remove(0);
+			if (fullTrace) {
+				System.out.println("<<<FROM CONTROL<<<"+data);
+			}
+			return data;
 		}else{
 			return null;
 		}
@@ -42,5 +50,13 @@ public class NodeInterfaceString extends NodeInterface {
 	
 	public void sendDataToController(String data) {
 		sendDataToController(data, this);
+	}
+
+	public boolean isFullTrace() {
+		return fullTrace;
+	}
+
+	public void setFullTrace(boolean fullTrace) {
+		this.fullTrace = fullTrace;
 	}
 }
