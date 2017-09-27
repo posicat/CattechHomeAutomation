@@ -7,9 +7,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import DeviceResolver.DeviceResolver;
-import moduleBase.HomeAutomationModeuleTestBase;
+import moduleBase.BaseTestForModules;
 
-public class DeviceResolverTest extends HomeAutomationModeuleTestBase {
+public class DeviceResolverTest extends BaseTestForModules {
 	DeviceResolver deviceResolver;
 	@Override
 	@Before
@@ -25,7 +25,7 @@ public class DeviceResolverTest extends HomeAutomationModeuleTestBase {
 				"{\"source\":\"heyu\",\"house\":\"B\",\"unit\":\"9\"}",
 				"[\"upstairs\",\"posi's bedroom\",\"nightstand\",\"lamp\"]"
 		);
-		registerChannel("EventHandler");
+		registerChannel(testInterface,"EventHandler");
 	}
 
 
@@ -40,7 +40,7 @@ public class DeviceResolverTest extends HomeAutomationModeuleTestBase {
 		testInterface.sendDataToController("{\"destination\":[\"DeviceResolver\"],"+testPacketSource+","+
 		"\"data\":{\"resolution\":\"toCommon\",\"PostResolv\":\"EventHandler\",\"nativeDevice\":{\"source\":\"heyu\",\"house\":\"B\",\"unit\":\"9\"},\"action\":\"on\"}}");
 		
-		String result = waitforResult(10000);
+		String result = waitforResult(testInterface,(long) 10000);
 		
 		System.out.println(result);
 		

@@ -29,7 +29,7 @@
 				<executions>
 					<execution>
 						<id>copy-dependencies</id>
-						<phase>package</phase>
+						<phase>test</phase>
 						<goals>
 							<goal>copy-dependencies</goal>
 						</goals>
@@ -62,11 +62,11 @@
 				<version>4.12</version>
 				<scope>test</scope>
 			</dependency>
-			<dependency>
-				<groupId>org.cattech.homeAutomation</groupId>
-				<artifactId>CommonLibraries</artifactId>
-				<version>0.0.1-SNAPSHOT</version>
-			</dependency>
 		</dependencies>
 	</dependencyManagement>
+	<modules>
+		<module>HomeAutomationModules</module>
+		<module>HomeAutomationHub</module>
+		<module>Deploy</module>
+	</modules>
 </project>

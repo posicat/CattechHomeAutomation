@@ -28,7 +28,7 @@ public class NodeInterfaceString extends NodeInterface {
 	}
 
 	@Override
-	public void sendDataToNode(String data) throws Exception {
+	synchronized public void sendDataToNode(String data) throws Exception {
 		if (fullTrace) {
 			System.out.println(">>>TO NODE>>>"+data);
 		}
@@ -36,7 +36,7 @@ public class NodeInterfaceString extends NodeInterface {
 	}
 	
 	
-	public String getDataFromController() {
+	synchronized public String getDataFromController() {
 		if (dataFromController.size() > 0) {
 			String data = dataFromController.remove(0);
 			if (fullTrace) {
@@ -48,7 +48,7 @@ public class NodeInterfaceString extends NodeInterface {
 		}
 	}
 	
-	public void sendDataToController(String data) {
+	synchronized public void sendDataToController(String data) {
 		sendDataToController(data, this);
 	}
 

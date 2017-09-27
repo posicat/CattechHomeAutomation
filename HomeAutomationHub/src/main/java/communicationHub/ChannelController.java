@@ -28,8 +28,8 @@ public class ChannelController {
 	public static final String					NODE_CHANNEL_CONTROLLER		= "ChannelController";
 	public static final String					NODE_SEND_TO_ALL_ADDRESS	= "all";
 
-	Hashtable<String, ArrayList<NodeInterface>>	channels					= new Hashtable<String, ArrayList<NodeInterface>>();
-	ArrayList<NodeInterface>					allNodes					= new ArrayList<NodeInterface>();
+	Hashtable<String, ArrayList<NodeInterface>>	masterChannelList					= new Hashtable<String, ArrayList<NodeInterface>>();
+	ArrayList<NodeInterface> masterNodeList					= new ArrayList<NodeInterface>();
 	Properties									props						= new Properties();
 
 	public Properties getProps() {
@@ -41,23 +41,23 @@ public class ChannelController {
 	}
 
 	public void addNodeToChannel(String channel, NodeInterface node) {
-		ArrayList<NodeInterface> nodes = channels.get(channel);
+		ArrayList<NodeInterface> nodes = masterChannelList.get(channel);
 		nodes = addNodeToList(nodes, node);
-		channels.put(channel, nodes);
+		masterChannelList.put(channel, nodes);
 	}
 
 	public void removeNodeFromChannel(String channel, NodeInterface node) {
-		ArrayList<NodeInterface> nodes = channels.get(channel);
+		ArrayList<NodeInterface> nodes = masterChannelList.get(channel);
 		removeNodeFromList(nodes, node);
-		channels.put(channel, nodes);
+		masterChannelList.put(channel, nodes);
 	}
 
 	public void addNode(NodeInterface node) {
-		addNodeToList(allNodes, node);
+		addNodeToList(masterNodeList, node);
 	}
 
 	public void removeNode(NodeInterface node) {
-		removeNodeFromList(allNodes, node);
+		removeNodeFromList(masterNodeList, node);
 	}
 
 	private ArrayList<NodeInterface> removeNodeFromList(ArrayList<NodeInterface> nodes, NodeInterface node) {
@@ -95,23 +95,25 @@ public class ChannelController {
 				JSONArray registerChannels = jsonIn.getJSONArray(NODE_REGISTER_CHANNELS);
 				for (int i = 0; i < registerChannels.length(); i++) {
 					addNodeToChannel(registerChannels.getString(i), fromNode);
+//					System.out.println("Registered "+registerChannels.getString(i)+" to "+fromNode);
 				}
 
 				jsonOut.put(NODE_STATUS_BLOCK, "registered");
 				jsonOut.put(NODE_DATA_SOURCE, NODE_CHANNEL_CONTROLLER);
+				jsonOut.put(NODE_DATA_CHANNEL, registerChannels);
 				jsonOut.put(NODE_NODE_NAME, fromNode.getNodeName());
 				fromNode.sendDataToNode(jsonOut.toString());
 			}
 
 			if (jsonIn.has(NODE_DATA_DESTINATION) && jsonIn.has(NODE_DATA_BLOCK)) {
-				JSONArray channels = jsonIn.getJSONArray(NODE_DATA_DESTINATION);
-				channels.put("all"); // Also send to channel all
+				JSONArray destinations = jsonIn.getJSONArray(NODE_DATA_DESTINATION);
+				destinations.put("all"); // Also send to channel all
 				JSONObject channelData = jsonIn.getJSONObject(NODE_DATA_BLOCK);
 				jsonOut.put(NODE_NODE_NAME, fromNode.getNodeName());
 				jsonOut.put(NODE_DATA_SOURCE, jsonIn.get(NODE_DATA_SOURCE));
 				jsonOut.put(NODE_DATA_BLOCK, channelData);
-				for (int i = 0; i < channels.length(); i++) {
-					String channel = channels.getString(i);
+				for (int i = 0; i < destinations.length(); i++) {
+					String channel = destinations.getString(i);
 					jsonOut.put(NODE_DATA_CHANNEL, channel);
 					sendToChannel(channel, jsonOut.toString());
 				}
@@ -124,6 +126,8 @@ public class ChannelController {
 			try {
 				JSONObject jsonOut = new JSONObject();
 				jsonOut.put(NODE_ERROR_MESSAGE, errors);
+				System.err.println("Error :"+errors);
+				System.err.println(data);
 				fromNode.sendDataToNode(jsonOut.toString());
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -136,7 +140,7 @@ public class ChannelController {
 		//		if (NODE_SEND_TO_ALL_ADDRESS.equals(channel)) {
 		//			nodes = allNodes;
 		//		} else {
-		nodes = channels.get(channel);
+		nodes = masterChannelList.get(channel);
 		//		}
 		if (nodes != null) {
 			for (NodeInterface node : nodes) {
@@ -144,7 +148,8 @@ public class ChannelController {
 			}
 		} else {
 			if (NODE_SEND_TO_ALL_ADDRESS != channel) {
-				System.out.println("No node registered for channel : " + channel);
+				System.err.println("No node registered for channel : " + channel);
+				System.err.println(data);
 			}
 		}
 	}
