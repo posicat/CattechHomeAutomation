@@ -21,7 +21,7 @@ public class BaseTestWithController {
 	}
 
 	protected String registerChannel(NodeInterfaceString inter, String channel) {
-		inter.sendDataToController("{\"register\":[\"" + channel + "\"],data:{\"testrunner\":\"true\"}}");
+		inter.sendDataToController("{\"register\":[\"" + channel + "\"],\"nodeName\":\"BaseTestWithController\",\"data\":{\"testrunner\":\"true\"}}");
 		return waitforResult(inter, 1000 * 10);
 	}
 

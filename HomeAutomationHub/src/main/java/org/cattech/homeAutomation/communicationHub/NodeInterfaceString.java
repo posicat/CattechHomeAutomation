@@ -7,7 +7,7 @@ import java.util.ArrayList;
 public class NodeInterfaceString extends NodeInterface {
     boolean fullTrace = false;
     
-	private ArrayList<String> dataFromController;
+	private volatile ArrayList<String> dataFromController;
 	public NodeInterfaceString(ChannelController controller) {
 		super(controller);
 		this.dataFromController = new ArrayList<String>();
@@ -30,7 +30,7 @@ public class NodeInterfaceString extends NodeInterface {
 	@Override
 	synchronized public void sendDataToNode(String data) throws Exception {
 		if (fullTrace) {
-			System.out.println(">>>TO NODE>>>"+data);
+			System.out.println("<<<FROM CONTROL<<<"+data);
 		}
 		dataFromController.add(data);
 	}
@@ -39,9 +39,6 @@ public class NodeInterfaceString extends NodeInterface {
 	synchronized public String getDataFromController() {
 		if (dataFromController.size() > 0) {
 			String data = dataFromController.remove(0);
-			if (fullTrace) {
-				System.out.println("<<<FROM CONTROL<<<"+data);
-			}
 			return data;
 		}else{
 			return null;
@@ -49,6 +46,9 @@ public class NodeInterfaceString extends NodeInterface {
 	}
 	
 	synchronized public void sendDataToController(String data) {
+		if (fullTrace) {
+			System.out.println(">>>TO CONTROL>>>"+data);
+		}
 		sendDataToController(data, this);
 	}
 

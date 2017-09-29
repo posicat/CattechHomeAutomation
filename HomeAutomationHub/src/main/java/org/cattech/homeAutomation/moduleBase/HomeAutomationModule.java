@@ -16,7 +16,7 @@ public abstract class HomeAutomationModule implements Runnable {
 		
 		this.hubInterface = new NodeInterfaceString(controller);
 //		System.out.println(getModuleChannelName());
-		hubInterface.sendDataToController("{\"register\":[\""+getModuleChannelName()+"\"]}");
+		hubInterface.sendDataToController("{\"register\":[\""+getModuleChannelName()+"\"],\"nodeName\":\""+getModuleChannelName()+"\"}");
 
 		String response = null;
 		while (null == response) {

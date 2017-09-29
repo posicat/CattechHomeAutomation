@@ -39,13 +39,18 @@
 			<groupId>org.cattech.homeAutomation</groupId>
 			<artifactId>HomeAutomationHub</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
-			<scope>compile</scope>
+			<scope>test</scope>
+			<type>test-jar</type>
 		</dependency>
 		<dependency>
 			<groupId>org.cattech.homeAutomation</groupId>
 			<artifactId>HomeAutomationHub</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.skyscreamer</groupId>
+			<artifactId>jsonassert</artifactId>
 		</dependency>
 	</dependencies>
 </project>

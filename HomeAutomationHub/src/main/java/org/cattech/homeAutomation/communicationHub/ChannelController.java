@@ -15,22 +15,22 @@ import org.json.JSONObject;
 public class ChannelController {
 
 	// Data packet field names
-	public static final String					NODE_DATA_SOURCE			= "source";
-	public static final String					NODE_DATA_DESTINATION		= "destination";
-	public static final String					NODE_DATA_BLOCK				= "data";
-	public static final String					NODE_REGISTER_CHANNELS		= "register";
-	public static final String					NODE_STATUS_BLOCK			= "status";
-	public static final String					NODE_ERROR_MESSAGE			= "error";
-	public static final String					NODE_NODE_NAME				= "nodeName";
-	private static final String					NODE_DATA_CHANNEL			= "channel";
+	public static final String NODE_DATA_SOURCE = "source";
+	public static final String NODE_DATA_DESTINATION = "destination";
+	public static final String NODE_DATA_BLOCK = "data";
+	public static final String NODE_REGISTER_CHANNELS = "register";
+	public static final String NODE_STATUS_BLOCK = "status";
+	public static final String NODE_ERROR_MESSAGE = "error";
+	public static final String NODE_NODE_NAME = "nodeName";
+	private static final String NODE_DATA_CHANNEL = "channel";
 
 	// Channel constants
-	public static final String					NODE_CHANNEL_CONTROLLER		= "ChannelController";
-	public static final String					NODE_SEND_TO_ALL_ADDRESS	= "all";
+	public static final String NODE_CHANNEL_CONTROLLER = "ChannelController";
+	public static final String NODE_SEND_TO_ALL_ADDRESS = "all";
 
-	Hashtable<String, ArrayList<NodeInterface>>	masterChannelList					= new Hashtable<String, ArrayList<NodeInterface>>();
-	ArrayList<NodeInterface> masterNodeList					= new ArrayList<NodeInterface>();
-	Properties									props						= new Properties();
+	Hashtable<String, ArrayList<NodeInterface>> masterChannelList = new Hashtable<String, ArrayList<NodeInterface>>();
+	ArrayList<NodeInterface> masterNodeList = new ArrayList<NodeInterface>();
+	Properties props = new Properties();
 
 	public Properties getProps() {
 		return props;
@@ -95,7 +95,8 @@ public class ChannelController {
 				JSONArray registerChannels = jsonIn.getJSONArray(NODE_REGISTER_CHANNELS);
 				for (int i = 0; i < registerChannels.length(); i++) {
 					addNodeToChannel(registerChannels.getString(i), fromNode);
-//					System.out.println("Registered "+registerChannels.getString(i)+" to "+fromNode);
+					// System.out.println("Registered "+registerChannels.getString(i)+" to
+					// "+fromNode);
 				}
 
 				jsonOut.put(NODE_STATUS_BLOCK, "registered");
@@ -126,7 +127,7 @@ public class ChannelController {
 			try {
 				JSONObject jsonOut = new JSONObject();
 				jsonOut.put(NODE_ERROR_MESSAGE, errors);
-				System.err.println("Error :"+errors);
+				System.err.println("Error :" + errors);
 				System.err.println(data);
 				fromNode.sendDataToNode(jsonOut.toString());
 			} catch (Exception e) {
@@ -137,11 +138,11 @@ public class ChannelController {
 
 	private void sendToChannel(String channel, String data) throws Exception {
 		ArrayList<NodeInterface> nodes;
-		//		if (NODE_SEND_TO_ALL_ADDRESS.equals(channel)) {
-		//			nodes = allNodes;
-		//		} else {
+		// if (NODE_SEND_TO_ALL_ADDRESS.equals(channel)) {
+		// nodes = allNodes;
+		// } else {
 		nodes = masterChannelList.get(channel);
-		//		}
+		// }
 		if (nodes != null) {
 			for (NodeInterface node : nodes) {
 				node.sendDataToNode(data);

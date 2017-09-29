@@ -42,6 +42,10 @@ public class HomeAutomationPacket {
 		return jsonDataOut;
 	}
 
+	public void setDataOut(JSONObject newJson) {
+		jsonDataOut = newJson;
+	}
+
 	public JSONObject getIn( ) {
 		return jsonIn;
 	}
@@ -54,8 +58,12 @@ public class HomeAutomationPacket {
 		return jsonDataOut.length() > 0;
 	}
 
-	public void setDataOut(JSONObject newJson) {
-		jsonOut = newJson;
+	public void addDestination(String channel) {
+		if (! jsonOut.has("destination")) {
+			jsonOut.put("destination",new JSONArray());
+		}
+		jsonOut.getJSONArray("destination").put(channel);
 	}
+
 	
 }
