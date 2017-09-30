@@ -1,5 +1,9 @@
 
 # Created by https://www.gitignore.io/api/eclipse
+HomeAutomationHub/bin/org/cattech/homeAutomation/communicationHub/bin
+target/*
+*.class
+*.prefs
 
 ### Eclipse ###
 
