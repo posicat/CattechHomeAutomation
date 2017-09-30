@@ -1,18 +1,13 @@
 package org.cattech.homeAutomation.deviceResolverTest;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import org.cattech.homeAutomation.deviceResolver.DeviceResolver;
 import org.cattech.homeAutomation.moduleBaseTest.BaseTestForModules;
-import org.json.JSONObject;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
-import org.skyscreamer.jsonassert.JSONCompare;
-import org.skyscreamer.jsonassert.JSONCompareMode;
-import org.skyscreamer.jsonassert.JSONCompareResult;
 
 public class DeviceResolverTest extends BaseTestForModules {
 	DeviceResolver deviceResolver;
@@ -55,7 +50,6 @@ public class DeviceResolverTest extends BaseTestForModules {
 		JSONAssert.assertEquals("{\"nodeName\":\"DeviceResolver\",\"data\":{\"action\":\"on\"," + "\"device\":"
 				+ commonDevMatches1 + "},\"channel\":\"testEventHandler\",\"source\":\"DeviceResolver\"}", result,
 				false);
-		System.out.println(result);
 	}
 
 	@Test
@@ -71,7 +65,6 @@ public class DeviceResolverTest extends BaseTestForModules {
 				"{\"nodeName\":\"DeviceResolver\",\"data\":{\"action\":\"on\"," + "\"nativeDevice\":"
 						+ nativeDevMatches1 + "},\"channel\":\"testEventHandler\",\"source\":\"DeviceResolver\"}",
 				result, false);
-		System.out.println(result);
 	}
 
 	@Test
@@ -91,24 +84,14 @@ public class DeviceResolverTest extends BaseTestForModules {
 		String result1 = waitforResult(testInterface, 10000);
 		String result2 = waitforResult(testInterface, 10000);
 
-		int m1 = assertMatchesOne(expected,result1);
-		int m2 = assertMatchesOne(expected,result2);
+		int m1 = assertResultIsInArray(expected,result1);
+		int m2 = assertResultIsInArray(expected,result2);
 		
 		assertTrue(m1!=-1);
 		assertTrue(m2!=-1);
 		
 		assertTrue(m1!=m2);
-		assertTrue(m1+m2==3);
-	}
-
-	private int assertMatchesOne(String[] expected, String result) {
-		for (int i = 0; i < expected.length; i++) {
-			JSONCompareResult res = JSONCompare.compareJSON(expected[1],result,JSONCompareMode.LENIENT);
-			if (res.passed()) {
-				return i;
-			}
-		}
-		return -1;
+		assertTrue(m1+m2==1);
 	}
 
 }

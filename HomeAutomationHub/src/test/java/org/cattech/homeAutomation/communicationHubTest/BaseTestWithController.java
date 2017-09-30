@@ -5,6 +5,9 @@ import java.util.Properties;
 import org.cattech.homeAutomation.communicationHub.ChannelController;
 import org.cattech.homeAutomation.communicationHub.NodeInterfaceString;
 import org.junit.Before;
+import org.skyscreamer.jsonassert.JSONCompare;
+import org.skyscreamer.jsonassert.JSONCompareMode;
+import org.skyscreamer.jsonassert.JSONCompareResult;
 
 public class BaseTestWithController {
 
@@ -35,6 +38,30 @@ public class BaseTestWithController {
 			} catch (InterruptedException e) {}
 		}
 		return result;
+	}
+
+	protected void addTranslationToResolver(String nativeDevice, String commonDevice) {
+		String message = 
+				"{\"destination\":[\"DeviceResolver\"],"+testPacketSource+",\"data\":{"+
+						"\"resolution\":\"addLookup\","+
+						"\"nativeDevice\":"+nativeDevice+","+
+						"\"commonDevice\":"+commonDevice+
+						"}}";
+		
+		testInterface.sendDataToController(message);
+		
+		String result = waitforResult(testInterface,1000*10);
+		System.out.println(result);
+	}
+
+	protected int assertResultIsInArray(String[] expected, String result) {
+		for (int i = 0; i < expected.length; i++) {
+			JSONCompareResult res = JSONCompare.compareJSON(expected[i],result,JSONCompareMode.LENIENT);
+			if (res.passed()) {
+				return i;
+			}
+		}
+		return -1;
 	}
 
 }
