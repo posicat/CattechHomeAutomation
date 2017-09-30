@@ -1,5 +1,4 @@
 HomeAutomationHub/bin/org/cattech/homeAutomation/communicationHub/bin
-
+target/*
 *.class
-
 *.prefs
