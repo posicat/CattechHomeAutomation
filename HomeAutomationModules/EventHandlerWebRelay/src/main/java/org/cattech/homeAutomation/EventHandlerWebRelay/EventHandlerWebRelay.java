@@ -8,7 +8,6 @@ import java.net.URL;
 import java.net.URLEncoder;
 
 import org.cattech.homeAutomation.communicationHub.ChannelController;
-import org.cattech.homeAutomation.configuration.homeAutomationConfiguration;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationModule;
 
 public class EventHandlerWebRelay extends HomeAutomationModule {

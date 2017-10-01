@@ -3,7 +3,6 @@ package org.cattech.homeAutomation.communicationHub;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.Properties;
 import java.util.UUID;
 
 import org.cattech.homeAutomation.configuration.homeAutomationConfiguration;

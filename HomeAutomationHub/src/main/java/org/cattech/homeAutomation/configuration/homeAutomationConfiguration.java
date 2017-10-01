@@ -77,7 +77,7 @@ public class homeAutomationConfiguration {
 	}
 	// ====================================================================================================
 
-	private void throwIfNotExistantDirectory(String dir) throws HomeAutomationConfigurationException {
+	private static void throwIfNotExistantDirectory(String dir) throws HomeAutomationConfigurationException {
 		File f = new File(dir);
 
 		if (!f.exists()) {

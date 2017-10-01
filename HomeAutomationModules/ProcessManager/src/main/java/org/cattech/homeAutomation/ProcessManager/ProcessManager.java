@@ -12,7 +12,7 @@ public class ProcessManager extends HomeAutomationModule {
 	
 	public ProcessManager(ChannelController controller) {
 			super(controller);
-			Properties props = controller.getProps();
+			Properties props = controller.getConfig().getProps();
 			
 			int count = 0;
 			while ( props.containsKey("StartProcess."+count)) {
