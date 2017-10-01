@@ -50,7 +50,7 @@
 					<archive>
 						<manifest>
 							<addClasspath>true</addClasspath>
-							<mainClass>communicationHub.Hub</mainClass>
+							<mainClass>org.cattech.homeAutomation.communicationHub</mainClass>
 							<classpathPrefix>lib/</classpathPrefix>
 						</manifest>
 					</archive>

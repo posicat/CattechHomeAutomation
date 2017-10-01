@@ -99,7 +99,7 @@ public class Hub {
 						System.err.println("	| Class we found was not found - should never happen");
 						e1.printStackTrace();
 					}
-					if (HomeAutomationModule.class.isAssignableFrom((Class<?>) clazz)) {
+					if (clazz!=null && HomeAutomationModule.class.isAssignableFrom((Class<?>) clazz)) {
 						System.out.println("	| " + ((Class<?>) clazz).getName()
 								+ " is a HomeAutomationModule, Loading : " + ((Class<?>) clazz).getName());
 						try {
@@ -111,7 +111,9 @@ public class Hub {
 							e1.printStackTrace();
 						}
 					} else {
-						System.err.println("	| " + ((Class<?>) clazz).getName() + " is not a HomeAutomationModule");
+						if (clazz != null) {
+							System.err.println("	| " + ((Class<?>) clazz).getName() + " is not a HomeAutomationModule");
+						}
 					}
 				}
 			} catch (IOException e2) {

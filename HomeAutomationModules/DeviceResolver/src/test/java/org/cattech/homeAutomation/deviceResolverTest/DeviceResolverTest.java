@@ -82,7 +82,7 @@ public class DeviceResolverTest extends BaseTestForModules {
 		};
 
 		String result1 = waitforResult(testInterface, 10000);
-		String result2 = waitforResult(testInterface, 10000);
+		String result2 = waitforResult(testInterface, 10000); 
 
 		int m1 = assertResultIsInArray(expected,result1);
 		int m2 = assertResultIsInArray(expected,result2);

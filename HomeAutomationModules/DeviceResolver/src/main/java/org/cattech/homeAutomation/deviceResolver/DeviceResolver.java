@@ -130,7 +130,7 @@ public class DeviceResolver extends HomeAutomationModule {
 		return resultDevices;
 	}
 
-	private boolean nativeKeysMatch(JSONObject mightMatch, JSONObject toMatch) {
+	private static boolean nativeKeysMatch(JSONObject mightMatch, JSONObject toMatch) {
 		int keysMatched = 0;
 		for (String key : toMatch.keySet()) {
 			if( mightMatch.has(key) && mightMatch.get(key).equals(toMatch.get(key)) ) {
@@ -140,7 +140,7 @@ public class DeviceResolver extends HomeAutomationModule {
 		return (keysMatched == toMatch.length());
 	}
 
-	private boolean commonDescriptorsMatch(JSONArray mightMatch, JSONArray toMatch) {
+	private static boolean commonDescriptorsMatch(JSONArray mightMatch, JSONArray toMatch) {
 		int keysMatched = 0;
 
 		for (Object entry : toMatch) {

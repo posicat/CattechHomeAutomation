@@ -39,8 +39,6 @@
 			<groupId>org.cattech.homeAutomation</groupId>
 			<artifactId>HomeAutomationHub</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
-			<scope>test</scope>
-			<type>test-jar</type>
 		</dependency>
 		<dependency>
 			<groupId>org.cattech.homeAutomation</groupId>

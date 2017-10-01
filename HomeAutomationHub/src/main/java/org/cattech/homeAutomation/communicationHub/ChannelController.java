@@ -14,7 +14,7 @@ import org.json.JSONObject;
 
 public class ChannelController {
 
-	// Data packet field names
+	// Data packet field names 
 	public static final String NODE_DATA_SOURCE = "source";
 	public static final String NODE_DATA_DESTINATION = "destination";
 	public static final String NODE_DATA_BLOCK = "data";
@@ -60,7 +60,7 @@ public class ChannelController {
 		removeNodeFromList(masterNodeList, node);
 	}
 
-	private ArrayList<NodeInterface> removeNodeFromList(ArrayList<NodeInterface> nodes, NodeInterface node) {
+	private static ArrayList<NodeInterface> removeNodeFromList(ArrayList<NodeInterface> nodes, NodeInterface node) {
 		if (nodes == null) {
 			nodes = new ArrayList<NodeInterface>();
 		}
@@ -68,7 +68,7 @@ public class ChannelController {
 		return nodes;
 	}
 
-	private ArrayList<NodeInterface> addNodeToList(ArrayList<NodeInterface> nodes, NodeInterface node) {
+	private static ArrayList<NodeInterface> addNodeToList(ArrayList<NodeInterface> nodes, NodeInterface node) {
 		if (nodes == null) {
 			nodes = new ArrayList<NodeInterface>();
 		}
