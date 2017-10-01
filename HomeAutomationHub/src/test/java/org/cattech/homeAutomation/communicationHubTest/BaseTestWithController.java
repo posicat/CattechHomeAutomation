@@ -1,9 +1,8 @@
 package org.cattech.homeAutomation.communicationHubTest;
 
-import java.util.Properties;
-
 import org.cattech.homeAutomation.communicationHub.ChannelController;
 import org.cattech.homeAutomation.communicationHub.NodeInterfaceString;
+import org.cattech.homeAutomation.configuration.homeAutomationConfiguration;
 import org.junit.Before;
 import org.skyscreamer.jsonassert.JSONCompare;
 import org.skyscreamer.jsonassert.JSONCompareMode;
@@ -18,7 +17,8 @@ public class BaseTestWithController {
 
 	@Before
 	protected void setUp() throws Exception {
-		controller = new ChannelController(new Properties());
+		controller = new ChannelController(new homeAutomationConfiguration());
+		
 		testInterface = new NodeInterfaceString(controller);
 		registerChannel(testInterface, TESTCHANNEL);
 	}

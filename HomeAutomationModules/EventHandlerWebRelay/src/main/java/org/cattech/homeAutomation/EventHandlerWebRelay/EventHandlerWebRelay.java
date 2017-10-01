@@ -8,6 +8,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 
 import org.cattech.homeAutomation.communicationHub.ChannelController;
+import org.cattech.homeAutomation.configuration.homeAutomationConfiguration;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationModule;
 
 public class EventHandlerWebRelay extends HomeAutomationModule {
@@ -15,7 +16,7 @@ public class EventHandlerWebRelay extends HomeAutomationModule {
 	public EventHandlerWebRelay(ChannelController controller) {
 			super(controller);
 			
-			final String baseUrl = controller.getProps().getProperty("baseUrl");
+			final String baseUrl = controller.getConfig().getProps().getProperty("baseUrl");
 			this.urlPrefix = baseUrl+"eventHandler.cgi";
 			log.info("Enabling webrelay to " + this.urlPrefix);
 		}

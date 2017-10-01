@@ -6,6 +6,7 @@ import java.util.Hashtable;
 import java.util.Properties;
 import java.util.UUID;
 
+import org.cattech.homeAutomation.configuration.homeAutomationConfiguration;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -30,14 +31,14 @@ public class ChannelController {
 
 	Hashtable<String, ArrayList<NodeInterface>> masterChannelList = new Hashtable<String, ArrayList<NodeInterface>>();
 	ArrayList<NodeInterface> masterNodeList = new ArrayList<NodeInterface>();
-	Properties props = new Properties();
+	homeAutomationConfiguration config;
 
-	public Properties getProps() {
-		return props;
+	public homeAutomationConfiguration getConfig() {
+		return config;
 	}
 
-	public ChannelController(Properties props2) throws IOException {
-		this.props = props2;
+	public ChannelController(homeAutomationConfiguration config) throws IOException {
+		this.config = config;
 	}
 
 	public void addNodeToChannel(String channel, NodeInterface node) {

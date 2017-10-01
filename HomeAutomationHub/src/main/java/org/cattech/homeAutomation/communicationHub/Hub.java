@@ -1,7 +1,6 @@
 package org.cattech.homeAutomation.communicationHub;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
@@ -9,32 +8,28 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Properties;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import org.cattech.homeAutomation.configuration.HomeAutomationConfigurationException;
+import org.cattech.homeAutomation.configuration.homeAutomationConfiguration;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationModule;
 
 public class Hub {
 
-	public static final String			HOMEAUTOMATION_HOME	= "HOMEAUTOMATION_HOME";
 	private static ChannelController	controller			= null;
-	private static Properties			props				= new Properties();
-
-	public static void main(String[] args) throws IOException {
-		loadConfiguration();
-		controller = new ChannelController(props);
+	private static homeAutomationConfiguration config;
+	
+	public static void main(String[] args) throws IOException, HomeAutomationConfigurationException {
+		config = new homeAutomationConfiguration();
+		config.initialize();
+		controller = new ChannelController(config);
 
 		NodeSocketConnectionManager server = new NodeSocketConnectionManager(10042, controller);
 		new Thread(server, "Socket Connection Manager").start();
-
-		String modulesFolder = System.getenv(HOMEAUTOMATION_HOME);
-		if (null == modulesFolder) {
-			modulesFolder = "./modules";
-		} else {
-			modulesFolder += "/modules/";
-		}
-		List<HomeAutomationModule> modules = loadModules(controller, modulesFolder);
+		
+		
+		List<HomeAutomationModule> modules = loadModules();
 
 		for (HomeAutomationModule mod : modules) {
 			new Thread(mod, "Module : " + mod.getModuleChannelName()).start();
@@ -53,9 +48,9 @@ public class Hub {
 	}
 
 	//================================================================================
-	private static List<HomeAutomationModule> loadModules(ChannelController controller, String modulesFolder) {
+	private static List<HomeAutomationModule> loadModules() {
 		List<HomeAutomationModule> modules = new ArrayList<HomeAutomationModule>();
-		File folder = new File(modulesFolder);
+		File folder = new File(config.getModulesFolder());
 		File[] listOfFiles = folder.listFiles((dir, name) -> name.endsWith(".jar"));
 
 		int total;
@@ -65,9 +60,9 @@ public class Hub {
 			total = listOfFiles.length;
 		}
 
-		System.out.println("| Loading " + total + " modules from " + modulesFolder);
+		System.out.println("| Loading " + total + " modules from " + config.getModulesFolder());
 		String classPath = System.getProperty("java.class.path");
-		classPath += ";./lib/*";
+		classPath += config.getLibFolder();
 		System.setProperty("java.class.path", classPath);
 		System.out.println("| Classpath : " + classPath);
 
@@ -123,35 +118,6 @@ public class Hub {
 		}
 		return modules;
 	}
-
-	//================================================================================
-	private static void loadConfiguration() throws IOException {
-		String homePath = getHomePath().replace("\\", "/");
-		FileInputStream input;
-		try {
-			input = new FileInputStream(homePath + "/etc/settings.conf");
-			props.load(input);
-		} catch (IOException e) {
-			throw new IOException("Could not find configuration file, please set " + HOMEAUTOMATION_HOME, e);
-		}
-	}
-
-	//================================================================================
-	private static String getHomePath() {
-		String home = System.getenv(HOMEAUTOMATION_HOME);
-
-		if (null == home) {
-			String os = System.getProperty("os.name");
-			if (os.matches(".*Windows.*")) {
-				home = "C:/homeAutomation/";
-			}
-			if (os.matches(".*Linux.*")) {
-				home = "/etc/homeAutomation/";
-			}
-		}
-		return home;
-	}
-	//================================================================================
 
 	//================================================================================
 	//================================================================================
