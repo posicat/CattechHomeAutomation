@@ -1,9 +1,49 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.cattech.homeAutomation</groupId>
-    <artifactId>HomeAutomationParent</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-  </parent>
-  <artifactId>Deploy</artifactId>
+<project xmlns="http:/maven.apache.org/POM/4.0.0" xmlns:xsi="http:/www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http:/maven.apache.org/POM/4.0.0 http:/maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.cattech.homeAutomation</groupId>
+		<artifactId>HomeAutomationParent</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+	<artifactId>Deploy</artifactId>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.7</version>
+				<executions>
+					<execution>
+						<id>copy-HomeAutomation-bin</id>
+						<phase>install</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<!-- <target> <echo message="${project.basedir}/../${homeAutomation.bin}"></echo> 
+								<copy todir="${project.basedir}/../${homeAutomation.bin}" flatten="true"> 
+								<fileset dir="${project.basedir}/../HomeAutomationHub/target/"> <include 
+								name="HomeAutomationHub.jar" /> </fileset> </copy> <copy todir="${project.basedir}/../${homeAutomation.lib}" 
+								flatten="true"> <fileset dir="${project.basedir}/../HomeAutomationHub/target/lib/"> 
+								<include name="*.jar" /> </fileset> </copy> </target> -->
+							<target>
+								<for param="directory">
+									<fileset dir="${project.basedir}/../HomeAutomationModules/" />
+									<sequential>
+										<local name="foo" />
+										<local name="bar" />  <!-- Properties that may change with each iteration -->
+										<echo message="${directory}"></echo>
+									</sequential>
+								</for>
+							</target>
+							<!-- <target> <copy todir="${project.basedir}/../${homeAutomation.modules}" 
+								flatten="true"> <fileset dir="${project.basedir}/../HomeAutomationModules/**/target/"> 
+								<include name="*.jar" /> </fileset> </copy> </target> -->
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>

@@ -2,12 +2,17 @@ package org.cattech.homeAutomation.communicationHub;
 
 import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
+
 // Mainly for testing this implements a string based node controller.
 
 public class NodeInterfaceString extends NodeInterface {
-    boolean fullTrace = false;
-    
-	private volatile ArrayList<String> dataFromController;
+	private Logger						log			= Logger.getLogger(this.getClass());
+
+	boolean								fullTrace	= false;
+
+	private volatile ArrayList<String>	dataFromController;
+
 	public NodeInterfaceString(ChannelController controller) {
 		super(controller);
 		this.dataFromController = new ArrayList<String>();
@@ -30,24 +35,23 @@ public class NodeInterfaceString extends NodeInterface {
 	@Override
 	synchronized public void sendDataToNode(String data) throws Exception {
 		if (fullTrace) {
-			System.out.println("<<<FROM CONTROL<<<"+data);
+			log.info("<<<FROM CONTROL<<<" + data);
 		}
 		dataFromController.add(data);
 	}
-	
-	
+
 	synchronized public String getDataFromController() {
 		if (dataFromController.size() > 0) {
 			String data = dataFromController.remove(0);
 			return data;
-		}else{
+		} else {
 			return null;
 		}
 	}
-	
+
 	synchronized public void sendDataToController(String data) {
 		if (fullTrace) {
-			System.out.println(">>>TO CONTROL>>>"+data);
+			log.info(">>>TO CONTROL>>>" + data);
 		}
 		sendDataToController(data, this);
 	}

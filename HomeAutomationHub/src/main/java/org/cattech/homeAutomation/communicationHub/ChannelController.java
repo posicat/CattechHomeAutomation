@@ -95,7 +95,7 @@ public class ChannelController {
 				JSONArray registerChannels = jsonIn.getJSONArray(NODE_REGISTER_CHANNELS);
 				for (int i = 0; i < registerChannels.length(); i++) {
 					addNodeToChannel(registerChannels.getString(i), fromNode);
-					// System.out.println("Registered "+registerChannels.getString(i)+" to
+					// log.info("Registered "+registerChannels.getString(i)+" to
 					// "+fromNode);
 				}
 

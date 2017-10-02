@@ -9,6 +9,11 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
 		<homeAutomationVersion>${project.version}</homeAutomationVersion>
+		<homeAutomation.parent>${project.build.directory}/..</homeAutomation.parent>
+		<homeAutomation.bin>bin/HomeAutomationHub/</homeAutomation.bin>
+		<homeAutomation.config>bin/HomeAutomationHub/etc/</homeAutomation.config>
+		<homeAutomation.modules>bin/HomeAutomationHub/modules/</homeAutomation.modules>
+		<homeAutomation.lib>bin/homeAutomationHub/lib/</homeAutomation.lib>
 	</properties>
 	<build>
 		<plugins>

@@ -8,7 +8,11 @@
 		<groupId>org.cattech.homeAutomation</groupId>
 		<artifactId>HomeAutomationModules</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
-	</parent>
+	</parent> 
+	<packaging>jar</packaging>
+ <build>
+   <finalName>EventHandlerWebRelay</finalName>
+ </build>
 	<dependencies>
 		<dependency>
 			<groupId>org.json</groupId>

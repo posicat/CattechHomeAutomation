@@ -4,8 +4,11 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class NodeSocketConnectionManager implements Runnable {
+import org.apache.log4j.Logger;
 
+public class NodeSocketConnectionManager implements Runnable {
+	private Logger log = Logger.getLogger(this.getClass());
+	
 	protected int serverPort;
 	protected ServerSocket serverSocket = null;
 	protected boolean isStopped = false;
@@ -29,14 +32,14 @@ public class NodeSocketConnectionManager implements Runnable {
 				clientSocket = this.serverSocket.accept();
 			} catch (IOException e) {
 				if (isStopped()) {
-					System.out.println("Server Stopped.");
+					log.info("Server Stopped.");
 					return;
 				}
 				throw new RuntimeException("Error accepting client connection", e);
 			}
 			new Thread(new NodeInterfaceSocket(clientSocket, controller),"Client "+clientSocket.getInetAddress()).start();
 		}
-		System.out.println("Server Stopped.");
+		log.info("Server Stopped.");
 		this.stop();
 	}
 

@@ -6,4 +6,8 @@ public class HomeAutomationConfigurationException extends Exception {
 	public HomeAutomationConfigurationException(String message) {
 			super(message);
 	}
+
+	public HomeAutomationConfigurationException(String message, Exception e) {
+		super(message,e);
+	}
 }

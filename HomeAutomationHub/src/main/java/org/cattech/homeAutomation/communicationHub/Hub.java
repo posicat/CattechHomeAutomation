@@ -11,12 +11,14 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import org.apache.log4j.Logger;
 import org.cattech.homeAutomation.configuration.HomeAutomationConfigurationException;
 import org.cattech.homeAutomation.configuration.homeAutomationConfiguration;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationModule;
 
 public class Hub {
-
+	private static Logger log = Logger.getLogger(Hub.class);
+	
 	private static ChannelController	controller			= null;
 	private static homeAutomationConfiguration config;
 	
@@ -35,7 +37,7 @@ public class Hub {
 			new Thread(mod, "Module : " + mod.getModuleChannelName()).start();
 		}
 
-		System.out.println("Listening...");
+		log.info("Listening...");
 		try {
 			while (!server.isStopped()) {
 				Thread.sleep(1000);
@@ -43,7 +45,7 @@ public class Hub {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		System.out.println("Stopping Server");
+		log.info("Stopping Server");
 		server.stop();
 	}
 
@@ -60,14 +62,14 @@ public class Hub {
 			total = listOfFiles.length;
 		}
 
-		System.out.println("| Loading " + total + " modules from " + config.getModulesFolder());
+		log.info("| Loading " + total + " modules from " + config.getModulesFolder());
 		String classPath = System.getProperty("java.class.path");
 		classPath += config.getLibFolder();
 		System.setProperty("java.class.path", classPath);
-		System.out.println("| Classpath : " + classPath);
+		log.info("| Classpath : " + classPath);
 
 		if (null != listOfFiles) for (File jarName : listOfFiles) {
-			System.out.println("| Found Jar : " + jarName);
+			log.info("| Found Jar : " + jarName);
 
 			JarFile jarFile;
 			URLClassLoader classLoader;
@@ -95,7 +97,7 @@ public class Hub {
 						e1.printStackTrace();
 					}
 					if (clazz!=null && HomeAutomationModule.class.isAssignableFrom((Class<?>) clazz)) {
-						System.out.println("	| " + ((Class<?>) clazz).getName()
+						log.info("	| " + ((Class<?>) clazz).getName()
 								+ " is a HomeAutomationModule, Loading : " + ((Class<?>) clazz).getName());
 						try {
 							clazz = ((Class<?>) clazz).getConstructor(ChannelController.class).newInstance(controller);
@@ -114,7 +116,7 @@ public class Hub {
 			} catch (IOException e2) {
 				System.err.println("	| Could not load jar : " + rawURL + "(" + e2.getMessage() + ")");
 			}
-			System.out.println(".\r\n\r\n");
+			log.info(".\r\n\r\n");
 		}
 		return modules;
 	}

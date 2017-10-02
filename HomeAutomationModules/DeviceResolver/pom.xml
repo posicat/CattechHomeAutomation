@@ -10,7 +10,10 @@
 		<artifactId>HomeAutomationModules</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-
+	<packaging>jar</packaging>
+ <build>
+   <finalName>DeviceResolver</finalName>
+ </build>
 	<dependencies>
 		<dependency>
 			<groupId>org.json</groupId>

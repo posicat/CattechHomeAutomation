@@ -15,7 +15,7 @@ public abstract class HomeAutomationModule implements Runnable {
 		log = Logger.getLogger( this.getClass().getSimpleName() );
 		
 		this.hubInterface = new NodeInterfaceString(controller);
-//		System.out.println(getModuleChannelName());
+//		log.info(getModuleChannelName());
 		hubInterface.sendDataToController("{\"register\":[\""+getModuleChannelName()+"\"],\"nodeName\":\""+getModuleChannelName()+"\"}");
 
 		String response = null;
@@ -23,7 +23,7 @@ public abstract class HomeAutomationModule implements Runnable {
 			response = hubInterface.getDataFromController();
 			sleepNoThrow(100);
 		}
-		//		System.out.println(response);
+		//		log.info(response);
 	}
 
 	public String getModuleChannelName() {

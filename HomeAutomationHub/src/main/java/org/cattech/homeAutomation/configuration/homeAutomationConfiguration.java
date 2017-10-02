@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
+
 public class homeAutomationConfiguration {
 
 	private static final String ENV_FOLDER_CONFIG = "HOMEAUTOMATION_CONFIG";
@@ -12,72 +14,57 @@ public class homeAutomationConfiguration {
 	private static final String ENV_FOLDER_LIBRARIES = "HOMEAUTOMATION_LIB";
 
 	private static Properties props = new Properties();
+	private Logger log = Logger.getLogger(this.getClass());
 
 	public homeAutomationConfiguration() {
 
 	}
 
 	public void initialize() throws HomeAutomationConfigurationException {
-		String os = System.getProperty("os.name");
-
-		// Home Directory Config
-		String home = System.getenv(ENV_FOLDER_CONFIG);
-		if (null == home) {
-			if (os.matches(".*Windows.*")) {
-				home = "C:/homeAutomation/";
-			}
-			if (os.matches(".*Linux.*")) {
-				home = "/etc/homeAutomation/";
-			}
+		try {
+			props.load(getClass().getResourceAsStream("/org/cattech/homeAutomation/HomeAutomation.properties"));
+		} catch (IOException|NullPointerException e) {
+			log.warn("Could not load jar-internal configuration",e);
 		}
+		
+		String home = overridePropsWithEnvironment("homeAutomation.home",ENV_FOLDER_CONFIG);
 		throwIfNotExistantDirectory(home);
-		props.setProperty("homeAutomation.home", home);
 
-		// Modules Directory Modules
-		String modules = System.getenv(ENV_FOLDER_MODULES);
-		if (null == modules) {
-			if (os.matches(".*Windows.*")) {
-				modules = "C:/homeAutomation/modules/";
-			}
-			if (os.matches(".*Linux.*")) {
-				modules = "/usr/local/bin/homeAutomation/modules/";
-			}
-		}
-		throwIfNotExistantDirectory(home);
-		props.setProperty("homeAutomation.modules", modules);
+		String modules = overridePropsWithEnvironment("homeAutomation.modules",ENV_FOLDER_MODULES);
+		throwIfNotExistantDirectory(modules);
 
-		// Libraries Directory Config
-		String libraries = System.getenv(ENV_FOLDER_LIBRARIES);
-		if (null == libraries) {
-			if (os.matches(".*Windows.*")) {
-				libraries = "C:/homeAutomation/lib/";
-			}
-			if (os.matches(".*Linux.*")) {
-				libraries = "/usr/local/bin/homeAutomation/lib/";
-			}
-		}
+		String libraries = overridePropsWithEnvironment("homeAutomation.lib",ENV_FOLDER_LIBRARIES);
 		throwIfNotExistantDirectory(libraries);
-		props.setProperty("homeAutomation.lib", libraries);
-
 	}
 
 	// ====================================================================================================
 	// Helper Methods
 	// ====================================================================================================
 
-	public void loadConfiguration() throws IOException {
+	private static String overridePropsWithEnvironment(String propName, String envName) {
+		if (null != System.getenv(envName)) {
+			props.setProperty(propName, System.getenv(envName));
+		}
+		return props.getProperty(propName);
+	}
+
+	public void loadConfiguration() throws HomeAutomationConfigurationException {
 		String configFolder = getConfigFolder().replace("\\", "/");
 		FileInputStream input;
 		try {
 			input = new FileInputStream(configFolder + "/settings.conf");
 			props.load(input);
 		} catch (IOException e) {
-			throw new IOException("Could not find configuration file, please set " + ENV_FOLDER_CONFIG, e);
+			throw new HomeAutomationConfigurationException("Could not find configuration file, please set " + ENV_FOLDER_CONFIG, e);
 		}
 	}
 	// ====================================================================================================
 
 	private static void throwIfNotExistantDirectory(String dir) throws HomeAutomationConfigurationException {
+		if (null==dir) {
+			throw (new HomeAutomationConfigurationException("Null folder name"));
+		}
+		
 		File f = new File(dir);
 
 		if (!f.exists()) {

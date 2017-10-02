@@ -4,11 +4,15 @@
 	<groupId>org.cattech.homeAutomation.HomeAutomationModules</groupId>
 	<artifactId>ProcessManager</artifactId>
 	<name>ProcessManager</name>
+	 <packaging>jar</packaging>
 	<parent>
 		<groupId>org.cattech.homeAutomation</groupId>
 		<artifactId>HomeAutomationModules</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
+ <build>
+   <finalName>ProcessManager</finalName>
+ </build>
 	<dependencies>
 		<dependency>
 			<groupId>org.json</groupId>
