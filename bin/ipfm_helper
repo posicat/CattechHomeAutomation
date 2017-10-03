@@ -103,4 +103,13 @@ sub alertNewDevice {
 sub tagNewDevice {
 	my ($device)=@_;
 	# Maybe tag it as found in the DB, maybe not...
+
+	my $netNames={};
+
+	$netNames->{name} = 'Found '.strftime('%F %R');
+	$netNames->{mac} = $device->{mac};
+	$netNames->{alert}=1;
+
+	$::HA->{SH}->addupdate_data($netNames,'networkNames',['mac']);
+
 }
