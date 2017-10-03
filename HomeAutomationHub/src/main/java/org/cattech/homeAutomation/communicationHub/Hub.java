@@ -24,10 +24,9 @@ public class Hub {
 	
 	public static void main(String[] args) throws IOException, HomeAutomationConfigurationException {
 		config = new homeAutomationConfiguration();
-		config.initialize();
 		controller = new ChannelController(config);
 
-		NodeSocketConnectionManager server = new NodeSocketConnectionManager(10042, controller);
+		NodeSocketConnectionManager server = new NodeSocketConnectionManager(config.getPort(), controller);
 		new Thread(server, "Socket Connection Manager").start();
 		
 		
@@ -62,14 +61,14 @@ public class Hub {
 			total = listOfFiles.length;
 		}
 
-		log.info("| Loading " + total + " modules from " + config.getModulesFolder());
+		log.info("Loading " + total + " modules from " + config.getModulesFolder());
 		String classPath = System.getProperty("java.class.path");
 		classPath += config.getLibFolder();
 		System.setProperty("java.class.path", classPath);
-		log.info("| Classpath : " + classPath);
+		log.info("Classpath : " + classPath);
 
 		if (null != listOfFiles) for (File jarName : listOfFiles) {
-			log.info("| Found Jar : " + jarName);
+			log.info("Found Jar : " + jarName);
 
 			JarFile jarFile;
 			URLClassLoader classLoader;
@@ -93,30 +92,28 @@ public class Hub {
 					try {
 						clazz = classLoader.loadClass(className);
 					} catch (ClassNotFoundException e1) {
-						System.err.println("	| Class we found was not found - should never happen");
+						log.error("Class we found was not found - should never happen");
 						e1.printStackTrace();
 					}
 					if (clazz!=null && HomeAutomationModule.class.isAssignableFrom((Class<?>) clazz)) {
-						log.info("	| " + ((Class<?>) clazz).getName()
-								+ " is a HomeAutomationModule, Loading : " + ((Class<?>) clazz).getName());
+						log.info("Module : "+((Class<?>) clazz).getName());
 						try {
 							clazz = ((Class<?>) clazz).getConstructor(ChannelController.class).newInstance(controller);
 							modules.add((HomeAutomationModule) clazz);
 						} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 								| InvocationTargetException | NoSuchMethodException | SecurityException e1) {
-							System.err.println("	| Could not create instance of " + clazz.getClass().getName());
+							log.error("Could not create instance of " + clazz.getClass().getName());
 							e1.printStackTrace();
 						}
 					} else {
 						if (clazz != null) {
-							System.err.println("	| " + ((Class<?>) clazz).getName() + " is not a HomeAutomationModule");
+							log.info("Library " + ((Class<?>) clazz).getName());
 						}
 					}
 				}
 			} catch (IOException e2) {
-				System.err.println("	| Could not load jar : " + rawURL + "(" + e2.getMessage() + ")");
+				log.error("Could not load jar : " + rawURL + "(" + e2.getMessage() + ")");
 			}
-			log.info(".\r\n\r\n");
 		}
 		return modules;
 	}

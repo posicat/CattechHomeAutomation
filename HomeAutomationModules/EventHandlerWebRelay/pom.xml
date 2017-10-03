@@ -8,11 +8,8 @@
 		<groupId>org.cattech.homeAutomation</groupId>
 		<artifactId>HomeAutomationModules</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
-	</parent> 
+	</parent>
 	<packaging>jar</packaging>
- <build>
-   <finalName>EventHandlerWebRelay</finalName>
- </build>
 	<dependencies>
 		<dependency>
 			<groupId>org.json</groupId>
@@ -21,17 +18,16 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
+						<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.cattech.homeAutomation</groupId>
 			<artifactId>HomeAutomationHub</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
 			<type>jar</type>
 		</dependency>
 		<dependency>
 			<groupId>org.cattech.homeAutomation</groupId>
 			<artifactId>HomeAutomationHub</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
 			<type>test-jar</type>
 		</dependency>
 	</dependencies>

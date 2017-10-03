@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.UUID;
 
+import org.apache.log4j.Logger;
 import org.cattech.homeAutomation.configuration.homeAutomationConfiguration;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -13,7 +14,8 @@ import org.json.JSONObject;
 //import org.json.JSONObject;
 
 public class ChannelController {
-
+	private Logger						log			= Logger.getLogger(this.getClass());
+	
 	// Data packet field names 
 	public static final String NODE_DATA_SOURCE = "source";
 	public static final String NODE_DATA_DESTINATION = "destination";
@@ -127,8 +129,8 @@ public class ChannelController {
 			try {
 				JSONObject jsonOut = new JSONObject();
 				jsonOut.put(NODE_ERROR_MESSAGE, errors);
-				System.err.println("Error :" + errors);
-				System.err.println(data);
+				log.error("Error :" + errors);
+				log.error(data);
 				fromNode.sendDataToNode(jsonOut.toString());
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -149,8 +151,8 @@ public class ChannelController {
 			}
 		} else {
 			if (NODE_SEND_TO_ALL_ADDRESS != channel) {
-				System.err.println("No node registered for channel : " + channel);
-				System.err.println(data);
+				log.error("No node registered for channel : " + channel);
+				log.error(data);
 			}
 		}
 	}

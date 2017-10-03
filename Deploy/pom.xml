@@ -7,39 +7,103 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>Deploy</artifactId>
+	<packaging>pom</packaging>
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<version>1.7</version>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.0.2</version>
 				<executions>
 					<execution>
-						<id>copy-HomeAutomation-bin</id>
+						<id>copy-homeAutomation-configuration</id>
 						<phase>install</phase>
 						<goals>
-							<goal>run</goal>
+							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
-							<!-- <target> <echo message="${project.basedir}/../${homeAutomation.bin}"></echo> 
-								<copy todir="${project.basedir}/../${homeAutomation.bin}" flatten="true"> 
-								<fileset dir="${project.basedir}/../HomeAutomationHub/target/"> <include 
-								name="HomeAutomationHub.jar" /> </fileset> </copy> <copy todir="${project.basedir}/../${homeAutomation.lib}" 
-								flatten="true"> <fileset dir="${project.basedir}/../HomeAutomationHub/target/lib/"> 
-								<include name="*.jar" /> </fileset> </copy> </target> -->
-							<target>
-								<for param="directory">
-									<fileset dir="${project.basedir}/../HomeAutomationModules/" />
-									<sequential>
-										<local name="foo" />
-										<local name="bar" />  <!-- Properties that may change with each iteration -->
-										<echo message="${directory}"></echo>
-									</sequential>
-								</for>
-							</target>
-							<!-- <target> <copy todir="${project.basedir}/../${homeAutomation.modules}" 
-								flatten="true"> <fileset dir="${project.basedir}/../HomeAutomationModules/**/target/"> 
-								<include name="*.jar" /> </fileset> </copy> </target> -->
+							<outputDirectory>${basedir}/target/</outputDirectory>
+							<resources>
+								<resource>
+									<directory>src/main/resources</directory>
+									<filtering>true</filtering>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-homeAutomation-hub</id>
+						<phase>install</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/target/</outputDirectory>
+							<resources>
+								<resource>
+									<directory>../HomeAutomationHub/target/</directory>
+									<includes>
+										<indlude>HomeAutomationHub.jar</indlude>
+									</includes>
+									<filtering>false</filtering>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-homeAutomation-hub-lib</id>
+						<phase>install</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/target/lib</outputDirectory>
+							<resources>
+								<resource>
+									<directory>../HomeAutomationHub/target/lib/</directory>
+									<includes>
+										<indlude>*.jar</indlude>
+									</includes>
+									<filtering>false</filtering>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-homeAutomation-modules</id>
+						<phase>install</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/target/modules</outputDirectory>
+							<resources>
+								<resource>
+									<directory>../HomeAutomationModules/target/</directory>
+									<includes>
+										<indlude>*.jar</indlude>
+									</includes>
+									<filtering>false</filtering>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-homeAutomation-modules-libs</id>
+						<phase>install</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/target/lib</outputDirectory>
+							<resources>
+								<resource>
+									<directory>../HomeAutomationModules/target/lib/</directory>
+									<includes>
+										<indlude>*.jar</indlude>
+									</includes>
+									<filtering>false</filtering>
+								</resource>
+							</resources>
 						</configuration>
 					</execution>
 				</executions>

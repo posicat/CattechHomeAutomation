@@ -58,6 +58,7 @@ public class NodeSocketConnectionManager implements Runnable {
 
 	private void openServerSocket() {
 		try {
+			log.info("Starting hub on port "+ this.serverPort);
 			this.serverSocket = new ServerSocket(this.serverPort);
 		} catch (IOException e) {
 			throw new RuntimeException("Cannot open port " + this.serverPort, e);

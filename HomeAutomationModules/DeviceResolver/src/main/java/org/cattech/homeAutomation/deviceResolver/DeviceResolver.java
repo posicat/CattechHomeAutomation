@@ -31,7 +31,7 @@ public class DeviceResolver extends HomeAutomationModule {
 	}
 
 	private void processMessage(String packet) {
-		log.fine("Message : "+packet);
+		log.info("Message : "+packet);
 
 		HomeAutomationPacket hap = new HomeAutomationPacket(this.getModuleChannelName(),packet);
 		

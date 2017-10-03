@@ -15,7 +15,7 @@ public class EventHandlerWebRelay extends HomeAutomationModule {
 	public EventHandlerWebRelay(ChannelController controller) {
 			super(controller);
 			
-			final String baseUrl = controller.getConfig().getProps().getProperty("baseUrl");
+			final String baseUrl = controller.getConfig().getBaseURL();
 			this.urlPrefix = baseUrl+"eventHandler.cgi";
 			log.info("Enabling webrelay to " + this.urlPrefix);
 		}
@@ -51,6 +51,11 @@ public class EventHandlerWebRelay extends HomeAutomationModule {
 				}
 			}
 		}
+	}
+	
+	@Override
+	public String getModuleChannelName() {
+		return "EventHandler";
 	}
 
 }

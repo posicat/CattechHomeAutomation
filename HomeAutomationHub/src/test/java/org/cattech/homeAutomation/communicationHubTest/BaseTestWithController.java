@@ -19,7 +19,7 @@ public class BaseTestWithController {
 
 	@Before
 	protected void setUp() throws Exception {
-		controller = new ChannelController(new homeAutomationConfiguration());
+		controller = new ChannelController(new homeAutomationConfiguration(false));
 		
 		testInterface = new NodeInterfaceString(controller);
 		registerChannel(testInterface, TESTCHANNEL);

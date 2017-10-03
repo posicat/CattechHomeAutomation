@@ -1,22 +1,22 @@
 package org.cattech.homeAutomation.moduleBase;
 
 import java.sql.Connection;
-import java.util.logging.Logger;
 
+import org.apache.log4j.Logger;
 import org.cattech.homeAutomation.communicationHub.ChannelController;
 import org.cattech.homeAutomation.communicationHub.NodeInterfaceString;
 
 public abstract class HomeAutomationModule implements Runnable {
-	protected NodeInterfaceString hubInterface;
-	protected boolean running=false;
-	protected Logger log = null;
+	protected Logger				log		= Logger.getLogger(this.getClass());
+	protected NodeInterfaceString	hubInterface;
+	protected boolean				running	= false;
 
 	protected HomeAutomationModule(ChannelController controller) {
-		log = Logger.getLogger( this.getClass().getSimpleName() );
-		
+		log.info("--- Initializing module, channels : "+getModuleChannelName()+" ---");
 		this.hubInterface = new NodeInterfaceString(controller);
-//		log.info(getModuleChannelName());
-		hubInterface.sendDataToController("{\"register\":[\""+getModuleChannelName()+"\"],\"nodeName\":\""+getModuleChannelName()+"\"}");
+		//		log.info(getModuleChannelName());
+		hubInterface.sendDataToController(
+				"{\"register\":[\"" + getModuleChannelName() + "\"],\"nodeName\":\"" + getModuleChannelName() + "\"}");
 
 		String response = null;
 		while (null == response) {

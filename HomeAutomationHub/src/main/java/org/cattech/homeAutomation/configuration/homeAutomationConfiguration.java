@@ -12,29 +12,40 @@ public class homeAutomationConfiguration {
 	private static final String ENV_FOLDER_CONFIG = "HOMEAUTOMATION_CONFIG";
 	private static final String ENV_FOLDER_MODULES = "HOMEAUTOMATION_MODULES";
 	private static final String ENV_FOLDER_LIBRARIES = "HOMEAUTOMATION_LIB";
+	private static final String ENV_FOLDER_HOME ="HOMEAUTOMATION_HOME";
 
 	private static Properties props = new Properties();
 	private Logger log = Logger.getLogger(this.getClass());
 
-	public homeAutomationConfiguration() {
-
+	public homeAutomationConfiguration() throws HomeAutomationConfigurationException {
+		initialize();
+	}
+	public homeAutomationConfiguration(boolean initialize) throws HomeAutomationConfigurationException {
+		if (initialize) {
+			initialize();
+		}
 	}
 
-	public void initialize() throws HomeAutomationConfigurationException {
+	private  void initialize() throws HomeAutomationConfigurationException {
 		try {
-			props.load(getClass().getResourceAsStream("/org/cattech/homeAutomation/HomeAutomation.properties"));
+			props.load(getClass().getClassLoader().getResourceAsStream("homeAutomation.properties"));
 		} catch (IOException|NullPointerException e) {
 			log.warn("Could not load jar-internal configuration",e);
 		}
 		
-		String home = overridePropsWithEnvironment("homeAutomation.home",ENV_FOLDER_CONFIG);
+		String home = overridePropsWithEnvironment("homeAutomation.config",ENV_FOLDER_HOME);
 		throwIfNotExistantDirectory(home);
+
+		String config = overridePropsWithEnvironment("homeAutomation.config",ENV_FOLDER_CONFIG);
+		throwIfNotExistantDirectory(config);
 
 		String modules = overridePropsWithEnvironment("homeAutomation.modules",ENV_FOLDER_MODULES);
 		throwIfNotExistantDirectory(modules);
 
 		String libraries = overridePropsWithEnvironment("homeAutomation.lib",ENV_FOLDER_LIBRARIES);
 		throwIfNotExistantDirectory(libraries);
+		
+		loadConfiguration();
 	}
 
 	// ====================================================================================================
@@ -48,14 +59,14 @@ public class homeAutomationConfiguration {
 		return props.getProperty(propName);
 	}
 
-	public void loadConfiguration() throws HomeAutomationConfigurationException {
-		String configFolder = getConfigFolder().replace("\\", "/");
+	private void loadConfiguration() throws HomeAutomationConfigurationException {
+		String configFolder = this.getConfigFolder().replace("\\", "/");
 		FileInputStream input;
 		try {
 			input = new FileInputStream(configFolder + "/settings.conf");
 			props.load(input);
 		} catch (IOException e) {
-			throw new HomeAutomationConfigurationException("Could not find configuration file, please set " + ENV_FOLDER_CONFIG, e);
+			log.error("Could not find configuration file, please set " + ENV_FOLDER_CONFIG, e);
 		}
 	}
 	// ====================================================================================================
@@ -93,6 +104,14 @@ public class homeAutomationConfiguration {
 
 	public String getLibFolder() {
 		return props.getProperty("homeAutomation.lib");
+	}
+
+	public int getPort() {
+		 return Integer.parseInt(props.getProperty("hub.port","10042"));
+	}
+
+	public String getBaseURL() {
+		return props.getProperty("baseUrl");
 	}
 
 	// ================================================================================
