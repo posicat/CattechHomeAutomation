@@ -140,7 +140,12 @@ sub displayAjaxGroupControls {
 		print "$menuCtl->{deviceName}\n";
 		print "</div>\n";
 
-		$scr .= "\$('#$id').load('dispatch.cgi?devName=".uri_escape($menuCtl->{deviceName})."&id=ctl_$menuCtl->{ctlID}');\n";
+		$scr .= "\$('#$id').load('dispatch.cgi?commonDevice=".
+			uri_escape($menuCtl->{commonDevice}).
+			"&id=ctl_$menuCtl->{ctlID}".
+			"&title=".uri_escape($menuCtl->{controlName}).
+			"&image=".uri_escape($menuCtl->{image}).
+		"');\n";
 	}
 	print "<script>\n$scr</script>";
 }

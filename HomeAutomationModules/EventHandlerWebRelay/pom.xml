@@ -9,5 +9,26 @@
 		<artifactId>HomeAutomationModules</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-
+	<packaging>jar</packaging>
+	<dependencies>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+						<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.cattech.homeAutomation</groupId>
+			<artifactId>HomeAutomationHub</artifactId>
+			<type>jar</type>
+		</dependency>
+		<dependency>
+			<groupId>org.cattech.homeAutomation</groupId>
+			<artifactId>HomeAutomationHub</artifactId>
+			<type>test-jar</type>
+		</dependency>
+	</dependencies>
 </project>
