@@ -11,7 +11,7 @@ function findPos(obj) {
 		do {
 			curleft += obj.offsetLeft;
 			curtop += obj.offsetTop;
-		} while (obj = obj.offsetParent);
+		} while (obj == obj.offsetParent);
 	}
 	return {x:curleft,y:curtop};
 }
@@ -31,7 +31,7 @@ function getStatusInABit(seconds,type) {
 }
 
 function getStatus(type) {
-	$.getJSON('./dispatch.cgi?data={}&type='+type+'&mode=status',function(data){updateStatus(data,type);})
+	$.getJSON('./dispatch.cgi?type='+type+'&mode=status',function(data){updateStatus(data,type);})
   .fail(function(jqXHR, textStatus, errorThrown) {
     console.log( "error "+textStatus );
   });
