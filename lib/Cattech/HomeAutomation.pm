@@ -80,8 +80,10 @@ sub getDataFromHub {
 sub _transmitDataToTCPHub {
 	my ($self,$data)=@_;
 	$self->_openTCPSocket();
-	print {$self->{_socket}} $data."\r\n";
-	print "Sent : $data<br>\n";
+	if ($::Gdebug) {
+		print {$self->{_socket}} $data."\r\n";
+		print "Sent : $data<br>\n";
+	}
 }
 #================================================================================
 sub _openTCPSocket {

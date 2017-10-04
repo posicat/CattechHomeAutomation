@@ -72,7 +72,7 @@ while (1==1) {
 		if ($foundNet->{$mac}->{known}) {
 			#Nothing, we know this device.
 		}else{
-			print "Found new Device! $mac\t$foundNet->{$mac}->{ip}\t$foundNet->{$mac}->{known}\n";
+			#print "Found new Device! $mac\t$foundNet->{$mac}->{ip}\t$foundNet->{$mac}->{known}\n";
 			alertNewDevice($foundNet->{$mac});
 			tagNewDevice($foundNet->{$mac});
 		}
@@ -97,19 +97,19 @@ sub alertNewDevice {
 		"message"=>"Device $device->{mac}/$device->{ip} is unknown",
 	};
 
-	$::HA->registerToHub('transient.ipfm_helper',[]);
-	$::HA->sendDataToHub(['eventHandler'],$data);
+	my $channel='transient.ipfm_helper';
+	$::HA->registerToHub($channel,[$channel]);
+	$::HA->sendDataToHub(['EventHandler'],$channel,$data);
 }
 sub tagNewDevice {
 	my ($device)=@_;
 	# Maybe tag it as found in the DB, maybe not...
 
 	my $netNames={};
-
-	$netNames->{name} = 'Found '.strftime('%F %R');
 	$netNames->{mac} = $device->{mac};
+
+	$::HA->{SH}->select_data($netNames,'networkNames',['mac']);
+	$netNames->{name} = 'Found '.strftime('%F %R',localtime);
 	$netNames->{alert}=1;
-
-	$::HA->{SH}->addupdate_data($netNames,'networkNames',['mac']);
-
+	$::HA->{SH}->addupdate_data($netNames,'networkNames');
 }
