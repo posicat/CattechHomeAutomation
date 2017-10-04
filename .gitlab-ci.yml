@@ -1,2 +1,6 @@
+before_script:
+  - source /etc/profile
+
 maven_build:
-  script: mvn test
+  script: mvn test 
+
