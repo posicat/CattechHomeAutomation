@@ -17,9 +17,8 @@ public class ProcessManager extends HomeAutomationModule {
 			int count = 0;
 			while ( props.containsKey("StartProcess."+count)) {
 				String command = props.getProperty("StartProcess."+count);
+				log.info("Starting process "+count+": "+command);
 				count++;
-
-				log.info("Starting process : "+command);
 				try {
 					subProcesses.add(new RestartableProcess(command));
 				} catch (IOException | RestartableProcessException e) {
@@ -34,12 +33,16 @@ public class ProcessManager extends HomeAutomationModule {
 		while (running) {
 			
 			for (RestartableProcess process : subProcesses) {
-					log.info("Process :" + process.getCommand() + "has exited.");
-
-					try {
-						process.restartProcess();
-					} catch (IOException | RestartableProcessException e) {
-						log.info("Process :"+process.getCommand() + " failed to restart");
+					if (process.isEnabled() && ! process.isAlive()){
+						log.info("Process : " + process.getCommand() + " has exited.");
+						log.info("Stderr : " + process.getStderr());
+						log.info("Stdout : " + process.getStdout());
+						try {
+							process.restartProcess();
+						} catch (IOException | RestartableProcessException e) {
+							log.info("Process : "+process.getCommand() + " failed to restart",e);
+							process.setEnabled(false);
+						}
 					}
 			}
 			
