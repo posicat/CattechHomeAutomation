@@ -55,9 +55,9 @@ if ( open(my $LOG,">>",$log) ) {
 }else{
 	print "Couldn't write to $log : $!\n";
 }	
-
-$::HA->registerToHub('transient.heyuhelper',[]);
-$::HA->sendDataToHub(['eventHandler'],$data);
+my $channel='transient.heyuhelper';
+$::HA->registerToHub($channel,[$channel]);
+$::HA->sendDataToHub(['EventHandler'],$channel,$data);
 
 my $example = <<EOB;
 2017-06-14 00:45:30 b9On 

@@ -52,10 +52,11 @@ sub registerToHub {
 }
 #================================================================================
 sub sendDataToHub {
-	my ($self,$channels,$data)=@_;
+	my ($self,$channels,$sourceChannel,$data)=@_;
 
 	my $packet = {
 		'destination' => $channels,
+		'source' => $sourceChannel,
 		'data' => $data,
 	};
 
