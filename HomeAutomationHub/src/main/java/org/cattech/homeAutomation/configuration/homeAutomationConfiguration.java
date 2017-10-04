@@ -63,8 +63,9 @@ public class homeAutomationConfiguration {
 		String configFolder = this.getConfigFolder().replace("\\", "/");
 		FileInputStream input;
 		try {
-			input = new FileInputStream(configFolder + "/settings.conf");
-			props.load(input);
+			String settings = configFolder + "/settings.conf";
+			log.info("Loading config from "+settings);
+			props.load(new FileInputStream(settings));
 		} catch (IOException e) {
 			log.error("Could not find configuration file, please set " + ENV_FOLDER_CONFIG, e);
 		}
