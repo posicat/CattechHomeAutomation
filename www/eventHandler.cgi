@@ -50,7 +50,9 @@ if (exists $input{event}) {
 }
 
 
-if ($packet->{source} eq 'eventHandler' || $packet->{source} eq 'AmazonEchoBridge' ) {
+print "Source : $packet->{source}\n";
+
+if ($packet->{channel} eq 'EventHandler' ) {
 	my @actions = findActions($packet->{data});
 	executeActions(\@actions,$packet->{data});
 	print "{\"status\":\"processed\"}\n";
