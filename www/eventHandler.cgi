@@ -49,40 +49,58 @@ if (exists $input{event}) {
 	(undef,$event,$date) = getEventFromDB($id);
 }
 
+
 if ($packet->{source} eq 'eventHandler' || $packet->{source} eq 'AmazonEchoBridge' ) {
 	my @actions = findActions($packet->{data});
 	executeActions(\@actions,$packet->{data});
 	print "{\"status\":\"processed\"}\n";
 }else{
+
 	print <<EOB;
 	<style>
 	body {
 		background-color:#AAA;
+		margin:0px;
 	}
 	.runningActions	{
+		position:relative;
+		right:0px;
 		margin:2em;
 		border:1px solid blue;
 		background-color:#FFF;
 	}
-	.halfpage {
-		width:49%;
-		float:right;
-		overflow-wrap: break-word;
+	.incoming {
+		background-color:#CCA;
+	}
+	.events {
+		font-size:90%;
+		max-height:15em;
+		overflow:auto;
+		border:5px outset #444;
+	}
+	.bottom {
+		bottom:0px;
+	}
+	.top {
+		top:0px;
 	}
 	.eventLine {
-		font-size:1vmin;
-		background-color:#CCC;
 		margin-top:5px;
-		display:inline-block;
+		border:1px solid black;
 	}
 	</style>
 EOB
+
+	if (! exists $input{event}) {
+		print "<div class=\"events incoming\">\n";
+		displayLastXEvents(50);
+		print "</div>\n";
+	}
+
 	my $eventLogID = $input{eventLogID};
-	print "<div class=\"halfpage\">\n<hr>";
 	if ($eventLogID ne "") {
 		(undef,$event,$date) = getEventFromDB($eventLogID);
 
-		print "<h2>Selected event : $eventLogID @ $date</h2>\n";
 
 		$packet = JSON->new->utf8->decode($event);
 		$packet->{data}->{debug}='console';
@@ -92,21 +110,20 @@ EOB
 			@actions = findActions($packet->{data});
 		}
 
-		print "<h3>Event : $event</h3>\n";
+		print "<br>\n";
+		print "<h2>Selected event : $eventLogID <span style=\"float:right\">$date</span></h2>\n";
+		print "<div class=\"events incoming\">\n";
+		print "<center>$event</center>\n";
+		print "</div>\n";
+		print "<br>\n";
 
 		print "Triggers [" . join(',',@actions) . "]<br>\n";
 
-		print "<h4>Simulating triggers</h4>\n";
+		print "Simulating triggers:</h4>\n";
 
 		executeActions(\@actions,$packet->{data});
 	}
-	print "</div>\n";
 
-	if (! exists $input{event}) {
-		print "<div class=\"halfpage\">\n";
-		displayLastXEvents(40);
-		print "</div>\n";
-	}
 }
 
 #================================================================================
@@ -147,7 +164,8 @@ sub displayLastXEvents {
         $::HA->{SH}->execute_raw_sql($eventData,"SELECT * FROM eventLog ORDER BY time DESC LIMIT $limit");
 
 	while ($::HA->{SH}->next_row($eventData)) {
-		print "<a class=\"eventLine\" href=\"?eventLogID=$eventData->{eventLog_id}\">$eventData->{event} \@ $eventData->{time}</a><br>\n";
+		print "<div class=\"eventLine\"><a href=\"?eventLogID=$eventData->{eventLog_id}\">$eventData->{event} "
+		."<span style=\"float:right\">$eventData->{time}</span></a></div>\n";
 	}
 }
 
@@ -155,9 +173,6 @@ sub displayLastXEvents {
 sub findActions {
 	my ($data)=@_;
 	my @actions;
-
-
-	print "Parsing : " . Dumper($data) . "<br>\n";
 
 	if (exists $data->{reaction}) {
 		my $json = encode_json($data);

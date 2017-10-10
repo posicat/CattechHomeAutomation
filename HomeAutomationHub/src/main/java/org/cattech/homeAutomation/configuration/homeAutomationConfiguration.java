@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
+import org.apache.log4j.RollingFileAppender;
+import org.apache.log4j.SimpleLayout;
 
 public class homeAutomationConfiguration {
 
@@ -13,6 +15,7 @@ public class homeAutomationConfiguration {
 	private static final String ENV_FOLDER_MODULES = "HOMEAUTOMATION_MODULES";
 	private static final String ENV_FOLDER_LIBRARIES = "HOMEAUTOMATION_LIB";
 	private static final String ENV_FOLDER_HOME ="HOMEAUTOMATION_HOME";
+	private static final String ENV_FOLDER_LOGS = "HOMEAUTOMATION_LOGS";
 
 	private static Properties props = new Properties();
 	private Logger log = Logger.getLogger(this.getClass());
@@ -33,17 +36,24 @@ public class homeAutomationConfiguration {
 			log.warn("Could not load jar-internal configuration",e);
 		}
 		
-		String home = overridePropsWithEnvironment("homeAutomation.config",ENV_FOLDER_HOME);
-		throwIfNotExistantDirectory(home);
-
-		String config = overridePropsWithEnvironment("homeAutomation.config",ENV_FOLDER_CONFIG);
-		throwIfNotExistantDirectory(config);
-
-		String modules = overridePropsWithEnvironment("homeAutomation.modules",ENV_FOLDER_MODULES);
-		throwIfNotExistantDirectory(modules);
-
-		String libraries = overridePropsWithEnvironment("homeAutomation.lib",ENV_FOLDER_LIBRARIES);
-		throwIfNotExistantDirectory(libraries);
+		overridePropsWithEnvironment("homeAutomation.config",ENV_FOLDER_HOME);
+		overridePropsWithEnvironment("homeAutomation.config",ENV_FOLDER_CONFIG);
+		overridePropsWithEnvironment("homeAutomation.modules",ENV_FOLDER_MODULES);
+		overridePropsWithEnvironment("homeAutomation.lib",ENV_FOLDER_LIBRARIES);
+		overridePropsWithEnvironment("homeAutomation.log",ENV_FOLDER_LOGS);
+		
+		SimpleLayout layout = new SimpleLayout();
+        
+        RollingFileAppender appender;
+        String logFile = getLogFolder()+"HomeautomationHub.log";
+		try {
+			appender = new RollingFileAppender(layout,logFile,true);
+			appender.setMaxFileSize("40MB");
+			Logger.getRootLogger().addAppender(appender);
+		} catch (IOException e) {
+			log.error("Could not divert log to file:"+logFile);
+			e.printStackTrace();
+		}
 		
 		loadConfiguration();
 	}
@@ -52,10 +62,11 @@ public class homeAutomationConfiguration {
 	// Helper Methods
 	// ====================================================================================================
 
-	private static String overridePropsWithEnvironment(String propName, String envName) {
+	private static String overridePropsWithEnvironment(String propName, String envName) throws HomeAutomationConfigurationException {
 		if (null != System.getenv(envName)) {
 			props.setProperty(propName, System.getenv(envName));
 		}
+		throwIfNotExistantDirectory(propName,props.getProperty(propName));
 		return props.getProperty(propName);
 	}
 
@@ -72,18 +83,18 @@ public class homeAutomationConfiguration {
 	}
 	// ====================================================================================================
 
-	private static void throwIfNotExistantDirectory(String dir) throws HomeAutomationConfigurationException {
+	private static void throwIfNotExistantDirectory(String prop, String dir) throws HomeAutomationConfigurationException {
 		if (null==dir) {
-			throw (new HomeAutomationConfigurationException("Null folder name"));
+			throw (new HomeAutomationConfigurationException(prop+" : Null folder name"));
 		}
 		
 		File f = new File(dir);
 
 		if (!f.exists()) {
-			throw (new HomeAutomationConfigurationException("Folder " + dir + " does not exist"));
+			throw (new HomeAutomationConfigurationException(prop+" : Folder " + dir + " does not exist"));
 		}
 		if (!f.isDirectory()) {
-			throw (new HomeAutomationConfigurationException("Path " + dir + " is not a folder"));
+			throw (new HomeAutomationConfigurationException(prop+" : Path " + dir + " is not a folder"));
 		}
 
 	}
@@ -105,6 +116,10 @@ public class homeAutomationConfiguration {
 
 	public String getLibFolder() {
 		return props.getProperty("homeAutomation.lib");
+	}
+
+	public String getLogFolder() {
+		return props.getProperty("homeAutomation.log");
 	}
 
 	public int getPort() {
