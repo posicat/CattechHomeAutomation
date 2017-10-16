@@ -33,10 +33,11 @@ sub new {
 sub connectToSQLDatabase {
 	my ($self)=@_;
 	$self->{SH}=Cattech::SQLHelper->new(
-		$self->{reg}->{db},
-		$self->{reg}->{username},
-		$self->{reg}->{password}
+		$self->{reg}->{'db.name'},
+		$self->{reg}->{'db.username'},
+		$self->{reg}->{'db.password'}
 	);
+
 }
 #================================================================================
 sub registerToHub {

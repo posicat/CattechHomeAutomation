@@ -1,6 +1,5 @@
 package org.cattech.homeAutomation.ProcessManager;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;

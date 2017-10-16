@@ -30,11 +30,11 @@ public class DeviceResolverTest extends BaseTestForModules {
 		addTranslationToResolver(nativeDevMatchA, commonDevMatches2);
 		addTranslationToResolver(nativeDevMatchB, commonDevMatches2);
 
-		registerChannel(testInterface, "testEventHandler");
+		registerChannel(testInterface,new String[]{"testEventHandler"});
 	}
 
 	@After
-	public void tearDown() throws Exception {
+	public void tearDown() {
 		deviceResolver.setRunning(false);
 	}
 

@@ -72,7 +72,6 @@ public class homeAutomationConfiguration {
 
 	private void loadConfiguration() throws HomeAutomationConfigurationException {
 		String configFolder = this.getConfigFolder().replace("\\", "/");
-		FileInputStream input;
 		try {
 			String settings = configFolder + "/settings.conf";
 			log.info("Loading config from "+settings);

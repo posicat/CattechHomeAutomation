@@ -1,4 +1,4 @@
-package org.cattech.homeAutomation.deviceResolver;
+package org.cattech.homeAutomation.moduleBase;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
