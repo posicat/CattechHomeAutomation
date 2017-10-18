@@ -5,9 +5,11 @@ hub.port=10042
 hub.host=<your server name/ip>
 
 #Database settings for HomeAutomation MySQL database
-db=HomeAutomation
-username=homeauto
-password=<add password here>
+db.host
+db.port
+db.database=HomeAutomation
+db.username=homeauto
+db.password=<add password here>
 
 # Path to the web-interface portion of the HomeAutomationHub
 baseUrl=http://www.example.com/homeAutomation

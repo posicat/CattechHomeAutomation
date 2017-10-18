@@ -1,5 +1,9 @@
 package org.cattech.homeAutomation.deviceResolver;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
@@ -16,7 +20,10 @@ public class DeviceResolver extends HomeAutomationModule {
 
 	public DeviceResolver(ChannelController controller) {
 			super(controller);
-		}
+			loadDeviceMappings();
+	}
+
+
 
 	@Override
 	public void run() {
@@ -155,7 +162,33 @@ public class DeviceResolver extends HomeAutomationModule {
 
 
 	private String addLookup(JSONObject nativeDevice, JSONArray commonDevice) {
+		log.info("\tAdding loopup " + nativeDevice.toString() + " <--> " + commonDevice.toString());
 		lookupTable.put(nativeDevice,commonDevice);
 		return "successful";
+	}
+	
+	public void loadDeviceMappings() {
+		Connection conn = getHomeAutomationDBConnection();
+		if(null==conn) {
+			log.error("Could not obtain connection to HomeAutomation database");
+			return;
+		}
+		
+		Statement stmt;
+		ResultSet rs;
+		try {
+			stmt = conn.createStatement();
+			String query = "SELECT commonDevice,nativeDevice FROM deviceMap" ;
+			rs = stmt.executeQuery(query) ;
+			while ( rs.next() ) {
+				JSONObject nativeDevice = new JSONObject(rs.getString("nativeDevice"));
+				JSONArray commonDevice = new JSONArray(rs.getString("commonDevice"));
+				addLookup(nativeDevice,commonDevice);
+			}
+		} catch (SQLException e) {
+			log.error("Error occured while loading device mappings from datbase",e);
+			e.printStackTrace();
+		}
+		 
 	}
 }
