@@ -1,13 +1,12 @@
-package org.cattech.homeAutomation.EventHandler;
+package org.cattech.homeAutomation.DeviceEventHandler;
 
 import org.cattech.homeAutomation.communicationHub.ChannelController;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationModule;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
 
-public class EventHandler extends HomeAutomationModule {
-	private String urlPrefix;
+public class DeviceEventHandler extends HomeAutomationModule {
 
-	public EventHandler(ChannelController controller) {
+	public DeviceEventHandler(ChannelController controller) {
 		super(controller);
 	}
 
@@ -25,10 +24,10 @@ public class EventHandler extends HomeAutomationModule {
 					} else {
 						if (hap.getDataIn().has("nativeDevice")) {
 							hap.setDataOut(hap.getDataIn());
+							hap.getDataOut().put("resolution", "toCommon");
 							log.info("Sending packet to have nativeDevice decoded.\n" + packet);
 							hap.getOut().remove("destination");
 							hap.getOut().put("destination",  new String[] {"DeviceResolver"});
-							hap.getOut().append("resolution", "toCommon");
 						} else {
 							hap.setDataOut(hap.getDataIn());
 							log.info("Sending packet directly to WebEventHandler.");
@@ -54,7 +53,7 @@ public class EventHandler extends HomeAutomationModule {
 
 	@Override
 	public String getModuleChannelName() {
-		return "EventHandler";
+		return "DeviceEventHandler";
 	}
 
 }

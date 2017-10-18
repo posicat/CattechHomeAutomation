@@ -1,0 +1,146 @@
+#!/usr/bin/perl
+BEGIN {
+        unshift @INC,'./lib';
+        unshift @INC,'/home/websites/lib';
+        unshift @INC,'/usr/local/homeAutomation/lib';
+}
+use strict;
+use POSIX; 
+use JSON;
+use LWP::UserAgent;
+use URI::Escape;
+use Cattech::HomeAutomation;
+use Data::Dumper;
+
+my $sensorNode=Cattech::SQLHelper->new('CattechSensorNode','sensors','4JdzYzea2pWrYusp');
+
+my $prodAuth={};
+my $comAuth={};
+
+loadNestAPIProductCodes();
+
+while (1) {
+	my $data = getDevices();
+
+	my $nestNode=300;
+	foreach my $dev (%$data) {
+		writeSensorData($data->{$dev},$nestNode++);
+	}
+	sleep(60*15); # 15 Minutes
+}
+
+#nestset() {
+#curl -L -X PUT "https://developer-api.nest.com/devices/thermostats/$YOUR_DEVICE_ID/target_temperature_f?auth=$YOUR_ACCESS_TOKEN$" -H "Content-Type: application/json" -d "$1"
+#nestget() {
+#curl -L https://developer-api.nest.com/devices/thermostats/$YOUR_DEVICE_ID/target_temperature_f\?auth\=$YOUR_ACCESS_TOKEN$
+#nestaway() {
+#curl -L -X PUT "https://developer-api.nest.com/structures/$YOUR_STRUCTURE_ID/away?auth=$YOUR_ACCESS_TOKEN$" -H "Content-Type: application/json" -d '"away"'
+#nesthome() {
+#curl -L -X PUT "https://developer-api.nest.com/structures/$YOUR_STRUCTURE_ID/away?auth=$YOUR_ACCESS_TOKEN$" -H "Content-Type: application/json" -d '"home"'
+
+
+#================================================================================
+sub getDevices() {
+	my $devices={};
+
+	my $deviceUrl="https://developer-api.nest.com/devices/thermostats?auth=".$comAuth->{access_token};
+
+	#print "deviceUrl:".$deviceUrl."\n";
+
+	my $ua = LWP::UserAgent->new;
+	my $result = $ua->get($deviceUrl);
+
+#	print "Result : ".$result->decoded_content."\n";
+
+	return decode_json($result->decoded_content);
+}
+#================================================================================
+sub loadNestAPIProductCodes() {
+	if (! loadJsonFile(\$prodAuth,"/etc/homeAutomation/nest_authentication.json")) {
+		die "Could not load authentication file : $!";
+	}
+#	print Dumper $prodAuth;
+
+	my $getAuth=0;
+
+	if ( -e "./authenticationCache.json" ) { 
+		if (! loadJsonFile(\$comAuth,"./authenticationCache.json")) {
+			die "Could not load cached data : $!"
+		}
+		##Check Expiration
+	}else{
+		$getAuth=1;
+	}
+
+	if ($getAuth) {
+		my $authUrl = "https://api.home.nest.com/oauth2/access_token?"
+			."client_id=$prodAuth->{product_id}"
+			."&code=$prodAuth->{pin_code}"
+			."&client_secret=$prodAuth->{product_secret}"
+			."&grant_type=authorization_code";
+		#"https://api.home.nest.com/oauth2/access_token?
+			#client_id=%YOUR_PRODUCT_ID%
+			#&amp;code=%YOUR_PIN_CODE%
+			#&amp;#client_secret=%YOUR_PRODUCT_SECRET%
+			#&amp;grant_type=authorization_code"
+#		print "authUrl : $authUrl\n";
+
+		my $ua = LWP::UserAgent->new;
+		my $result = $ua->post($authUrl);
+
+#		print "Result : ".$result->decoded_content."\n";
+
+		if (open (my $OUT,">", "./authenticationCache.json") ) {
+			print $OUT $result->decoded_content;
+			close $OUT;
+		}
+		$comAuth=decode_json($result->decoded_content);
+	}
+}
+#================================================================================
+sub loadJsonFile {
+	local $/=undef;
+	my ($hash,$fileName)=@_;
+	$$hash={};
+	my $Jdata;
+	if ( open(my $IN,"<",$fileName) ) {
+		$Jdata = <$IN>;
+	}
+
+	#print "Jdata : ".$Jdata."\n";
+
+	$$hash=decode_json($Jdata);
+}
+#================================================================================
+sub writeSensorData { 
+	my ($data,$node)=@_;
+
+	my $sensors = {};
+
+	$sensors->{ambient_temperature_c}='temp,1';
+	$sensors->{humidity}='humid,2';
+
+	foreach my $k (keys %$sensors) {
+
+		my ($name,$subNode)=split(',',$sensors->{$k});
+
+		my $sensor_data={
+			'node'=>$node,
+			'name'=>$name,
+			'value'=>$data->{$k},
+        	        'subNode'=>int($subNode),
+		};
+
+#		print Dumper $sensor_data;
+
+		if (defined $sensor_data->{value} ) {
+			$sensorNode->addupdate_data($sensor_data,'sensorData');
+		}
+	}
+}
+#================================================================================
+#================================================================================
+
+#$::HA->registerToHub('transient.heyuhelper',[]);
+#$::HA->sendDataToHub(['eventHandler,temperature'],$data);
+

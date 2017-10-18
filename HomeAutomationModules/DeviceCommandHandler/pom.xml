@@ -5,5 +5,11 @@
     <artifactId>HomeAutomationModules</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
-  <artifactId>EventHandler</artifactId>
+  <artifactId>CommandHandler</artifactId>
+  <dependencies>
+  	<dependency>
+  		<groupId>junit</groupId>
+  		<artifactId>junit</artifactId>
+  	</dependency>
+  </dependencies>
 </project>
