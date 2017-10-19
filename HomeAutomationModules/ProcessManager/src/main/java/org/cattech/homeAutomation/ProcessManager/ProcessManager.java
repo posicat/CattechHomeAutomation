@@ -19,7 +19,7 @@ public class ProcessManager extends HomeAutomationModule {
 			String command = props.getProperty("StartProcess." + count);
 			log.info("Starting process " + count + ": " + command);
 			count++;
-			String logFile = controller.getConfig().getLogFolder() + "process" + count + ".out";
+			String logFile = controller.getConfig().getLogFolder() + "/process" + count + ".out";
 			try {
 				subProcesses.add(new RestartableProcess(command, logFile));
 			} catch (IOException | RestartableProcessException e) {

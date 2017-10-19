@@ -131,24 +131,29 @@ public class DeviceResolver extends HomeAutomationModule {
 		
 		for (JSONObject nDev : lookupTable.keySet()) {
 			JSONArray cDev = lookupTable.get(nDev);
-			if(nativeKeysMatch(nDev,nativeDevice)){
+			if(nativeKeysMatch(nativeDevice,nDev)){
 				resultDevices.add(cDev);
 			}
 		}
 		return resultDevices;
 	}
 
-	private static boolean nativeKeysMatch(JSONObject mightMatch, JSONObject toMatch) {
+	private boolean nativeKeysMatch(JSONObject mightMatch, JSONObject toMatch) {
 		int keysMatched = 0;
 		for (String key : toMatch.keySet()) {
-			if( mightMatch.has(key) && mightMatch.get(key).equals(toMatch.get(key)) ) {
+			String mm = mightMatch.getString(key).toUpperCase();
+			String tm = toMatch.getString(key).toUpperCase();
+			if( mightMatch.has(key) && mm.equals(tm) ) {
 				keysMatched++;
+			}else {
+//				log.debug("Didn't match : "+mm+"::"+tm);
 			}
 		}
+//		log.debug("Matching " + mightMatch + " <to> " + toMatch + "["+keysMatched+"/"+toMatch.length()+"]");
 		return (keysMatched == toMatch.length());
 	}
 
-	private static boolean commonDescriptorsMatch(JSONArray mightMatch, JSONArray toMatch) {
+	private boolean commonDescriptorsMatch(JSONArray mightMatch, JSONArray toMatch) {
 		int keysMatched = 0;
 
 		for (Object entry : toMatch) {
@@ -157,6 +162,7 @@ public class DeviceResolver extends HomeAutomationModule {
 				keysMatched++;
 			}
 		}
+//		log.debug("Matching " + mightMatch + " <to> " + toMatch + "["+keysMatched+"/"+toMatch.length()+"]");
 		return (keysMatched == toMatch.length());
 	}
 

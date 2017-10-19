@@ -25,6 +25,7 @@ public class DeviceEventHandler extends HomeAutomationModule {
 						if (hap.getDataIn().has("nativeDevice")) {
 							hap.setDataOut(hap.getDataIn());
 							hap.getDataOut().put("resolution", "toCommon");
+							hap.getDataOut().put("postResolv", "WebEventHandler");
 							log.info("Sending packet to have nativeDevice decoded.\n" + packet);
 							hap.getOut().remove("destination");
 							hap.getOut().put("destination",  new String[] {"DeviceResolver"});

@@ -28,7 +28,7 @@ public class BaseTestWithController {
 	}
 	
     @After
-	public void tearDown() {
+	public void tearDown() throws Exception {
 		
 	}
 

@@ -3,7 +3,7 @@ use strict;
 BEGIN { 
 	unshift @INC,'./lib';
 	unshift @INC,'/home/websites/lib';
-	unshift @INC,'/usr/local/homeAutomation/lib';
+	unshift @INC,'/usr/local/homeAutomation/bin/lib';
 }
 use File::Copy;
 use URI::Escape;
@@ -12,6 +12,7 @@ use Cattech::WatchCat;
 use Cattech::HomeAutomation;
 use JSON;
 use Data::Dumper;
+use Data::Compare;
 require "cgi-lib.pm";
 
 $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
@@ -50,7 +51,7 @@ if (exists $input{event}) {
 }
 
 
-print "Source : $packet->{source}\n";
+print "Source XXX: $packet->{source}\n";
 
 if ($packet->{channel} eq 'EventHandler' ) {
 	my @actions = findActions($packet->{data});
@@ -176,38 +177,43 @@ sub findActions {
 	my ($data)=@_;
 	my @actions;
 
+#	print "Data : $data<br>\n";
+
 	if (exists $data->{reaction}) {
 		my $json = encode_json($data);
 		push @actions,$json;
 	}
 
-#	if ($data->{source} eq "X10" || ) {
-		my $actionData={};
-		my $sql = "SELECT event,action,triggers_id FROM triggers";
+	my $actionData={};
+	my $sql = "SELECT event,action,triggers_id FROM triggers";
 
-		if ($data->{debug} eq "") {
-			$sql .=" WHERE earliestNext <= NOW()";
+	if ($data->{debug} eq "") {
+		$sql .=" WHERE earliestNext <= NOW()";
+	}
+#	print "SQL : $sql<br>\n";
+        $::HA->{SH}->execute_raw_sql($actionData,$sql);
+
+	while ($::HA->{SH}->next_row($actionData)) {
+		my $triggerHash = decode_json($actionData->{event});
+
+		if (exists $data->{debug}) {
+			$triggerHash->{debug}=$data->{debug};
 		}
-#		print "SQL : $sql<br>\n";
-	        $::HA->{SH}->execute_raw_sql($actionData,$sql);
 
-		while ($::HA->{SH}->next_row($actionData)) {
-			my $triggerHash = decode_json($actionData->{event});
+#		print "<hr>\n";
+#		print "R :".Dumper($actionData)."<br><br>\n";
+#		print "ED:".Dumper($data)."<br>\n";
+#		print "T :".Dumper($triggerHash)."<br>\n";
 
-#			print "R :".Dumper($actionData)."<br>\n";
-#			print "ED:".Dumper($data)."<br>\n";
-#			print "T :".Dumper($triggerHash)."<br>\n";
-
-			if (matchTrigger($data,$triggerHash)) {
-				push @actions,$actionData->{action};
-#				print "ATI:$actionData->{triggers_id}<br>\n";
-				if ($data->{debug} eq "") {
-					setTriggerEarliestNext($actionData->{triggers_id});
-				}
+		if (matchTrigger($data,$triggerHash)) {
+			push @actions,$actionData->{action};
+#			print "ATI:$actionData->{triggers_id}<br>\n";
+			if ($data->{debug} eq "") {
+				setTriggerEarliestNext($actionData->{triggers_id});
 			}
 		}
-#	}		
-	#print "<hr>\n";
+	}
+#	print "<hr>\n";
 
 	return @actions;
 }
@@ -217,15 +223,20 @@ sub matchTrigger {
 	my ($eh,$th)=@_;
 	my $match=1;
 
+	my $c = Data::Compare->new($eh, $th)->Cmp;
+#	print "C :" . $c . "<br>\n";
+
+	return $c;
+		
 	foreach my $key (keys %$th) {
-#		print "TH[$key] $th->{$key} =~m/ $eh->{$key} /<br>\n";
+		print "TH[$key] $th->{$key} =~m/ $eh->{$key} /<br>\n";
 
 		if (! ($eh->{$key} =~ m/$th->{$key}/)) {
-#			print "No regex match<br>\n";
+			print "No regex match<br>\n";
 			$match=0;
 		}
 		if (! exists $eh->{$key}) {
-#			print "No key $key<br>\n";
+			print "No key $key<br>\n";
 			$match=0;
 		}
 	}

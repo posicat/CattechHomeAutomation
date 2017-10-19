@@ -47,13 +47,13 @@ public class RestartableProcess {
 
 	public void handleOutputLogging() {
 		try {
-			Files.write(Paths.get(log),getStderr().getBytes(), StandardOpenOption.APPEND);
+			Files.write(Paths.get(log),getStderr().getBytes());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		try {
-			Files.write(Paths.get(log),getStdout().getBytes(), StandardOpenOption.APPEND);
+			Files.write(Paths.get(log),getStdout().getBytes());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

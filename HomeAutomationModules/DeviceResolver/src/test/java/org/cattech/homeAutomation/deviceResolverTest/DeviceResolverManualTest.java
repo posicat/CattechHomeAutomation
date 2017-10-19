@@ -5,10 +5,10 @@ import org.cattech.homeAutomation.deviceResolver.DeviceResolver;
 import org.cattech.homeAutomation.moduleBaseTest.BaseTestForModules;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
 
 public class DeviceResolverManualTest extends BaseTestForModules {
 	DeviceResolver deviceResolver;
+	
 	@Override
 	@Before
 	public void setUp() throws Exception {
@@ -17,7 +17,7 @@ public class DeviceResolverManualTest extends BaseTestForModules {
 		deviceResolver = new DeviceResolver(controller);
 		new Thread(deviceResolver, "Testing DeviceResolver").start();
 
-		registerChannel(testInterface, "testEventHandler");
+		registerChannel(testInterface, new String[] {"testEventHandler"});
 	}
 
 	@After
@@ -25,7 +25,7 @@ public class DeviceResolverManualTest extends BaseTestForModules {
 		deviceResolver.setRunning(false);
 	}
 
-	@Test
+//	@Test
 	public void testCanTalkToLocalMySQL() throws HomeAutomationConfigurationException {
 		controller.getConfig().getProps().setProperty("homeAutomation.config","d:/HomeAutomationHub/etc/");
 		controller.getConfig().loadConfiguration();

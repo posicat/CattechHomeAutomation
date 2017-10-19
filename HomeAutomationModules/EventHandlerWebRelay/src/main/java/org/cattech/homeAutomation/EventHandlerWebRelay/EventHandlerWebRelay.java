@@ -55,7 +55,7 @@ public class EventHandlerWebRelay extends HomeAutomationModule {
 	
 	@Override
 	public String getModuleChannelName() {
-		return "EventHandlerWebRelay";
+		return "WebEventHandler";
 	}
 
 }

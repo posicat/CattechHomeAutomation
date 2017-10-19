@@ -5,7 +5,7 @@
     <artifactId>HomeAutomationModules</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
-  <artifactId>EventHandler</artifactId>
+  <artifactId>DeviceEventHandler</artifactId>
   <dependencies>
   	<dependency>
   		<groupId>junit</groupId>

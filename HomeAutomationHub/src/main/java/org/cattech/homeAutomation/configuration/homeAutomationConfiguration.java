@@ -138,10 +138,11 @@ public class homeAutomationConfiguration {
 	public String getDBURL() {
 		 String url = "jdbc:mysql://"
 				+ props.getProperty("db.host")
-		 		+ "/"+props.getProperty("db.database") + "?"
+		 		+ "/"+props.getProperty("db.name") + "?"
 		 		+ "useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC"
 				+ "&user="+props.getProperty("db.username")
 				+ "&password="+props.getProperty("db.password");
+//		 log.info(url);
 		 return url;
 	}
 

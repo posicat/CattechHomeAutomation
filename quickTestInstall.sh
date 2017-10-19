@@ -1,4 +1,4 @@
-mvn clean install
+#mvn clean install
 
 # Deploy the web code
 cp -v  	www/*				/home/homeAutomation/public_html/

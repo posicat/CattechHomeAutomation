@@ -21,7 +21,7 @@ public class DeviceCommandHandlerTest extends BaseTestForModules {
 
 	@Override
 	@After
-	public void tearDown() {
+	public void tearDown() throws Exception {
 		super.tearDown();
 		deviceCommandHandler.setRunning(false);
 	}

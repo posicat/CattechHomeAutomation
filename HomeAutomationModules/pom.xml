@@ -14,8 +14,8 @@
 		<module>DeviceResolver</module>
 		<module>ProcessManager</module>
 		<module>EventHandlerWebRelay</module>
-		<module>EventHandler</module>
-		<module>CommandHandler</module>
+		<module>DeviceEventHandler</module>
+		<module>DeviceCommandHandler</module>
 	</modules>
 	<build>
 		<plugins>
