@@ -38,7 +38,6 @@ $::HA=Cattech::HomeAutomation->new();
 $::HA->connectToSQLDatabase();
 
 print "Content-type:text/html\n\n";
-print "<body>\n";
 
 #$input{eventLogID}=2448;
 
@@ -46,14 +45,13 @@ my $packet={};
 if (exists $input{event}) {
 	my $id = logEventToDB($input{event});
 	$packet = JSON->new->utf8->decode($input{event});
-
 	(undef,$event,$date) = getEventFromDB($id);
+}else{
+	print "<body>\n";
+	print "Source : $packet->{source}\n";
 }
 
-
-print "Source XXX: $packet->{source}\n";
-
-if ($packet->{channel} eq 'EventHandler' ) {
+if ($packet->{channel} eq 'WebEventHandler' ) {
 	my @actions = findActions($packet->{data});
 	executeActions(\@actions,$packet->{data});
 	print "{\"status\":\"processed\"}\n";

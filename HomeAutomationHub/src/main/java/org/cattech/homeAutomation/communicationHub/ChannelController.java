@@ -110,7 +110,6 @@ public class ChannelController {
 
 			if (jsonIn.has(NODE_DATA_DESTINATION) && jsonIn.has(NODE_DATA_BLOCK)) {
 				JSONArray destinations = jsonIn.getJSONArray(NODE_DATA_DESTINATION);
-				destinations.put("all"); // Also send to channel all
 				JSONObject channelData = jsonIn.getJSONObject(NODE_DATA_BLOCK);
 				jsonOut.put(NODE_NODE_NAME, fromNode.getNodeName());
 				jsonOut.put(NODE_DATA_SOURCE, jsonIn.get(NODE_DATA_SOURCE));
@@ -118,8 +117,10 @@ public class ChannelController {
 				for (int i = 0; i < destinations.length(); i++) {
 					String channel = destinations.getString(i);
 					jsonOut.put(NODE_DATA_CHANNEL, channel);
-					sendToChannel(channel, jsonOut.toString());
+					sendToChannel(channel, jsonOut,true);
 				}
+				jsonOut.put("all_channels", destinations.toString());
+				sendToChannel("all", jsonOut,false);
 			}
 		} catch (Exception e) {
 			errors += e.getMessage();
@@ -138,7 +139,7 @@ public class ChannelController {
 		}
 	}
 
-	private void sendToChannel(String channel, String data) throws Exception {
+	private void sendToChannel(String channel, JSONObject jsonOut,boolean throwNoChannel) throws Exception {
 		ArrayList<NodeInterface> nodes;
 		// if (NODE_SEND_TO_ALL_ADDRESS.equals(channel)) {
 		// nodes = allNodes;
@@ -147,12 +148,12 @@ public class ChannelController {
 		// }
 		if (nodes != null) {
 			for (NodeInterface node : nodes) {
-				node.sendDataToNode(data);
+				node.sendDataToNode(jsonOut.toString());
 			}
 		} else {
-			if (NODE_SEND_TO_ALL_ADDRESS != channel) {
+			if (throwNoChannel) {
 				log.error("No node registered for channel : " + channel);
-				log.error(data);
+				log.error(jsonOut);
 			}
 		}
 	}

@@ -46,7 +46,7 @@ public class homeAutomationConfiguration {
 		SimpleLayout layout = new SimpleLayout();
 
 		RollingFileAppender appender;
-		String logFile = getLogFolder() + "HomeautomationHub.log";
+		String logFile = getLogFolder() + "/HomeautomationHub.log";
 		try {
 			appender = new RollingFileAppender(layout, logFile, true);
 			appender.setMaxFileSize("40MB");

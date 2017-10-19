@@ -6,8 +6,10 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 
 public class RestartableProcess {
+	private Logger log = Logger.getLogger(this.getClass());
 	private int maxRestartsInWindow = 3;
 	private int windowMillis = 1000 * 60 * 5;
 
@@ -16,13 +18,13 @@ public class RestartableProcess {
 	private int starts;
 	private String command;
 	private boolean enabled = true;
-	private String log;
+	private String logFile;
 
 	public RestartableProcess(String command, String logFile) throws IOException, RestartableProcessException {
 		this.command = command;
 		this.lastStart = 0;
 
-		this.log = logFile;
+		this.logFile = logFile;
 		restartProcess();
 	}
 
@@ -47,13 +49,20 @@ public class RestartableProcess {
 
 	public void handleOutputLogging() {
 		try {
-			Files.write(Paths.get(log),getStderr().getBytes());
+			String stderr = getStderr();
+			if (null != stderr) {
+				log.error(stderr);
+				Files.write(Paths.get(logFile), stderr.getBytes(), StandardOpenOption.CREATE,
+						StandardOpenOption.APPEND);
+			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		try {
-			Files.write(Paths.get(log),getStdout().getBytes());
+			String stdout = getStdout();
+			log.error(stdout);
+			Files.write(Paths.get(logFile), stdout.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
