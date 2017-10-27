@@ -86,7 +86,10 @@ public class DeviceResolver extends HomeAutomationModule {
 					hap.setDataOut(hap.getDataIn());
 					// Remove output destinations, so we can set our own.
 					hap.getOut().remove("destination");
-					hap.addDestination(hap.getDataIn().getString("postResolv"));
+					String postResolv = null;
+					if (hap.getDataIn().has("postResolv")) {
+						postResolv=hap.getDataIn().getString("postResolv");
+					}
 					// Clear fields we don't need to send back from the DataOut
 					hap.getDataOut().remove("postResolv");
 					hap.getDataOut().remove("resolution");
@@ -96,12 +99,22 @@ public class DeviceResolver extends HomeAutomationModule {
 					hap.getDataOut().remove("device");
 					
 					for (JSONObject nDev : nDevs) {
+						if (null == postResolv ) {
+							if (nDev.has("controlChannel")) {
+								String controlChannel = nDev.getString("controlChannel");
+								hap.remoteDestination();
+								hap.addDestination(controlChannel);
+							}else{
+								log.error("Native device block doesn't have controChannel."+nDev);
+							}
+						}else{
+							hap.addDestination(postResolv);
+						}
 						hap.getDataOut().remove("nativeDevice");
 						hap.getDataOut().put("nativeDevice",nDev);
 						hubInterface.sendDataToController(hap.getReturnPacket());
 					}
 					hap.setDataOut(new JSONObject());
-					
 				}
 			}
 		}

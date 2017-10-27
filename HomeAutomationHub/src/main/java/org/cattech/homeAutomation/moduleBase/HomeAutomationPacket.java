@@ -65,5 +65,9 @@ public class HomeAutomationPacket {
 		jsonOut.getJSONArray("destination").put(channel);
 	}
 
+	public void remoteDestination() {
+		jsonOut.remove("destination");
+	}
+
 	
 }

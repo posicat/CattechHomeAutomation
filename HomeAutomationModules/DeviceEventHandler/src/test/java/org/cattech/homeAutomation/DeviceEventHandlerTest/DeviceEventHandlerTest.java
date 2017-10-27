@@ -34,7 +34,7 @@ public class DeviceEventHandlerTest extends BaseTestForModules {
 		String result = waitforResult(testInterface, 10000);
 
 		JSONAssert.assertEquals(
-				"{\"nodeName\":\"DeviceEventHandler\",\"data\":{\"postResolv\":\"WebEventHandler\",\"resolution\":\"toCommon\",\"nativeDevice\":\"\"},\"channel\":\"DeviceResolver\",\"source\":\"DeviceEventHandler\"}s",
+				"{\"nodeName\":\"DeviceEventHandler\",\"data\":{\"resolution\":\"toCommon\",\"nativeDevice\":\"\"},\"channel\":\"DeviceResolver\",\"source\":\"DeviceEventHandler\"}s",
 				result, false);
 	}
 
