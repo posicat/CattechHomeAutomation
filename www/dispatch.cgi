@@ -2,7 +2,7 @@
 use strict;
 BEGIN { 
 	unshift @INC,'/home/websites/lib';
-	unshift @INC,'/usr/local/homeAutomation/lib';
+	unshift @INC,'/usr/local/homeAutomation/bin/lib';
 	unshift @INC,'./lib';
 }
 use URI::Escape;
@@ -172,15 +172,15 @@ sub command {
 	
 	my $inDev = decode_json($commonDevice);
 	$data->{device}=$inDev->{device};
-	$data->{postResolv}="commandHandler";
-	$data->{action}->{command}=$command;
+	$data->{action}=$command;
 
 	if ($amt ne ""){
 		$data->{command}->{amount}=$amt;
 	}		
 
+	$::Gdebug=1;
 	$::HA->registerToHub("dispatch.transient",[]);
-	$::HA->sendDataToHub(['nameResolution'],$data);
+	$::HA->sendDataToHub(['deviceCommandHandler'],"dispatch.transient",$data);
 
 	print "<script>console.log('".encode_json($data)."')</script>\n";
 

@@ -300,7 +300,7 @@ sub executeActions {
 			$known=1;
 			if ($data->{debug} eq "") {
 				$::HA->registerToHub('transient.eventHandler',[]);
-				$::HA->sendDataToHub($action->{destination},$action->{data});
+				$::HA->sendDataToHub($action->{destination},'eventHandler',$action->{data});
 			}else{
 				print "Would have forwarded action on to hub on channel(s): ".join(',',@{$action->{destination}})."<br>\n";
 			}
