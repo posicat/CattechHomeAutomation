@@ -4,6 +4,8 @@ import org.apache.log4j.Logger;
 import org.cattech.homeAutomation.communicationHub.ChannelController;
 import org.cattech.homeAutomation.communicationHub.NodeInterfaceString;
 import org.cattech.homeAutomation.configuration.homeAutomationConfiguration;
+import org.json.JSONArray;
+import org.junit.After;
 import org.junit.Before;
 import org.skyscreamer.jsonassert.JSONCompare;
 import org.skyscreamer.jsonassert.JSONCompareMode;
@@ -22,11 +24,17 @@ public class BaseTestWithController {
 		controller = new ChannelController(new homeAutomationConfiguration(false));
 		
 		testInterface = new NodeInterfaceString(controller);
-		registerChannel(testInterface, TESTCHANNEL);
+		registerChannel(testInterface,new String[]{TESTCHANNEL});
+	}
+	
+    @After
+	public void tearDown() throws Exception {
+		
 	}
 
-	protected String registerChannel(NodeInterfaceString inter, String channel) {
-		inter.sendDataToController("{\"register\":[\"" + channel + "\"],\"nodeName\":\"BaseTestWithController\",\"data\":{\"testrunner\":\"true\"}}");
+	protected String registerChannel(NodeInterfaceString inter, String[] channels) {
+		JSONArray channelArr =  new JSONArray(channels);
+		inter.sendDataToController("{\"register\":" + channelArr + ",\"nodeName\":\"BaseTestWithController\",\"data\":{\"testrunner\":\"true\"}}");
 		return waitforResult(inter, 1000 * 10);
 	}
 

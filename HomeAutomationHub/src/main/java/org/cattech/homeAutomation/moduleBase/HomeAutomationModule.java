@@ -1,15 +1,19 @@
 package org.cattech.homeAutomation.moduleBase;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
 import org.cattech.homeAutomation.communicationHub.ChannelController;
 import org.cattech.homeAutomation.communicationHub.NodeInterfaceString;
+import org.cattech.homeAutomation.configuration.homeAutomationConfiguration;
 
 public abstract class HomeAutomationModule implements Runnable {
 	protected Logger				log		= Logger.getLogger(this.getClass());
 	protected NodeInterfaceString	hubInterface;
 	protected boolean				running	= false;
+	protected homeAutomationConfiguration configuration;
 
 	protected HomeAutomationModule(ChannelController controller) {
 		log.info("--- Initializing module, channels : "+getModuleChannelName()+" ---");
@@ -23,7 +27,9 @@ public abstract class HomeAutomationModule implements Runnable {
 			response = hubInterface.getDataFromController();
 			sleepNoThrow(100);
 		}
+		log.info(response);
 		//		log.info(response);
+		configuration = controller.getConfig();
 	}
 
 	public String getModuleChannelName() {
@@ -47,7 +53,15 @@ public abstract class HomeAutomationModule implements Runnable {
 	}
 
 	protected Connection getHomeAutomationDBConnection() {
-		// TODO Auto-generated method stub
-		return null;
+		Connection conn = null;
+		try {
+		    conn = DriverManager.getConnection(configuration.getDBURL());
+		} catch (SQLException ex) {
+		    // handle any errors
+		    System.out.println("SQLException: " + ex.getMessage());
+		    System.out.println("SQLState: " + ex.getSQLState());
+		    System.out.println("VendorError: " + ex.getErrorCode());
+		}
+		return conn;
 	}
 }

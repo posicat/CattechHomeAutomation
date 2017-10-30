@@ -3,7 +3,7 @@ use strict;
 BEGIN { 
 	unshift @INC,'./lib';
 	unshift @INC,'/home/websites/lib';
-	unshift @INC,'/usr/local/homeAutomation/lib';
+	unshift @INC,'/usr/local/homeAutomation/bin/lib';
 }
 use File::Copy;
 use URI::Escape;
@@ -12,6 +12,7 @@ use Cattech::WatchCat;
 use Cattech::HomeAutomation;
 use JSON;
 use Data::Dumper;
+use Data::Compare;
 require "cgi-lib.pm";
 
 $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
@@ -37,7 +38,6 @@ $::HA=Cattech::HomeAutomation->new();
 $::HA->connectToSQLDatabase();
 
 print "Content-type:text/html\n\n";
-print "<body>\n";
 
 #$input{eventLogID}=2448;
 
@@ -45,44 +45,63 @@ my $packet={};
 if (exists $input{event}) {
 	my $id = logEventToDB($input{event});
 	$packet = JSON->new->utf8->decode($input{event});
-
 	(undef,$event,$date) = getEventFromDB($id);
+}else{
+	print "<body>\n";
+	print "Source : $packet->{source}\n";
 }
 
-if ($packet->{source} eq 'eventHandler' || $packet->{source} eq 'AmazonEchoBridge' ) {
+if ($packet->{channel} eq 'WebEventHandler' ) {
 	my @actions = findActions($packet->{data});
 	executeActions(\@actions,$packet->{data});
 	print "{\"status\":\"processed\"}\n";
 }else{
+
 	print <<EOB;
 	<style>
 	body {
 		background-color:#AAA;
+		margin:0px;
 	}
 	.runningActions	{
+		position:relative;
+		right:0px;
 		margin:2em;
 		border:1px solid blue;
 		background-color:#FFF;
 	}
-	.halfpage {
-		width:49%;
-		float:right;
-		overflow-wrap: break-word;
+	.incoming {
+		background-color:#CCA;
+	}
+	.events {
+		font-size:90%;
+		max-height:15em;
+		overflow:auto;
+		border:5px outset #444;
+	}
+	.bottom {
+		bottom:0px;
+	}
+	.top {
+		top:0px;
 	}
 	.eventLine {
-		font-size:1vmin;
-		background-color:#CCC;
 		margin-top:5px;
-		display:inline-block;
+		border:1px solid black;
 	}
 	</style>
 EOB
+
+	if (! exists $input{event}) {
+		print "<div class=\"events incoming\">\n";
+		displayLastXEvents(50);
+		print "</div>\n";
+	}
+
 	my $eventLogID = $input{eventLogID};
-	print "<div class=\"halfpage\">\n<hr>";
 	if ($eventLogID ne "") {
 		(undef,$event,$date) = getEventFromDB($eventLogID);
 
-		print "<h2>Selected event : $eventLogID @ $date</h2>\n";
 
 		$packet = JSON->new->utf8->decode($event);
 		$packet->{data}->{debug}='console';
@@ -92,21 +111,20 @@ EOB
 			@actions = findActions($packet->{data});
 		}
 
-		print "<h3>Event : $event</h3>\n";
+		print "<br>\n";
+		print "<h2>Selected event : $eventLogID <span style=\"float:right\">$date</span></h2>\n";
+		print "<div class=\"events incoming\">\n";
+		print "<center>$event</center>\n";
+		print "</div>\n";
+		print "<br>\n";
 
 		print "Triggers [" . join(',',@actions) . "]<br>\n";
 
-		print "<h4>Simulating triggers</h4>\n";
+		print "Simulating triggers:</h4>\n";
 
 		executeActions(\@actions,$packet->{data});
 	}
-	print "</div>\n";
 
-	if (! exists $input{event}) {
-		print "<div class=\"halfpage\">\n";
-		displayLastXEvents(40);
-		print "</div>\n";
-	}
 }
 
 #================================================================================
@@ -147,7 +165,8 @@ sub displayLastXEvents {
         $::HA->{SH}->execute_raw_sql($eventData,"SELECT * FROM eventLog ORDER BY time DESC LIMIT $limit");
 
 	while ($::HA->{SH}->next_row($eventData)) {
-		print "<a class=\"eventLine\" href=\"?eventLogID=$eventData->{eventLog_id}\">$eventData->{event} \@ $eventData->{time}</a><br>\n";
+		print "<div class=\"eventLine\"><a href=\"?eventLogID=$eventData->{eventLog_id}\">$eventData->{event} "
+		."<span style=\"float:right\">$eventData->{time}</span></a></div>\n";
 	}
 }
 
@@ -156,41 +175,43 @@ sub findActions {
 	my ($data)=@_;
 	my @actions;
 
-
-	print "Parsing : " . Dumper($data) . "<br>\n";
+#	print "Data : $data<br>\n";
 
 	if (exists $data->{reaction}) {
 		my $json = encode_json($data);
 		push @actions,$json;
 	}
 
-#	if ($data->{source} eq "X10" || ) {
-		my $actionData={};
-		my $sql = "SELECT event,action,triggers_id FROM triggers";
+	my $actionData={};
+	my $sql = "SELECT event,action,triggers_id FROM triggers";
 
-		if ($data->{debug} eq "") {
-			$sql .=" WHERE earliestNext <= NOW()";
+	if ($data->{debug} eq "") {
+		$sql .=" WHERE earliestNext <= NOW()";
+	}
+#	print "SQL : $sql<br>\n";
+        $::HA->{SH}->execute_raw_sql($actionData,$sql);
+
+	while ($::HA->{SH}->next_row($actionData)) {
+		my $triggerHash = decode_json($actionData->{event});
+
+		if (exists $data->{debug}) {
+			$triggerHash->{debug}=$data->{debug};
 		}
-#		print "SQL : $sql<br>\n";
-	        $::HA->{SH}->execute_raw_sql($actionData,$sql);
 
-		while ($::HA->{SH}->next_row($actionData)) {
-			my $triggerHash = decode_json($actionData->{event});
+#		print "<hr>\n";
+#		print "R :".Dumper($actionData)."<br><br>\n";
+#		print "ED:".Dumper($data)."<br>\n";
+#		print "T :".Dumper($triggerHash)."<br>\n";
 
-#			print "R :".Dumper($actionData)."<br>\n";
-#			print "ED:".Dumper($data)."<br>\n";
-#			print "T :".Dumper($triggerHash)."<br>\n";
-
-			if (matchTrigger($data,$triggerHash)) {
-				push @actions,$actionData->{action};
-#				print "ATI:$actionData->{triggers_id}<br>\n";
-				if ($data->{debug} eq "") {
-					setTriggerEarliestNext($actionData->{triggers_id});
-				}
+		if (matchTrigger($data,$triggerHash)) {
+			push @actions,$actionData->{action};
+#			print "ATI:$actionData->{triggers_id}<br>\n";
+			if ($data->{debug} eq "") {
+				setTriggerEarliestNext($actionData->{triggers_id});
 			}
 		}
-#	}		
-	#print "<hr>\n";
+	}
+#	print "<hr>\n";
 
 	return @actions;
 }
@@ -200,15 +221,20 @@ sub matchTrigger {
 	my ($eh,$th)=@_;
 	my $match=1;
 
+	my $c = Data::Compare->new($eh, $th)->Cmp;
+#	print "C :" . $c . "<br>\n";
+
+	return $c;
+		
 	foreach my $key (keys %$th) {
-#		print "TH[$key] $th->{$key} =~m/ $eh->{$key} /<br>\n";
+		print "TH[$key] $th->{$key} =~m/ $eh->{$key} /<br>\n";
 
 		if (! ($eh->{$key} =~ m/$th->{$key}/)) {
-#			print "No regex match<br>\n";
+			print "No regex match<br>\n";
 			$match=0;
 		}
 		if (! exists $eh->{$key}) {
-#			print "No key $key<br>\n";
+			print "No key $key<br>\n";
 			$match=0;
 		}
 	}
@@ -274,7 +300,7 @@ sub executeActions {
 			$known=1;
 			if ($data->{debug} eq "") {
 				$::HA->registerToHub('transient.eventHandler',[]);
-				$::HA->sendDataToHub($action->{destination},$action->{data});
+				$::HA->sendDataToHub($action->{destination},'eventHandler',$action->{data});
 			}else{
 				print "Would have forwarded action on to hub on channel(s): ".join(',',@{$action->{destination}})."<br>\n";
 			}

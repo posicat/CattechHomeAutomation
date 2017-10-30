@@ -18,7 +18,7 @@ public class ChannelControllerTest extends BaseTestWithController {
 	public void testRegisterChannel() throws Exception {
 		NodeInterfaceString testInterface = new NodeInterfaceString(controller);
 
-		String result = registerChannel(testInterface,"a");
+		String result = registerChannel(testInterface,new String[]{"a"});
 
 		JSONAssert.assertEquals("{\"source\":\"ChannelController\",\"status\":\"registered\",\"channel\":[\"a\"],\"nodeName\":\""
 				+ testInterface.getNodeName() + "\"}", result, true);
@@ -28,7 +28,7 @@ public class ChannelControllerTest extends BaseTestWithController {
 	public void testSendDataToChannel() throws Exception {
 		NodeInterfaceString testInterface = new NodeInterfaceString(controller);
 
-		String result = registerChannel(testInterface,"a");
+		String result = registerChannel(testInterface,new String[]{"a"});
 
 		JSONAssert.assertEquals("{\"source\":\"ChannelController\",\"status\":\"registered\",\"channel\":[\"a\"],\"nodeName\":\""
 				+ testInterface.getNodeName() + "\"}", result, true);
@@ -44,7 +44,7 @@ public class ChannelControllerTest extends BaseTestWithController {
 	public void testSendDataToDifferentChannel() throws Exception {
 		NodeInterfaceString testInterface = new NodeInterfaceString(controller);
 
-		String result = registerChannel(testInterface,"a");
+		String result = registerChannel(testInterface,new String[]{"a"});
 
 		JSONAssert.assertEquals("{\"source\":\"ChannelController\",\"status\":\"registered\",\"channel\":[\"a\"],\"nodeName\":\""
 				+ testInterface.getNodeName() + "\"}", result, true);
@@ -61,12 +61,12 @@ public class ChannelControllerTest extends BaseTestWithController {
 		NodeInterfaceString testInterfaceA = new NodeInterfaceString(controller);
 		NodeInterfaceString testInterfaceB = new NodeInterfaceString(controller);
 
-		String result = registerChannel(testInterfaceA,"a");
+		String result = registerChannel(testInterfaceA,new String[]{"a"});
 
 		JSONAssert.assertEquals("{\"source\":\"ChannelController\",\"status\":\"registered\",\"channel\":[\"a\"],\"nodeName\":\""
 				+ testInterfaceA.getNodeName() + "\"}", result, true);
 
-		result = registerChannel(testInterfaceB,"b");
+		result = registerChannel(testInterfaceB,new String[]{"b"});
 		JSONAssert.assertEquals("{\"source\":\"ChannelController\",\"status\":\"registered\",\"channel\":[\"b\"],\"nodeName\":\""
 				+ testInterfaceB.getNodeName() + "\"}", result, true);
 

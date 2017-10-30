@@ -14,6 +14,9 @@
 		<module>DeviceResolver</module>
 		<module>ProcessManager</module>
 		<module>EventHandlerWebRelay</module>
+		<module>DeviceEventHandler</module>
+		<module>DeviceCommandHandler</module>
+		<module>X10InterfaceHandler</module>
 	</modules>
 	<build>
 		<plugins>

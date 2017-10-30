@@ -1,0 +1,53 @@
+#!/usr/bin/perl
+BEGIN {
+        unshift @INC,'./lib';
+        unshift @INC,'/home/websites/lib';
+        unshift @INC,'/usr/local/homeAutomation/bin/lib';
+}
+use strict;
+use POSIX; 
+use JSON;
+use LWP::Simple;
+use URI::Escape;
+use Cattech::HomeAutomation;
+
+$::HA=Cattech::HomeAutomation->new();
+
+my $log = "/etc/heyu/x10_events.log";
+
+my $date = strftime("%Y-%m-%d %H:%M:%S", localtime(time));
+
+#my $helper = $ENV{helper};
+
+#my ($address,$action) = $helper=~m/([a-z0-9]*)([A-Z].*)/;
+
+my $data={};
+
+my $mode='url';
+if ($ENV{X10_Source} ne "") {
+	$data->{nativeDevice}->{protocol}="X10";
+	$data->{nativeDevice}->{unit}=$ENV{X10_Unit};
+	$data->{nativeDevice}->{house}=$ENV{X10_Housecode};
+	$data->{nativeDevice}->{x10_Source}=$ENV{X10_Source};
+	$data->{action}=$ENV{X10_Function};
+}else{
+	if ($ARGV[0]=~m/([a-p])([1-9]|0[1-9]|1[0-6])(On|Off|Dim|Bri)/) {
+		$data->{nativeDevice}->{protocol}="X10";
+		$data->{nativeDevice}->{unit}=$1;
+		$data->{nativeDevice}->{house}=$2;
+		$data->{nativeDevice}->{x10_Source}='args';
+		$data->{action}=$3;
+	}
+}
+
+my $json = JSON->new->utf8->canonical->encode($data);
+if ( open(my $LOG,">>",$log) ) {
+	print $LOG $json."\n";
+	close $LOG;
+}else{
+	print "Couldn't write to $log : $!\n";
+}	
+my $channel='transient.heyuhelper';
+$::Gdebug=1;
+$::HA->registerToHub($channel,[$channel]);
+$::HA->sendDataToHub(['DeviceEventHandler'],$channel,$data);

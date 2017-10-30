@@ -33,10 +33,11 @@ sub new {
 sub connectToSQLDatabase {
 	my ($self)=@_;
 	$self->{SH}=Cattech::SQLHelper->new(
-		$self->{reg}->{db},
-		$self->{reg}->{username},
-		$self->{reg}->{password}
+		$self->{reg}->{'db.name'},
+		$self->{reg}->{'db.username'},
+		$self->{reg}->{'db.password'}
 	);
+
 }
 #================================================================================
 sub registerToHub {
@@ -52,10 +53,11 @@ sub registerToHub {
 }
 #================================================================================
 sub sendDataToHub {
-	my ($self,$channels,$data)=@_;
+	my ($self,$channels,$sourceChannel,$data)=@_;
 
 	my $packet = {
 		'destination' => $channels,
+		'source' => $sourceChannel,
 		'data' => $data,
 	};
 
@@ -79,21 +81,27 @@ sub getDataFromHub {
 sub _transmitDataToTCPHub {
 	my ($self,$data)=@_;
 	$self->_openTCPSocket();
-	print {$self->{_socket}} $data."\r\n";
-	print "Sent : $data<br>\n";
+	if ($::Gdebug) {
+		print {$self->{_socket}} $data."\r\n";
+		print "Sent : $data<br>\n";
+	}
 }
 #================================================================================
 sub _openTCPSocket {
 	my ($self)=@_;
 
-#	if (! exists $self->{_socket}) {
+	if ($::Gdebug) {
+		print $self->{reg}->{'hub.host'}."\r\n";
+		print $self->{reg}->{'hub.port'}."\r\n";
+	}
+	if (! exists $self->{_socket}) {
 		$self->{_socket} = IO::Socket::INET->new(
 			PeerAddr => $self->{reg}->{'hub.host'},
                         PeerPort => $self->{reg}->{'hub.port'},
                         Proto    => 'tcp'
 		) or die "ERROR in Socket Creation : $!\n";
 
-#	}
+	}
 }
 #================================================================================
 1;
