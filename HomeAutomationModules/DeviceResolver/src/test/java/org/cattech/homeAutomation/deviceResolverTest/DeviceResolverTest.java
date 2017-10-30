@@ -51,9 +51,11 @@ public class DeviceResolverTest extends BaseTestForModules {
 
 		String result = waitforResult(testInterface, 10000);
 
-		JSONAssert.assertEquals("{\"nodeName\":\"DeviceResolver\",\"data\":{\"action\":\"on\"," + "\"device\":"
-				+ commonDevMatches1 + "},\"channel\":\"testEventHandler\",\"source\":\"DeviceResolver\"}", result,
-				false);
+		String expectedStr = "{\"nodeName\":\"DeviceResolver\",\"data\":{\"action\":\"on\"," + "\"device\":"
+				+ commonDevMatches1 + "},\"channel\":\"testEventHandler\",\"source\":\"DeviceResolver\"}";
+		System.out.println(expectedStr);
+		System.out.println(result);
+		JSONAssert.assertEquals(expectedStr, result, false);
 	}
 
 	@Test

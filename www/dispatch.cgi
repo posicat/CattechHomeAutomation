@@ -180,7 +180,7 @@ sub command {
 
 	$::Gdebug=1;
 	$::HA->registerToHub("dispatch.transient",[]);
-	$::HA->sendDataToHub(['deviceCommandHandler'],"dispatch.transient",$data);
+	$::HA->sendDataToHub(['DeviceCommandHandler'],"dispatch.transient",$data);
 
 	print "<script>console.log('".encode_json($data)."')</script>\n";
 

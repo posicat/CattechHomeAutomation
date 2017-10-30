@@ -1,5 +1,10 @@
 mvn clean install
 
+if [ $? -ne 0] ; then
+	echo "Error"
+	exit
+fi
+
 # Deploy the web code
 cp -v  	www/*				/home/homeAutomation/public_html/
 
