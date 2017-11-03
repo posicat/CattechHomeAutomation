@@ -72,4 +72,10 @@ public class X10InterfaceHandler extends HomeAutomationModule {
 		return "x10Controller";
 	}
 
+	@Override
+	protected void processMessage(HomeAutomationPacket hap) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

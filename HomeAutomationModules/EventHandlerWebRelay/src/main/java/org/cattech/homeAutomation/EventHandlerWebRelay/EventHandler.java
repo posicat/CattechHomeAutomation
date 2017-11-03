@@ -9,10 +9,11 @@ import java.net.URLEncoder;
 
 import org.cattech.homeAutomation.communicationHub.ChannelController;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationModule;
+import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
 
-public class EventHandlerWebRelay extends HomeAutomationModule {
+public class EventHandler extends HomeAutomationModule {
 	private String urlPrefix;
-	public EventHandlerWebRelay(ChannelController controller) {
+	public EventHandler(ChannelController controller) {
 			super(controller);
 			
 			final String baseUrl = controller.getConfig().getBaseURL();
@@ -27,17 +28,23 @@ public class EventHandlerWebRelay extends HomeAutomationModule {
 		while (running) {
 			try {
 				String event = hubInterface.getDataFromController();
-				if (null != event) {
-					log.info("Forwarded to web eventHandler: " + event);
-					URL url = new URL(urlPrefix + "?event=" + URLEncoder.encode(event, "UTF-8"));
-					is = url.openStream();
-					BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-					String line;
-					while ((line = reader.readLine()) != null) {
-						log.info("Response:"+line);
-					}
-				} else {
+				if (null == event) {
 					Thread.sleep(100);
+				} else {
+					boolean handledInternally = false;
+
+					
+					
+					if (!handledInternally) {
+						log.info("Forwarded to web eventHandler: " + event);
+						URL url = new URL(urlPrefix + "?event=" + URLEncoder.encode(event, "UTF-8"));
+						is = url.openStream();
+						BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+						String line;
+						while ((line = reader.readLine()) != null) {
+							log.info("Response:" + line);
+						}
+					}
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -55,7 +62,13 @@ public class EventHandlerWebRelay extends HomeAutomationModule {
 	
 	@Override
 	public String getModuleChannelName() {
-		return "WebEventHandler";
+		return "EventHandler";
+	}
+
+	@Override
+	protected void processMessage(HomeAutomationPacket hap) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

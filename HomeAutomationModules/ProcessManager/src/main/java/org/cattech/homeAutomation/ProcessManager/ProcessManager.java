@@ -6,6 +6,7 @@ import java.util.Properties;
 
 import org.cattech.homeAutomation.communicationHub.ChannelController;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationModule;
+import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
 
 public class ProcessManager extends HomeAutomationModule {
 	ArrayList<RestartableProcess> subProcesses = new ArrayList<RestartableProcess>();
@@ -49,6 +50,12 @@ public class ProcessManager extends HomeAutomationModule {
 
 			sleepNoThrow(10000);
 		}
+	}
+
+	@Override
+	protected void processMessage(HomeAutomationPacket hap) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

@@ -48,4 +48,10 @@ public class DeviceCommandHandler extends HomeAutomationModule {
 		return "DeviceCommandHandler";
 	}
 
+	@Override
+	protected void processMessage(HomeAutomationPacket hap) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

@@ -16,7 +16,7 @@ public class DeviceEventHandlerTest extends BaseTestForModules {
 		super.setUp();
 		deviceEventHandler=new DeviceEventHandler(controller);
 		new Thread(deviceEventHandler, "Testing DeviceEventHandler").start();
-		registerChannel(testInterface, new String[] { "DeviceResolver", "WebEventHandler" });
+		registerChannel(testInterface, new String[] { "DeviceResolver", "EventHandler" });
 	}
 
 	@Override
@@ -39,14 +39,14 @@ public class DeviceEventHandlerTest extends BaseTestForModules {
 	}
 
 	@Test
-	public void testForwardsCommonDevicesToWebEventHandler() {
+	public void testForwardsCommonDevicesToEventHandler() {
 
 		testInterface.sendDataToController("{\"destination\":[\"DeviceEventHandler\"]," + testPacketSource + ",\"data\":{\"device\":[\"lamp\"]}}");
 
 		String result = waitforResult(testInterface, 10000);
 
 		JSONAssert.assertEquals(
-				"{\"nodeName\":\"DeviceEventHandler\",\"data\":{\"device\":[\"lamp\"]},\"channel\":\"WebEventHandler\",\"source\":\"DeviceEventHandler\"}",
+				"{\"nodeName\":\"DeviceEventHandler\",\"data\":{\"device\":[\"lamp\"]},\"channel\":\"EventHandler\",\"source\":\"DeviceEventHandler\"}",
 				result, false);
 	}
 }

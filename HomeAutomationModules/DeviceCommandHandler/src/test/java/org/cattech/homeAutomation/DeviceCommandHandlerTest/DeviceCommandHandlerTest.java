@@ -16,7 +16,7 @@ public class DeviceCommandHandlerTest extends BaseTestForModules {
 		super.setUp();
 		deviceCommandHandler=new DeviceCommandHandler(controller);
 		new Thread(deviceCommandHandler, "Testing DeviceCommandHandler").start();
-		registerChannel(testInterface, new String[] { "DeviceResolver", "WebEventHandler" });
+		registerChannel(testInterface, new String[] { "DeviceResolver", "EventHandler" });
 	}
 
 	@Override

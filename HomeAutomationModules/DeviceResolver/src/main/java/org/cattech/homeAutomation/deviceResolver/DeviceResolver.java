@@ -24,24 +24,7 @@ public class DeviceResolver extends HomeAutomationModule {
 		loadDeviceMappings();
 	}
 
-	@Override
-	public void run() {
-		running = true;
-		while (running) {
-			String data = hubInterface.getDataFromController();
-			if (null != data) {
-				processMessage(data);
-			} else {
-				sleepNoThrow(1000);
-			}
-		}
-	}
-
-	private void processMessage(String packet) {
-		log.info("Message : " + packet);
-
-		HomeAutomationPacket hap = new HomeAutomationPacket(this.getModuleChannelName(), packet);
-
+	protected void processMessage(HomeAutomationPacket hap) {
 		if (hap.getDataIn().has("resolution")) {
 			String resolution = hap.getDataIn().getString("resolution");
 			if ("addLookup".equals(resolution)) {

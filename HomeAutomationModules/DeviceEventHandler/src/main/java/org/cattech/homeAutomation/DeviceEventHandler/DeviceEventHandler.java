@@ -25,15 +25,15 @@ public class DeviceEventHandler extends HomeAutomationModule {
 						if (hap.getDataIn().has("nativeDevice")) {
 							hap.setDataOut(hap.getDataIn());
 							hap.getDataOut().put("resolution", "toCommon");
-							hap.getDataOut().put("postResolv", "WebEventHandler");
+							hap.getDataOut().put("postResolv", "EventHandler");
 							log.info("Sending packet to have nativeDevice decoded.\n" + packet);
 							hap.getOut().remove("destination");
 							hap.getOut().put("destination",  new String[] {"DeviceResolver"});
 						} else {
 							hap.setDataOut(hap.getDataIn());
-							log.info("Sending packet directly to WebEventHandler.");
+							log.info("Sending packet directly to EventHandler.");
 							hap.getOut().remove("destination");
-							hap.getOut().put("destination", new String[] {"WebEventHandler"});
+							hap.getOut().put("destination", new String[] {"EventHandler"});
 						}
 					}
 					if (hap.hasReturnData()) {
@@ -55,6 +55,12 @@ public class DeviceEventHandler extends HomeAutomationModule {
 	@Override
 	public String getModuleChannelName() {
 		return "DeviceEventHandler";
+	}
+
+	@Override
+	protected void processMessage(HomeAutomationPacket hap) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

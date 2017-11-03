@@ -31,6 +31,25 @@ public abstract class HomeAutomationModule implements Runnable {
 		//		log.info(response);
 		configuration = controller.getConfig();
 	}
+	
+	public void run() {
+		running = true;
+		while (running) {
+			String packet = hubInterface.getDataFromController();
+			if (null != packet) {
+				log.info("Message : " + packet);
+
+				HomeAutomationPacket hap = new HomeAutomationPacket(this.getModuleChannelName(), packet);
+
+
+				processMessage(hap);
+			} else {
+				sleepNoThrow(1000);
+			}
+		}
+	}
+
+	protected abstract void processMessage(HomeAutomationPacket hap);
 
 	public String getModuleChannelName() {
 		return this.getClass().getSimpleName();

@@ -51,7 +51,7 @@ if (exists $input{event}) {
 	print "Source : $packet->{source}\n";
 }
 
-if ($packet->{channel} eq 'WebEventHandler' ) {
+if ($packet->{channel} eq 'EventHandler' ) {
 	my @actions = findActions($packet->{data});
 	executeActions(\@actions,$packet->{data});
 	print "{\"status\":\"processed\"}\n";
@@ -296,6 +296,7 @@ sub executeActions {
 			loadReactions($action->{reactions},$actions);
 		}
 
+		print "<pre>".Dumper($action)."</pre>\n";
 		if (defined $action->{destination} ) {
 			$known=1;
 			if ($data->{debug} eq "") {
