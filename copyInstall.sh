@@ -1,4 +1,4 @@
-mvn clean install
+mvn clean install -Dmaven.test.skip=true
 
 if [ $? -ne 0] ; then
 	echo "Error"

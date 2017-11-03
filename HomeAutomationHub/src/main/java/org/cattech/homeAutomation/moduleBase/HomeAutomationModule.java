@@ -40,8 +40,6 @@ public abstract class HomeAutomationModule implements Runnable {
 				log.info("Message : " + packet);
 
 				HomeAutomationPacket hap = new HomeAutomationPacket(this.getModuleChannelName(), packet);
-
-
 				processMessage(hap);
 			} else {
 				sleepNoThrow(1000);
@@ -82,5 +80,12 @@ public abstract class HomeAutomationModule implements Runnable {
 		    System.out.println("VendorError: " + ex.getErrorCode());
 		}
 		return conn;
+	}
+	protected void closeNoThrow(Connection conn) {
+		try {
+			conn.close();
+		} catch (SQLException e) {
+			log.error("Error closeing DB connection",e);
+		}
 	}
 }
