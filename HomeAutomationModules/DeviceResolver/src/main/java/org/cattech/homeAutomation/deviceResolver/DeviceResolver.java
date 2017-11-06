@@ -6,12 +6,14 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Set;
 
 import org.cattech.homeAutomation.communicationHub.ChannelController;
 import org.cattech.homeAutomation.deviceHelpers.DeviceNameHelper;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationModule;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
+import org.cattech.homeAutomation.moduleBase.HomeAutomationPacketHelper;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,85 +26,87 @@ public class DeviceResolver extends HomeAutomationModule {
 		loadDeviceMappings();
 	}
 
-	protected void processMessage(HomeAutomationPacket hap) {
-		if (hap.getDataIn().has("resolution")) {
-			String resolution = hap.getDataIn().getString("resolution");
-			if ("addLookup".equals(resolution)) {
-				JSONObject nativeDevice = hap.getDataIn().getJSONObject("nativeDevice");
-				JSONArray commonDevice = hap.getDataIn().getJSONArray("commonDevice");
+	@Override
+	public String getModuleChannelName() {
+		return "DeviceResolver";
+	}
 
-				String result = addLookup(nativeDevice, commonDevice);
-				hap.getDataOut().put("addLookupResult", result);
+	@Override
+	protected void processPacketRequest(HomeAutomationPacket incoming, List<HomeAutomationPacket> outgoing) {
+		if (incoming.getData().has("resolution")) {
+			String resolution = incoming.getData().getString("resolution");
+			if ("addLookup".equals(resolution)) {
+				JSONObject nativeDevice = incoming.getData().getJSONObject("nativeDevice");
+				JSONArray commonDevice = incoming.getData().getJSONArray("commonDevice");
+
+				String lookup = addLookup(nativeDevice, commonDevice);
+				HomeAutomationPacket reply = new HomeAutomationPacket();
+				reply.getData().put("addLookupResult", lookup);
+				outgoing.add(reply);
 			}
 			if ("toCommon".equals(resolution)) {
 				Set<JSONArray> cDevs = new HashSet<JSONArray>();
-				if (hap.getDataIn().has("nativeDevice")) {
-
-					// Copy data from In to Out as we want to send back most of it.
-					hap.setDataOut(hap.getDataIn());
-					// Remove output destinations, so we can set our own.
-					hap.getOut().remove("destination");
-					hap.addDestination(hap.getDataIn().getString("postResolv"));
-					// Clear fields we don't need to send back from the DataOut
-					hap.getDataOut().remove("postResolv");
-					hap.getDataOut().remove("resolution");
-
+				if (incoming.getData().has("nativeDevice")) {
 					// Resolve native devices, then clear it out of the data
-					cDevs = convertToCommonNames(hap.getDataIn().getJSONObject("nativeDevice"));
-					hap.getDataOut().remove("nativeDevice");
+					cDevs = convertToCommonNames(incoming.getData().getJSONObject("nativeDevice"));
+					incoming.getData().remove("nativeDevice");
 
 					for (JSONArray cDev : cDevs) {
-						hap.getDataOut().remove("device");
-						hap.getDataOut().put("device", cDev);
-						hubInterface.sendDataToController(hap.getReturnPacket());
-					}
-					hap.setDataOut(new JSONObject());
+						// Copy data from In to Out as we want to send back most of it.
+						HomeAutomationPacket reply = HomeAutomationPacketHelper.generateReplyPacket(incoming,getModuleChannelName());
 
+						// Remove output destinations, so we can set our own.
+						reply.removeDestination();
+						reply.addDestination(incoming.getData().getString("postResolv"));
+
+						// Clear fields we don't need to send back from the DataOut
+						reply.getData().remove("postResolv");
+						reply.getData().remove("resolution");
+						reply.getData().remove("device");
+						
+						reply.getData().put("device", cDev);
+						outgoing.add(reply);
+					}
 				}
 			}
 			if ("toNative".equals(resolution)) {
 				Set<JSONObject> nDevs = new HashSet<JSONObject>();
-				if (hap.getDataIn().has("device")) {
+				if (incoming.getData().has("device")) {
 
-					// Copy data from In to Out as we want to send back most of it.
-					hap.setDataOut(hap.getDataIn());
-					// Remove output destinations, so we can set our own.
-					hap.getOut().remove("destination");
 					String postResolv = null;
-					if (hap.getDataIn().has("postResolv")) {
-						postResolv = hap.getDataIn().getString("postResolv");
+					if (incoming.getData().has("postResolv")) {
+						postResolv = incoming.getData().getString("postResolv");
 					}
-					// Clear fields we don't need to send back from the DataOut
-					hap.getDataOut().remove("postResolv");
-					hap.getDataOut().remove("resolution");
-
 					// Resolve native devices, then clear it out of the data
-					nDevs = convertToNativeNames(hap.getDataIn().getJSONArray("device"));
-					hap.getDataOut().remove("device");
+					nDevs = convertToNativeNames(incoming.getData().getJSONArray("device"));
 
 					for (JSONObject nDev : nDevs) {
+						// Copy data from In to Out as we want to send back most of it.
+						HomeAutomationPacket reply = HomeAutomationPacketHelper.generateReplyPacket(incoming,getModuleChannelName());
+
+						// Clear fields we don't need to send back from the DataOut
+						reply.getData().remove("device");
+						reply.getData().remove("postResolv");
+						reply.getData().remove("resolution");
+						
+						
+						reply.removeDestination();
 						if (null == postResolv) {
 							if (nDev.has("controlChannel")) {
 								String controlChannel = nDev.getString("controlChannel");
-								hap.removeDestination();
-								hap.addDestination(controlChannel);
+								reply.addDestination(controlChannel);
 							} else {
 								log.error("Native device block doesn't have controChannel." + nDev);
 							}
 						} else {
-							hap.addDestination(postResolv);
+							reply.addDestination(postResolv);
 						}
-						hap.getDataOut().remove("nativeDevice");
-						hap.getDataOut().put("nativeDevice", nDev);
-						hubInterface.sendDataToController(hap.getReturnPacket());
+						reply.getData().remove("nativeDevice");
+						reply.getData().put("nativeDevice", nDev);
+						outgoing.add(reply);
 					}
-					hap.setDataOut(new JSONObject());
 				}
 			}
-		}
-
-		if (hap.hasReturnData()) {
-			hubInterface.sendDataToController(hap.getReturnPacket());
 		}
 	}
 
@@ -169,4 +173,5 @@ public class DeviceResolver extends HomeAutomationModule {
 		}
 
 	}
+
 }

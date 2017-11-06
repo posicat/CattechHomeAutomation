@@ -2,6 +2,7 @@ package org.cattech.homeAutomation.ProcessManager;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import org.cattech.homeAutomation.communicationHub.ChannelController;
@@ -30,6 +31,17 @@ public class ProcessManager extends HomeAutomationModule {
 	}
 
 	@Override
+	public String getModuleChannelName() {
+		return "ProcessManager";
+	}
+	
+	@Override
+	protected void processPacketRequest(HomeAutomationPacket incoming, List<HomeAutomationPacket> outgoing) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
 	public void run() {
 		running = true;
 		while (running) {
@@ -51,11 +63,4 @@ public class ProcessManager extends HomeAutomationModule {
 			sleepNoThrow(10000);
 		}
 	}
-
-	@Override
-	protected void processMessage(HomeAutomationPacket hap) {
-		// TODO Auto-generated method stub
-		
-	}
-
 }

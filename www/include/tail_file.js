@@ -7,7 +7,7 @@ function loadNextTail(fname,highlights,offset,delay) {
 }
 
 function doLoadNextTail(fname,highlights,offset) {
-        $.get("/cgi-bin/tail_file.cgi?fname="+fname+"&highlights="+highlights+"&offset="+offset, function(data) {
+        $.get("./tail_file.cgi?fname="+fname+"&highlights="+highlights+"&offset="+offset, function(data) {
                 var block=$(document.documentElement);
                         var vb=$("#view_block");
 

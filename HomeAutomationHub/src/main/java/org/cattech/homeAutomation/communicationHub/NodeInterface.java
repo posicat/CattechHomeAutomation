@@ -23,7 +23,7 @@ public abstract class NodeInterface implements Runnable {
 		this.running = false;
 		shutdown();
 	}
-	
+
 	public void stop() {
 		this.running = false;
 	}
@@ -34,7 +34,7 @@ public abstract class NodeInterface implements Runnable {
 
 	public void sendDataToController(String data, NodeInterface fromNode) {
 		this.controller.processIncomingData(data, fromNode);
-		
+
 	}
 
 	// Abstract Methods
@@ -49,6 +49,5 @@ public abstract class NodeInterface implements Runnable {
 	public void setNodeName(String nodeName) {
 		this.nodeName = nodeName;
 	}
-
 
 }

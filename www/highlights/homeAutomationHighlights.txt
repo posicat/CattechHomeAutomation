@@ -1,0 +1,4 @@
+/(&quot;nativeDevice&quot;:\{[^}]*\})/<span style="background-color:#A6A">$1<\/span>/
+/(&quot;device&quot;:\[[^]]*\])/<span style="background-color:#AA6">$1<\/span>/
+/(&quot;channel&quot;:"[^"]*")/<span style="background-color:#AAD">$1<\/span>/
+/(&quot;destination&quot;:\[[^]]*\])/<span style="background-color:#6AD">$1<\/span>/

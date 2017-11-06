@@ -36,6 +36,6 @@ public class NodeInterfaceSocket extends NodeInterface {
 
 	@Override
 	public void sendDataToNode(String data) throws IOException {
-		output.write((data+"\r\n").getBytes());
+		output.write((data + "\r\n").getBytes());
 	}
 }

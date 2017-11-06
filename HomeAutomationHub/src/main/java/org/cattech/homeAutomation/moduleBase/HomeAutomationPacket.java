@@ -4,70 +4,56 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class HomeAutomationPacket {
-	private static final String PACKET_DATA = "data";
-	private static final String PACKET_SOURCE = "source";
-	private static final String PACKET_DESTINATION = "destination";
-	private JSONObject jsonIn = null;
-	private JSONObject jsonOut = null;
-	private JSONObject jsonDataIn = null;
-	private JSONObject jsonDataOut = null;
-	
-	public HomeAutomationPacket(String returnPacketSource,String packet) {
-		jsonIn= new JSONObject(packet);
-		if (jsonIn.has(PACKET_DATA)) {
-			jsonDataIn=jsonIn.getJSONObject(PACKET_DATA);
-		}
-		jsonOut = new JSONObject("{}");
-		jsonDataOut = new JSONObject("{}");
-		
-		if (jsonIn.has(PACKET_SOURCE)) {
-			//	Generate the default return header
-			JSONArray destination = new JSONArray();
-			destination.put(jsonIn.get(PACKET_SOURCE));
-			jsonOut.putOnce(PACKET_DESTINATION, destination);
-			jsonOut.putOnce(PACKET_SOURCE, returnPacketSource);
+	static final String PACKET_DATA = "data";
+	static final String PACKET_SOURCE = "source";
+	static final String PACKET_DESTINATION = "destination";
+
+	private JSONObject wrapper = null;
+	private JSONObject data = null;
+
+	public HomeAutomationPacket(String returnPacketSource, String packet) {
+		wrapper = new JSONObject(packet);
+		if (wrapper.has(PACKET_DATA)) {
+			data = wrapper.getJSONObject(PACKET_DATA);
 		}
 	}
 
-	public String getReturnPacket() {
-		jsonOut.put(PACKET_DATA, jsonDataOut);
-		return jsonOut.toString();
-	}
-	
-	public JSONObject getDataIn( ) {
-		return jsonDataIn;
+	public HomeAutomationPacket() {
+		this.wrapper = new JSONObject();
+		this.data = new JSONObject();
 	}
 
-	public JSONObject getDataOut( ) {
-		return jsonDataOut;
+	public String toString() {
+		JSONObject toStr = HomeAutomationPacketHelper.copyJSONObject(wrapper);
+		JSONObject dataCopy = HomeAutomationPacketHelper.copyJSONObject(data);
+		toStr.put(PACKET_DATA, dataCopy);
+		return toStr.toString();
 	}
 
-	public void setDataOut(JSONObject newJson) {
-		jsonDataOut = newJson;
+	public JSONObject getData() {
+		return data;
 	}
 
-	public JSONObject getIn( ) {
-		return jsonIn;
-	}
-	
-	public JSONObject getOut( ) {
-		return jsonOut;
+	public JSONObject getWrapper() {
+		return wrapper;
 	}
 
-	public boolean hasReturnData() {
-		return jsonDataOut.length() > 0;
+	public boolean hasData() {
+		return data.length() > 0;
 	}
 
 	public void addDestination(String channel) {
-		if (! jsonOut.has("destination")) {
-			jsonOut.put("destination",new JSONArray());
+		if (!wrapper.has("destination")) {
+			wrapper.put("destination", new JSONArray());
 		}
-		jsonOut.getJSONArray("destination").put(channel);
+		wrapper.getJSONArray("destination").put(channel);
 	}
 
 	public void removeDestination() {
-		jsonOut.remove("destination");
+		wrapper.remove("destination");
 	}
 
-	
+	public void setData(JSONObject data) {
+		this.data = data;
+	}
 }

@@ -7,11 +7,11 @@ import org.apache.log4j.Logger;
 // Mainly for testing this implements a string based node controller.
 
 public class NodeInterfaceString extends NodeInterface {
-	private Logger						log			= Logger.getLogger(this.getClass());
+	private Logger log = Logger.getLogger(this.getClass());
 
-	boolean								fullTrace	= false;
+	boolean fullTrace = false;
 
-	private volatile ArrayList<String>	dataFromController;
+	private volatile ArrayList<String> dataFromController;
 
 	public NodeInterfaceString(ChannelController controller) {
 		super(controller);
@@ -19,7 +19,8 @@ public class NodeInterfaceString extends NodeInterface {
 		dataFromController = new ArrayList<String>();
 	}
 
-	// This method never really needs to be called, since we don't need to watch for a string to be sent
+	// This method never really needs to be called, since we don't need to watch for
+	// a string to be sent
 	// but it's here just in case some other method relies on it doing something.
 	@Override
 	public void watchForData() {

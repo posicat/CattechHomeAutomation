@@ -1,0 +1,20 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
+
+<head>
+	<title>HomeAutomation Log</title>
+	<script type="text/javascript" src="/include/jquery.js"></script>
+	<script>
+		function load_data(block, href) {
+			$(block).html("Loading...");
+			$(block).load(href, null);
+			return false;
+		}
+	</script>
+
+</head>
+<body>
+	<div id="logDiv"></div>
+	<script>
+		load_data("#logDiv", "tail_file.cgi?fname=[log]/HomeAutomationHub.log&highlights=./highlights/homeAutomationHighlights.txt&offset=0");
+	</script>
+</body>

@@ -32,30 +32,32 @@ public class EventHandler extends HomeAutomationModule {
 	}
 
 	@Override
-	protected void processMessage(HomeAutomationPacket hap) {
+	protected void processPacketRequest(HomeAutomationPacket incoming, List<HomeAutomationPacket> outgoing) {
+
 		InputStream is = null;
 
-		List<JSONObject> actions = getActionsForEvent(hap, true);
+		List<JSONObject> actions = getActionsForEvent(incoming, true);
 
 		log.debug("Result of reactions : " + actions.toString());
-		
+
 		boolean handledInternally = true;
 		for (JSONObject action : actions) {
 			if (action.has("destination")) {
 				action.put("source", "EventHandler");
 				hubInterface.sendDataToController(action.toString());
-			}else{
+			} else {
 				handledInternally = false;
 			}
 		}
-		
+
 		if (!handledInternally) {
-			
-			hap.setDataOut(hap.getDataIn());
-			hap.getDataOut().put("viaWeb", "true");
-			hap.removeDestination();
-			hap.addDestination("WebEventHandler");
-			String event = hap.getReturnPacket();
+			HomeAutomationPacket reply = new HomeAutomationPacket();
+
+			reply.setData(incoming.getData());
+			reply.getData().put("viaWeb", "true");
+			reply.removeDestination();
+			reply.addDestination("WebEventHandler");
+			String event = reply.toString();
 
 			log.info("Forwarded to web eventHandler, something wasn't handled: " + event);
 			URL url;
@@ -73,7 +75,7 @@ public class EventHandler extends HomeAutomationModule {
 		}
 	}
 
-	private List<JSONObject> getActionsForEvent(HomeAutomationPacket hap, boolean limitToEarliestNext) {
+	private List<JSONObject> getActionsForEvent(HomeAutomationPacket incoming, boolean limitToEarliestNext) {
 		Connection conn = getHomeAutomationDBConnection();
 		Statement stmt;
 		ResultSet rs;
@@ -91,8 +93,8 @@ public class EventHandler extends HomeAutomationModule {
 			while (rs.next()) {
 				JSONObject triggerEvent = new JSONObject(rs.getString("event"));
 				boolean match = DeviceNameHelper.commonDescriptorsMatch(triggerEvent.getJSONArray("device"),
-						hap.getDataIn().getJSONArray("device"))
-						&& triggerEvent.getString("action").equals(hap.getDataIn().getString("action"));
+						incoming.getData().getJSONArray("device"))
+						&& triggerEvent.getString("action").equals(incoming.getData().getString("action"));
 				if (match) {
 					log.debug("Matched : " + rs.getString("event"));
 					triggerMatches.add(new JSONObject(rs.getString("action")));
@@ -108,9 +110,9 @@ public class EventHandler extends HomeAutomationModule {
 
 		for (JSONObject trigger : triggerMatches) {
 			try {
-				log.debug("Processing : "+trigger.toString());
+				log.debug("Processing : " + trigger.toString());
 				JSONArray actions = trigger.getJSONArray("reactions");
-				
+
 				stmt = conn.createStatement();
 				String query = "SELECT action FROM reactions WHERE reactions_id in (" + actions.join(",") + ")";
 

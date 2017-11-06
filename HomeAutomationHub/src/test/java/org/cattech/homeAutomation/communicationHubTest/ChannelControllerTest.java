@@ -18,22 +18,27 @@ public class ChannelControllerTest extends BaseTestWithController {
 	public void testRegisterChannel() throws Exception {
 		NodeInterfaceString testInterface = new NodeInterfaceString(controller);
 
-		String result = registerChannel(testInterface,new String[]{"a"});
+		String result = registerChannel(testInterface, new String[] { "a" });
 
-		JSONAssert.assertEquals("{\"source\":\"ChannelController\",\"status\":\"registered\",\"channel\":[\"a\"],\"nodeName\":\""
-				+ testInterface.getNodeName() + "\"}", result, true);
+		JSONAssert.assertEquals(
+				"{\"source\":\"ChannelController\",\"status\":\"registered\",\"channel\":[\"a\"],\"nodeName\":\""
+						+ testInterface.getNodeName() + "\"}",
+				result, true);
 	}
 
 	@Test
 	public void testSendDataToChannel() throws Exception {
 		NodeInterfaceString testInterface = new NodeInterfaceString(controller);
 
-		String result = registerChannel(testInterface,new String[]{"a"});
+		String result = registerChannel(testInterface, new String[] { "a" });
 
-		JSONAssert.assertEquals("{\"source\":\"ChannelController\",\"status\":\"registered\",\"channel\":[\"a\"],\"nodeName\":\""
-				+ testInterface.getNodeName() + "\"}", result, true);
+		JSONAssert.assertEquals(
+				"{\"source\":\"ChannelController\",\"status\":\"registered\",\"channel\":[\"a\"],\"nodeName\":\""
+						+ testInterface.getNodeName() + "\"}",
+				result, true);
 
-		testInterface.sendDataToController("{\"destination\":[\"a\"],\"source\":\"a\",\"data\":{\"test\":\"success\"}}");
+		testInterface
+				.sendDataToController("{\"destination\":[\"a\"],\"source\":\"a\",\"data\":{\"test\":\"success\"}}");
 
 		result = testInterface.getDataFromController();
 		JSONAssert.assertEquals("{\"source\":\"a\",\"channel\":\"a\",\"nodeName\":\"" + testInterface.getNodeName()
@@ -44,13 +49,16 @@ public class ChannelControllerTest extends BaseTestWithController {
 	public void testSendDataToDifferentChannel() throws Exception {
 		NodeInterfaceString testInterface = new NodeInterfaceString(controller);
 
-		String result = registerChannel(testInterface,new String[]{"a"});
+		String result = registerChannel(testInterface, new String[] { "a" });
 
-		JSONAssert.assertEquals("{\"source\":\"ChannelController\",\"status\":\"registered\",\"channel\":[\"a\"],\"nodeName\":\""
-				+ testInterface.getNodeName() + "\"}", result, true);
-		
-		testInterface.sendDataToController("{\"destination\":[\"b\"],\"source\":\"a\",\"data\":{\"test\":\"should not send, no node b\"}}");
-		//This will display a "No node regitered" error on the server, can be ignored.
+		JSONAssert.assertEquals(
+				"{\"source\":\"ChannelController\",\"status\":\"registered\",\"channel\":[\"a\"],\"nodeName\":\""
+						+ testInterface.getNodeName() + "\"}",
+				result, true);
+
+		testInterface.sendDataToController(
+				"{\"destination\":[\"b\"],\"source\":\"a\",\"data\":{\"test\":\"should not send, no node b\"}}");
+		// This will display a "No node regitered" error on the server, can be ignored.
 
 		result = testInterface.getDataFromController();
 		assertEquals(null, result);
@@ -61,17 +69,22 @@ public class ChannelControllerTest extends BaseTestWithController {
 		NodeInterfaceString testInterfaceA = new NodeInterfaceString(controller);
 		NodeInterfaceString testInterfaceB = new NodeInterfaceString(controller);
 
-		String result = registerChannel(testInterfaceA,new String[]{"a"});
+		String result = registerChannel(testInterfaceA, new String[] { "a" });
 
-		JSONAssert.assertEquals("{\"source\":\"ChannelController\",\"status\":\"registered\",\"channel\":[\"a\"],\"nodeName\":\""
-				+ testInterfaceA.getNodeName() + "\"}", result, true);
+		JSONAssert.assertEquals(
+				"{\"source\":\"ChannelController\",\"status\":\"registered\",\"channel\":[\"a\"],\"nodeName\":\""
+						+ testInterfaceA.getNodeName() + "\"}",
+				result, true);
 
-		result = registerChannel(testInterfaceB,new String[]{"b"});
-		JSONAssert.assertEquals("{\"source\":\"ChannelController\",\"status\":\"registered\",\"channel\":[\"b\"],\"nodeName\":\""
-				+ testInterfaceB.getNodeName() + "\"}", result, true);
+		result = registerChannel(testInterfaceB, new String[] { "b" });
+		JSONAssert.assertEquals(
+				"{\"source\":\"ChannelController\",\"status\":\"registered\",\"channel\":[\"b\"],\"nodeName\":\""
+						+ testInterfaceB.getNodeName() + "\"}",
+				result, true);
 
 		// Send from A to A, should be received by A only
-		testInterfaceA.sendDataToController("{\"destination\":[\"a\"],\"source\":\"a\",\"data\":{\"test\":\"success1\"}}");
+		testInterfaceA
+				.sendDataToController("{\"destination\":[\"a\"],\"source\":\"a\",\"data\":{\"test\":\"success1\"}}");
 
 		result = testInterfaceA.getDataFromController();
 		JSONAssert.assertEquals("{\"source\":\"a\",\"channel\":\"a\",\"nodeName\":\"" + testInterfaceA.getNodeName()
@@ -81,7 +94,8 @@ public class ChannelControllerTest extends BaseTestWithController {
 		assertEquals(null, result);
 
 		// Send from A to B, should be received by B only
-		testInterfaceA.sendDataToController("{\"destination\":[\"b\"],\"source\":\"a\",\"data\":{\"test\":\"success2\"}}");
+		testInterfaceA
+				.sendDataToController("{\"destination\":[\"b\"],\"source\":\"a\",\"data\":{\"test\":\"success2\"}}");
 
 		result = testInterfaceA.getDataFromController();
 		assertEquals(null, result);
@@ -91,7 +105,8 @@ public class ChannelControllerTest extends BaseTestWithController {
 				+ "\",\"data\":{\"test\":\"success2\"}}", result, true);
 
 		// Send from B to A, should be received by A only
-		testInterfaceB.sendDataToController("{\"destination\":[\"a\"],\"source\":\"b\",\"data\":{\"test\":\"success3\"}}");
+		testInterfaceB
+				.sendDataToController("{\"destination\":[\"a\"],\"source\":\"b\",\"data\":{\"test\":\"success3\"}}");
 
 		result = testInterfaceA.getDataFromController();
 		JSONAssert.assertEquals("{\"source\":\"b\",\"channel\":\"a\",\"nodeName\":\"" + testInterfaceB.getNodeName()

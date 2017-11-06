@@ -14,9 +14,9 @@ import org.json.JSONObject;
 //import org.json.JSONObject;
 
 public class ChannelController {
-	private Logger						log			= Logger.getLogger(this.getClass());
-	
-	// Data packet field names 
+	private Logger log = Logger.getLogger(this.getClass());
+
+	// Data packet field names
 	public static final String NODE_DATA_SOURCE = "source";
 	public static final String NODE_DATA_DESTINATION = "destination";
 	public static final String NODE_DATA_BLOCK = "data";
@@ -117,10 +117,10 @@ public class ChannelController {
 				for (int i = 0; i < destinations.length(); i++) {
 					String channel = destinations.getString(i);
 					jsonOut.put(NODE_DATA_CHANNEL, channel);
-					sendToChannel(channel, jsonOut,true);
+					sendToChannel(channel, jsonOut, true);
 				}
 				jsonOut.put("all_channels", destinations.toString());
-				sendToChannel("all", jsonOut,false);
+				sendToChannel("all", jsonOut, false);
 			}
 		} catch (Exception e) {
 			errors += e.getMessage();
@@ -139,7 +139,7 @@ public class ChannelController {
 		}
 	}
 
-	private void sendToChannel(String channel, JSONObject jsonOut,boolean throwNoChannel) throws Exception {
+	private void sendToChannel(String channel, JSONObject jsonOut, boolean throwNoChannel) throws Exception {
 		ArrayList<NodeInterface> nodes;
 		// if (NODE_SEND_TO_ALL_ADDRESS.equals(channel)) {
 		// nodes = allNodes;

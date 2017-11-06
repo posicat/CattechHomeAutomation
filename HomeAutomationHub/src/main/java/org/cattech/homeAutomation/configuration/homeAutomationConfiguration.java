@@ -11,14 +11,14 @@ import org.apache.log4j.SimpleLayout;
 
 public class homeAutomationConfiguration {
 
-	private static final String	ENV_FOLDER_CONFIG		= "HOMEAUTOMATION_CONFIG";
-	private static final String	ENV_FOLDER_MODULES		= "HOMEAUTOMATION_MODULES";
-	private static final String	ENV_FOLDER_LIBRARIES	= "HOMEAUTOMATION_LIB";
-	private static final String	ENV_FOLDER_HOME			= "HOMEAUTOMATION_HOME";
-	private static final String	ENV_FOLDER_LOGS			= "HOMEAUTOMATION_LOG";
+	private static final String ENV_FOLDER_CONFIG = "HOMEAUTOMATION_CONFIG";
+	private static final String ENV_FOLDER_MODULES = "HOMEAUTOMATION_MODULES";
+	private static final String ENV_FOLDER_LIBRARIES = "HOMEAUTOMATION_LIB";
+	private static final String ENV_FOLDER_HOME = "HOMEAUTOMATION_HOME";
+	private static final String ENV_FOLDER_LOGS = "HOMEAUTOMATION_LOG";
 
-	private static Properties	props					= new Properties();
-	private Logger				log						= Logger.getLogger(this.getClass());
+	private static Properties props = new Properties();
+	private Logger log = Logger.getLogger(this.getClass());
 
 	public homeAutomationConfiguration() throws HomeAutomationConfigurationException {
 		initialize();
@@ -58,12 +58,13 @@ public class homeAutomationConfiguration {
 
 		loadConfiguration();
 
-//		try {
-//			Class.forName("com.mysql.jdbc.Driver").newInstance();
-//		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-//			log.error("Could not initialize com.mysql.jdbc.Driver", e);
-//			e.printStackTrace();
-//		}
+		// try {
+		// Class.forName("com.mysql.jdbc.Driver").newInstance();
+		// } catch (InstantiationException | IllegalAccessException |
+		// ClassNotFoundException e) {
+		// log.error("Could not initialize com.mysql.jdbc.Driver", e);
+		// e.printStackTrace();
+		// }
 	}
 
 	// ====================================================================================================
@@ -93,14 +94,18 @@ public class homeAutomationConfiguration {
 
 	private static void throwIfNotExistantDirectory(String prop, String dir)
 			throws HomeAutomationConfigurationException {
-		if (null == dir) { throw (new HomeAutomationConfigurationException(prop + " : Null folder name")); }
+		if (null == dir) {
+			throw (new HomeAutomationConfigurationException(prop + " : Null folder name"));
+		}
 
 		File f = new File(dir);
 
-		if (!f.exists()) { throw (new HomeAutomationConfigurationException(
-				prop + " : Folder " + dir + " does not exist")); }
-		if (!f.isDirectory()) { throw (new HomeAutomationConfigurationException(
-				prop + " : Path " + dir + " is not a folder")); }
+		if (!f.exists()) {
+			throw (new HomeAutomationConfigurationException(prop + " : Folder " + dir + " does not exist"));
+		}
+		if (!f.isDirectory()) {
+			throw (new HomeAutomationConfigurationException(prop + " : Path " + dir + " is not a folder"));
+		}
 
 	}
 	// ====================================================================================================
@@ -136,14 +141,11 @@ public class homeAutomationConfiguration {
 	}
 
 	public String getDBURL() {
-		 String url = "jdbc:mysql://"
-				+ props.getProperty("db.host")
-		 		+ "/"+props.getProperty("db.name") + "?"
-		 		+ "useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC"
-				+ "&user="+props.getProperty("db.username")
-				+ "&password="+props.getProperty("db.password");
-//		 log.info(url);
-		 return url;
+		String url = "jdbc:mysql://" + props.getProperty("db.host") + "/" + props.getProperty("db.name") + "?"
+				+ "useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC"
+				+ "&user=" + props.getProperty("db.username") + "&password=" + props.getProperty("db.password");
+		// log.info(url);
+		return url;
 	}
 
 	// ================================================================================

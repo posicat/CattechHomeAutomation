@@ -18,18 +18,17 @@ import org.cattech.homeAutomation.moduleBase.HomeAutomationModule;
 
 public class Hub {
 	private static Logger log = Logger.getLogger(Hub.class);
-	
-	private static ChannelController	controller			= null;
+
+	private static ChannelController controller = null;
 	private static homeAutomationConfiguration config;
-	
+
 	public static void main(String[] args) throws IOException, HomeAutomationConfigurationException {
 		config = new homeAutomationConfiguration();
 		controller = new ChannelController(config);
 
 		NodeSocketConnectionManager server = new NodeSocketConnectionManager(config.getPort(), controller);
 		new Thread(server, "Socket Connection Manager").start();
-		
-		
+
 		List<HomeAutomationModule> modules = loadModules();
 
 		for (HomeAutomationModule mod : modules) {
@@ -48,7 +47,7 @@ public class Hub {
 		server.stop();
 	}
 
-	//================================================================================
+	// ================================================================================
 	private static List<HomeAutomationModule> loadModules() {
 		List<HomeAutomationModule> modules = new ArrayList<HomeAutomationModule>();
 		File folder = new File(config.getModulesFolder());
@@ -67,58 +66,60 @@ public class Hub {
 		System.setProperty("java.class.path", classPath);
 		log.info("Classpath : " + classPath);
 
-		if (null != listOfFiles) for (File jarName : listOfFiles) {
-			log.info("Found Jar : " + jarName);
+		if (null != listOfFiles)
+			for (File jarName : listOfFiles) {
+				log.info("Found Jar : " + jarName);
 
-			JarFile jarFile;
-			URLClassLoader classLoader;
-			String rawURL = null;
-			try {
-				rawURL = "jar:file:" + jarName.getAbsolutePath() + "!/";
-				URL[] url = { new URL(rawURL) };
-				classLoader = URLClassLoader.newInstance(url);
-				jarFile = new JarFile(jarName);
-				Enumeration<JarEntry> e = jarFile.entries();
+				JarFile jarFile;
+				URLClassLoader classLoader;
+				String rawURL = null;
+				try {
+					rawURL = "jar:file:" + jarName.getAbsolutePath() + "!/";
+					URL[] url = { new URL(rawURL) };
+					classLoader = URLClassLoader.newInstance(url);
+					jarFile = new JarFile(jarName);
+					Enumeration<JarEntry> e = jarFile.entries();
 
-				while (e.hasMoreElements()) {
-					JarEntry je = e.nextElement();
-					if (je.isDirectory() || !je.getName().endsWith(".class")) {
-						continue;
-					}
-					// -6 because of .class
-					String className = je.getName().substring(0, je.getName().length() - 6);
-					className = className.replace('/', '.');
-					Object clazz = null;
-					try {
-						clazz = classLoader.loadClass(className);
-					} catch (ClassNotFoundException e1) {
-						log.error("Class we found was not found - should never happen");
-						e1.printStackTrace();
-					}
-					if (clazz!=null && HomeAutomationModule.class.isAssignableFrom((Class<?>) clazz)) {
-						log.info("Module : "+((Class<?>) clazz).getName());
+					while (e.hasMoreElements()) {
+						JarEntry je = e.nextElement();
+						if (je.isDirectory() || !je.getName().endsWith(".class")) {
+							continue;
+						}
+						// -6 because of .class
+						String className = je.getName().substring(0, je.getName().length() - 6);
+						className = className.replace('/', '.');
+						Object clazz = null;
 						try {
-							clazz = ((Class<?>) clazz).getConstructor(ChannelController.class).newInstance(controller);
-							modules.add((HomeAutomationModule) clazz);
-						} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-								| InvocationTargetException | NoSuchMethodException | SecurityException e1) {
-							log.error("Could not create instance of " + clazz.getClass().getName());
+							clazz = classLoader.loadClass(className);
+						} catch (ClassNotFoundException e1) {
+							log.error("Class we found was not found - should never happen");
 							e1.printStackTrace();
 						}
-					} else {
-						if (clazz != null) {
-							log.info("Library " + ((Class<?>) clazz).getName());
+						if (clazz != null && HomeAutomationModule.class.isAssignableFrom((Class<?>) clazz)) {
+							log.info("Module : " + ((Class<?>) clazz).getName());
+							try {
+								clazz = ((Class<?>) clazz).getConstructor(ChannelController.class)
+										.newInstance(controller);
+								modules.add((HomeAutomationModule) clazz);
+							} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+									| InvocationTargetException | NoSuchMethodException | SecurityException e1) {
+								log.error("Could not create instance of " + clazz.getClass().getName());
+								e1.printStackTrace();
+							}
+						} else {
+							if (clazz != null) {
+								log.info("Library " + ((Class<?>) clazz).getName());
+							}
 						}
 					}
+				} catch (IOException e2) {
+					log.error("Could not load jar : " + rawURL + "(" + e2.getMessage() + ")");
 				}
-			} catch (IOException e2) {
-				log.error("Could not load jar : " + rawURL + "(" + e2.getMessage() + ")");
 			}
-		}
 		return modules;
 	}
 
-	//================================================================================
-	//================================================================================
+	// ================================================================================
+	// ================================================================================
 
 }

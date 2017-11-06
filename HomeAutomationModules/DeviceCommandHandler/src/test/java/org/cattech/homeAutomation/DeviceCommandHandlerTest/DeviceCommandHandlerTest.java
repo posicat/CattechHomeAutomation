@@ -14,7 +14,7 @@ public class DeviceCommandHandlerTest extends BaseTestForModules {
 	@Before
 	public void setUp() throws Exception {
 		super.setUp();
-		deviceCommandHandler=new DeviceCommandHandler(controller);
+		deviceCommandHandler = new DeviceCommandHandler(controller);
 		new Thread(deviceCommandHandler, "Testing DeviceCommandHandler").start();
 		registerChannel(testInterface, new String[] { "DeviceResolver", "EventHandler" });
 	}
