@@ -5,9 +5,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
-import org.apache.log4j.RollingFileAppender;
-import org.apache.log4j.SimpleLayout;
 
 public class homeAutomationConfiguration {
 
@@ -43,28 +43,20 @@ public class homeAutomationConfiguration {
 		overridePropsWithEnvironment("homeAutomation.lib", ENV_FOLDER_LIBRARIES);
 		overridePropsWithEnvironment("homeAutomation.log", ENV_FOLDER_LOGS);
 
-		SimpleLayout layout = new SimpleLayout();
-
-		RollingFileAppender appender;
 		String logFile = getLogFolder() + "/HomeautomationHub.log";
+		Logger rootLogger = Logger.getRootLogger();
+		ConsoleAppender consoleAppender = (ConsoleAppender) rootLogger.getAppender("console");
+		
+		FileAppender fileAppender;
 		try {
-			appender = new RollingFileAppender(layout, logFile, true);
-			appender.setMaxFileSize("40MB");
-			Logger.getRootLogger().addAppender(appender);
+			fileAppender = new FileAppender(consoleAppender.getLayout(), logFile);
+			fileAppender.setName("file");
+			rootLogger.addAppender(fileAppender);
 		} catch (IOException e) {
-			log.error("Could not divert log to file:" + logFile);
-			e.printStackTrace();
+			log.error("Couldn't set logfile.",e);
 		}
 
 		loadConfiguration();
-
-		// try {
-		// Class.forName("com.mysql.jdbc.Driver").newInstance();
-		// } catch (InstantiationException | IllegalAccessException |
-		// ClassNotFoundException e) {
-		// log.error("Could not initialize com.mysql.jdbc.Driver", e);
-		// e.printStackTrace();
-		// }
 	}
 
 	// ====================================================================================================

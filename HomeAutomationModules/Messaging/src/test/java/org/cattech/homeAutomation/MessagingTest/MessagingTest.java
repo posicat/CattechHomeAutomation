@@ -1,21 +1,21 @@
-package org.cattech.homeAutomation.DeviceEventHandlerTest;
+package org.cattech.homeAutomation.MessagingTest;
 
-import org.cattech.homeAutomation.DeviceEventHandler.DeviceEventHandler;
+import org.cattech.homeAutomation.Messaging.Messaging;
 import org.cattech.homeAutomation.moduleBaseTest.BaseTestForModules;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 
-public class DeviceEventHandlerTest extends BaseTestForModules {
-	DeviceEventHandler deviceEventHandler;
+public class MessagingTest extends BaseTestForModules {
+	Messaging messaging;
 
 	@Override
 	@Before
 	public void setUp() throws Exception {
 		super.setUp();
-		deviceEventHandler = new DeviceEventHandler(controller);
-		new Thread(deviceEventHandler, "Testing DeviceEventHandler").start();
+		messaging = new Messaging(controller);
+		new Thread(messaging, "Testing DeviceEventHandler").start();
 		registerChannel(testInterface, new String[] { "DeviceResolver", "EventHandler" });
 	}
 
@@ -23,7 +23,7 @@ public class DeviceEventHandlerTest extends BaseTestForModules {
 	@After
 	public void tearDown() throws Exception {
 		super.tearDown();
-		deviceEventHandler.setRunning(false);
+		messaging.setRunning(false);
 	}
 
 	@Test

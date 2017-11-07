@@ -80,11 +80,12 @@ public class ChannelController {
 		return nodes;
 	}
 
-	public void processIncomingData(String data, NodeInterface fromNode) {
+	public void processIncomingData(String incoming, NodeInterface fromNode) {
 		String errors = "";
 		try {
+			log.debug("<--- FROM " + fromNode.getNodeName() + " " + incoming);
 
-			JSONObject jsonIn = new JSONObject(data);
+			JSONObject jsonIn = new JSONObject(incoming);
 			JSONObject jsonOut = new JSONObject();
 
 			if (jsonIn.has(NODE_REGISTER_CHANNELS)) {
@@ -106,6 +107,8 @@ public class ChannelController {
 				jsonOut.put(NODE_DATA_CHANNEL, registerChannels);
 				jsonOut.put(NODE_NODE_NAME, fromNode.getNodeName());
 				fromNode.sendDataToNode(jsonOut.toString());
+				log.debug("---> TO " + registerChannels + " " + jsonOut);
+
 			}
 
 			if (jsonIn.has(NODE_DATA_DESTINATION) && jsonIn.has(NODE_DATA_BLOCK)) {
@@ -118,6 +121,7 @@ public class ChannelController {
 					String channel = destinations.getString(i);
 					jsonOut.put(NODE_DATA_CHANNEL, channel);
 					sendToChannel(channel, jsonOut, true);
+					log.debug("---> TO " + channel + " " + jsonOut);
 				}
 				jsonOut.put("all_channels", destinations.toString());
 				sendToChannel("all", jsonOut, false);
@@ -131,7 +135,7 @@ public class ChannelController {
 				JSONObject jsonOut = new JSONObject();
 				jsonOut.put(NODE_ERROR_MESSAGE, errors);
 				log.error("Error :" + errors);
-				log.error(data);
+				log.error(incoming);
 				fromNode.sendDataToNode(jsonOut.toString());
 			} catch (Exception e) {
 				e.printStackTrace();

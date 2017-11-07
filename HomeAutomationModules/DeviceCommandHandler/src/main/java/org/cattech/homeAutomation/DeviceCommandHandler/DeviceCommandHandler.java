@@ -15,7 +15,6 @@ public class DeviceCommandHandler extends HomeAutomationModule {
 
 	@Override
 	protected void processPacketRequest(HomeAutomationPacket incoming, List<HomeAutomationPacket> outgoing) {
-		log.debug("Packet : " + incoming);
 		if (null != incoming.getWrapper()) {
 			if (!incoming.getWrapper().has("data")) {
 				log.error("Packet has no data element. " + incoming);

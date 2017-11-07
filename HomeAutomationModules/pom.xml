@@ -13,10 +13,11 @@
 	<modules>
 		<module>DeviceResolver</module>
 		<module>ProcessManager</module>
-		<module>EventHandlerWebRelay</module>
+		<module>Messaging</module>
 		<module>DeviceEventHandler</module>
 		<module>DeviceCommandHandler</module>
 		<module>X10InterfaceHandler</module>
+		<module>EventHandler</module>
 	</modules>
 	<build>
 		<plugins>

@@ -5,9 +5,16 @@ cp -v  	www/*				/home/homeAutomation/public_html/
 
 # Deoploy Java applications
 mkdir /usr/local/homeAutomation/bin/
+
+rm -rf /usr/local/homeAutomation/bin/modules/
 mkdir /usr/local/homeAutomation/bin/modules/
+
+rm -rf /usr/local/homeAutomation/bin/lib/
 mkdir /usr/local/homeAutomation/bin/lib/
+
+rm -rf /usr/local/homeAutomation/bin/log/
 mkdir /usr/local/homeAutomation/bin/log/
+
 mkdir /etc/homeAutomation/
 
 cp -v Deploy/target/*.jar 		/usr/local/homeAutomation/bin/

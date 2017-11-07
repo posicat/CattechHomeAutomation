@@ -5,6 +5,7 @@
     <artifactId>HomeAutomationModules</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
+  <groupId>org.cattech.homeAutomation.HomeAutomationModules</groupId>
   <artifactId>Messaging</artifactId>
   <dependencies>
   	<dependency>
@@ -12,5 +13,4 @@
   		<artifactId>junit</artifactId>
   	</dependency>
   </dependencies>
-  <groupId>org.cattech.homeAutomation.HomeAutomationModules</groupId>
 </project>

@@ -1,4 +1,4 @@
-package org.cattech.homeAutomation.EventHandlerWebRelay;
+package org.cattech.homeAutomation.EventHandler;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -32,13 +32,18 @@ public class EventHandler extends HomeAutomationModule {
 	}
 
 	@Override
+	public String getModuleChannelName() {
+		return "EventHandler";
+	}
+
+	@Override
 	protected void processPacketRequest(HomeAutomationPacket incoming, List<HomeAutomationPacket> outgoing) {
 
 		InputStream is = null;
 
 		List<JSONObject> actions = getActionsForEvent(incoming, true);
 
-		log.debug("Result of reactions : " + actions.toString());
+//		log.debug("Result of reactions : " + actions.toString());
 
 		boolean handledInternally = true;
 		for (JSONObject action : actions) {
@@ -49,7 +54,7 @@ public class EventHandler extends HomeAutomationModule {
 				handledInternally = false;
 			}
 		}
-
+		
 		if (!handledInternally) {
 			HomeAutomationPacket reply = new HomeAutomationPacket();
 
@@ -88,7 +93,7 @@ public class EventHandler extends HomeAutomationModule {
 			if (limitToEarliestNext) {
 				query += " WHERE earliestNext <= NOW()";
 			}
-			log.debug("SQL : " + query);
+//			log.debug("SQL : " + query);
 			rs = stmt.executeQuery(query);
 			while (rs.next()) {
 				JSONObject triggerEvent = new JSONObject(rs.getString("event"));
@@ -99,7 +104,7 @@ public class EventHandler extends HomeAutomationModule {
 					log.debug("Matched : " + rs.getString("event"));
 					triggerMatches.add(new JSONObject(rs.getString("action")));
 				} else {
-					log.debug("No Match : " + rs.getString("event"));
+//					log.debug("No Match : " + rs.getString("event"));
 				}
 			}
 		} catch (SQLException e) {
@@ -110,13 +115,13 @@ public class EventHandler extends HomeAutomationModule {
 
 		for (JSONObject trigger : triggerMatches) {
 			try {
-				log.debug("Processing : " + trigger.toString());
+//				log.debug("Processing : " + trigger.toString());
 				JSONArray actions = trigger.getJSONArray("reactions");
 
 				stmt = conn.createStatement();
 				String query = "SELECT action FROM reactions WHERE reactions_id in (" + actions.join(",") + ")";
 
-				log.debug("SQL : " + query);
+//				log.debug("SQL : " + query);
 
 				rs = stmt.executeQuery(query);
 				while (rs.next()) {
@@ -133,10 +138,4 @@ public class EventHandler extends HomeAutomationModule {
 		closeNoThrow(conn);
 		return result;
 	}
-
-	@Override
-	public String getModuleChannelName() {
-		return "EventHandler";
-	}
-
 }

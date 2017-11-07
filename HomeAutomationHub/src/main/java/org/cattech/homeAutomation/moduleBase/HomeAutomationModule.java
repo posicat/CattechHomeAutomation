@@ -42,16 +42,14 @@ public abstract class HomeAutomationModule implements Runnable {
 		while (running) {
 			String packet = hubInterface.getDataFromController();
 			if (null != packet) {
-				log.info("Message : " + packet);
 
 				HomeAutomationPacket incoming = new HomeAutomationPacket(this.getModuleChannelName(), packet);
 				List<HomeAutomationPacket> outgoing = new ArrayList<HomeAutomationPacket>();
 				processPacketRequest(incoming, outgoing);
-
+				
 				for (HomeAutomationPacket reply : outgoing) {
 					try {
 						hubInterface.sendDataToController(reply.toString());
-						log.debug("Return packet" + reply);
 					} catch (Exception e) {
 						log.error("Error sending message back to node", e);
 					}
