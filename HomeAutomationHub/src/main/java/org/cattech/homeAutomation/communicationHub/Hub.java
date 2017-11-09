@@ -1,15 +1,7 @@
 package org.cattech.homeAutomation.communicationHub;
 
-import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
 import org.apache.log4j.Logger;
 import org.cattech.homeAutomation.configuration.HomeAutomationConfigurationException;
@@ -20,22 +12,28 @@ public class Hub {
 	private static Logger log = Logger.getLogger(Hub.class);
 
 	private static ChannelController controller = null;
-	private static homeAutomationConfiguration config;
 
 	public static void main(String[] args) throws IOException, HomeAutomationConfigurationException {
-		config = new homeAutomationConfiguration();
-		controller = new ChannelController(config);
+		controller = new ChannelController(new homeAutomationConfiguration());
 
-		NodeSocketConnectionManager server = new NodeSocketConnectionManager(config.getPort(), controller);
+		NodeSocketConnectionManager server = new NodeSocketConnectionManager(controller);
 		new Thread(server, "Socket Connection Manager").start();
 
-		List<HomeAutomationModule> modules = loadModules();
+		ModuleManager loader;
+		try {
+			loader = new ModuleManager(controller.getConfig());
 
-		for (HomeAutomationModule mod : modules) {
-			new Thread(mod, "Module : " + mod.getModuleChannelName()).start();
+			List<HomeAutomationModule> modules = loader.findLoadableModules(controller);
+			
+			for (HomeAutomationModule mod : modules) {
+				new Thread(mod, "Module : " + mod.getModuleChannelName()).start();
+			}
+		} catch (Exception e) {
+			log.error("Could not initialize module loader, skipping module load.",e);
 		}
+				
 
-		log.info("Listening...");
+		log.info("\r\n\r\nListening . . .");
 		try {
 			while (!server.isStopped()) {
 				Thread.sleep(1000);
@@ -47,79 +45,6 @@ public class Hub {
 		server.stop();
 	}
 
-	// ================================================================================
-	private static List<HomeAutomationModule> loadModules() {
-		List<HomeAutomationModule> modules = new ArrayList<HomeAutomationModule>();
-		File folder = new File(config.getModulesFolder());
-		File[] listOfFiles = folder.listFiles((dir, name) -> name.endsWith(".jar"));
-
-		int total;
-		if (null == listOfFiles) {
-			total = 0;
-		} else {
-			total = listOfFiles.length;
-		}
-
-		log.info("Loading " + total + " modules from " + config.getModulesFolder());
-		String classPath = System.getProperty("java.class.path");
-		classPath += config.getLibFolder();
-		System.setProperty("java.class.path", classPath);
-		log.info("Classpath : " + classPath);
-
-		if (null != listOfFiles)
-			for (File jarName : listOfFiles) {
-				log.info("Found Jar : " + jarName);
-
-				JarFile jarFile;
-				URLClassLoader classLoader;
-				String rawURL = null;
-				try {
-					rawURL = "jar:file:" + jarName.getAbsolutePath() + "!/";
-					URL[] url = { new URL(rawURL) };
-					classLoader = URLClassLoader.newInstance(url);
-					jarFile = new JarFile(jarName);
-					Enumeration<JarEntry> e = jarFile.entries();
-
-					while (e.hasMoreElements()) {
-						JarEntry je = e.nextElement();
-						if (je.isDirectory() || !je.getName().endsWith(".class")) {
-							continue;
-						}
-						// -6 because of .class
-						String className = je.getName().substring(0, je.getName().length() - 6);
-						className = className.replace('/', '.');
-						Object clazz = null;
-						try {
-							clazz = classLoader.loadClass(className);
-						} catch (ClassNotFoundException e1) {
-							log.error("Class we found was not found - should never happen");
-							e1.printStackTrace();
-						}
-						if (clazz != null && HomeAutomationModule.class.isAssignableFrom((Class<?>) clazz)) {
-							log.info("Module : " + ((Class<?>) clazz).getName());
-							try {
-								clazz = ((Class<?>) clazz).getConstructor(ChannelController.class)
-										.newInstance(controller);
-								modules.add((HomeAutomationModule) clazz);
-							} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-									| InvocationTargetException | NoSuchMethodException | SecurityException e1) {
-								log.error("Could not create instance of " + clazz.getClass().getName());
-								e1.printStackTrace();
-							}
-						} else {
-							if (clazz != null) {
-								log.info("Library " + ((Class<?>) clazz).getName());
-							}
-						}
-					}
-				} catch (IOException e2) {
-					log.error("Could not load jar : " + rawURL + "(" + e2.getMessage() + ")");
-				}
-			}
-		return modules;
-	}
-
-	// ================================================================================
-	// ================================================================================
+	
 
 }

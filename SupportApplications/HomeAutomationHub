@@ -1,0 +1,5 @@
+#!/bin/sh
+
+cd /usr/local/homeAutomation/bin/
+
+java -cp ../lib/\*:./HomeAutomationHub.jar org.cattech.homeAutomation.communicationHub.Hub

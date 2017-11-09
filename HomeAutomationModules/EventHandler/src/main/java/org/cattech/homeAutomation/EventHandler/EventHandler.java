@@ -1,11 +1,5 @@
 package org.cattech.homeAutomation.EventHandler;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,6 +12,7 @@ import org.cattech.homeAutomation.deviceHelpers.DeviceNameHelper;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationModule;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class EventHandler extends HomeAutomationModule {
@@ -39,43 +34,19 @@ public class EventHandler extends HomeAutomationModule {
 	@Override
 	protected void processPacketRequest(HomeAutomationPacket incoming, List<HomeAutomationPacket> outgoing) {
 
-		InputStream is = null;
-
+		log.debug("EvemtHandler request : " + incoming);
+		
 		List<JSONObject> actions = getActionsForEvent(incoming, true);
 
-//		log.debug("Result of reactions : " + actions.toString());
+		log.debug("Result of reactions : " + actions.toString());
 
-		boolean handledInternally = true;
 		for (JSONObject action : actions) {
 			if (action.has("destination")) {
 				action.put("source", "EventHandler");
+				log.error("Action away..."+action);
 				hubInterface.sendDataToController(action.toString());
 			} else {
-				handledInternally = false;
-			}
-		}
-		
-		if (!handledInternally) {
-			HomeAutomationPacket reply = new HomeAutomationPacket();
-
-			reply.setData(incoming.getData());
-			reply.getData().put("viaWeb", "true");
-			reply.removeDestination();
-			reply.addDestination("WebEventHandler");
-			String event = reply.toString();
-
-			log.info("Forwarded to web eventHandler, something wasn't handled: " + event);
-			URL url;
-			try {
-				url = new URL(urlPrefix + "?event=" + URLEncoder.encode(event, "UTF-8"));
-				is = url.openStream();
-				BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-				String line;
-				while ((line = reader.readLine()) != null) {
-					log.info("Response:" + line);
-				}
-			} catch (IOException e) {
-				log.error("Error forwarding message to web event handler (why are we doing this?)", e);
+				log.error("Action has no destination."+action);
 			}
 		}
 	}
@@ -93,7 +64,7 @@ public class EventHandler extends HomeAutomationModule {
 			if (limitToEarliestNext) {
 				query += " WHERE earliestNext <= NOW()";
 			}
-//			log.debug("SQL : " + query);
+			log.debug("SQL : " + query);
 			rs = stmt.executeQuery(query);
 			while (rs.next()) {
 				JSONObject triggerEvent = new JSONObject(rs.getString("event"));
@@ -104,7 +75,7 @@ public class EventHandler extends HomeAutomationModule {
 					log.debug("Matched : " + rs.getString("event"));
 					triggerMatches.add(new JSONObject(rs.getString("action")));
 				} else {
-//					log.debug("No Match : " + rs.getString("event"));
+					log.debug("No Match : " + rs.getString("event"));
 				}
 			}
 		} catch (SQLException e) {
@@ -128,12 +99,14 @@ public class EventHandler extends HomeAutomationModule {
 					log.debug("Adding action : " + rs.getString("action"));
 					JSONObject action = new JSONObject(rs.getString("action"));
 					result.add(action);
+					log.error("Action added."+action);
 				}
-			} catch (SQLException e) {
+			} catch (SQLException|JSONException e) {
 				log.error("Error while reading data from reactions table.", e);
 			}
 		}
 		// ---------- Done ----------
+		log.error("Action done");
 
 		closeNoThrow(conn);
 		return result;

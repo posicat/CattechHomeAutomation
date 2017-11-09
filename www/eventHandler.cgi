@@ -3,7 +3,7 @@ use strict;
 BEGIN { 
 	unshift @INC,'./lib';
 	unshift @INC,'/home/websites/lib';
-	unshift @INC,'/usr/local/homeAutomation/bin/lib';
+	unshift @INC,'/usr/local/homeAutomation/lib';
 }
 use File::Copy;
 use URI::Escape;

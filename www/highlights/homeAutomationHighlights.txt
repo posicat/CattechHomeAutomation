@@ -1,6 +1,6 @@
-/(&quot;nativeDevice&quot;:\{[^}]*\})/<span style="background-color:#A6A">$1<\/span>/
-/(&quot;device&quot;:\[[^]]*\])/<span style="background-color:#AA6">$1<\/span>/
-/(&quot;channel&quot;:"[^"]*")/<span style="background-color:#AAD">$1<\/span>/
-/(&quot;destination&quot;:\[[^]]*\])/<span style="background-color:#6AD">$1<\/span>/
-/(%lt;---)/<span style="background-color:#7F7">$1<\/span>/
-/(---%gt;)/<span style="background-color:#F77">$1<\/span>/
+/(&quot;nativeDevice&quot;:\{[^}]*\})/<span style="background-color:#C8C">$1<\/span>/
+/(&quot;device&quot;:\[[^]]*\])/<span style="background-color:#CC8">$1<\/span>/
+/(&quot;channel&quot;:"[^"]*")/<span style="background-color:#CCf">$1<\/span>/
+/(&quot;destination&quot;:\[[^]]*\])/<span style="background-color:#6CF">$1<\/span>/
+/(&lt;---)/<span style="background-color:#7F7">$1<\/span>/
+/(---&gt;)/<span style="background-color:#F77">$1<\/span>/

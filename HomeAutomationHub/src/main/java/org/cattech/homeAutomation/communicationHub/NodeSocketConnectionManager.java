@@ -15,8 +15,8 @@ public class NodeSocketConnectionManager implements Runnable {
 	protected Thread runningThread = null;
 	protected ChannelController controller;
 
-	public NodeSocketConnectionManager(int port, ChannelController controller) {
-		this.serverPort = port;
+	public NodeSocketConnectionManager(ChannelController controller) {
+		this.serverPort = controller.getConfig().getPort();
 		this.controller = controller;
 	}
 

@@ -138,7 +138,7 @@ public class DeviceResolver extends HomeAutomationModule {
 	}
 
 	private String addLookup(JSONObject nativeDevice, JSONArray commonDevice) {
-		log.info("\tAdding loopup " + nativeDevice.toString() + " <--> " + commonDevice.toString());
+//		log.info("\tAdding lookup " + nativeDevice.toString() + " <--> " + commonDevice.toString());
 		lookupTable.put(nativeDevice, commonDevice);
 		return "successful";
 	}

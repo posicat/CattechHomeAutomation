@@ -35,10 +35,13 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<addClasspath>true</addClasspath>
+							<addClasspath>false</addClasspath>
 							<mainClass>org.cattech.homeAutomation.communicationHub.Hub</mainClass>
-							<classpathPrefix>lib/</classpathPrefix>
+							<classpathPrefix>../lib/*</classpathPrefix>
 						</manifest>
+						<manifestEntries>
+							<Class-Path>../lib/*</Class-Path>
+						</manifestEntries>
 					</archive>
 				</configuration>
 				<executions>

@@ -35,8 +35,8 @@ if ($first) {
         print "<tt>\n";
 }
 
-$input{fname} ='[log]/HomeautomationHub.log';
-$input{highlights} ='./highlights/homeAutomationHighlights.txt';
+#$input{fname} ='[log]/HomeautomationHub.log';
+#$input{highlights} ='./highlights/homeAutomationHighlights.txt';
 
 my $fname = expandRootPaths($input{fname});
 my $HLFile = expandRootPaths($input{highlights});
@@ -159,7 +159,7 @@ sub tail_file {
 sub expandRootPaths {
 	my ($fn)=@_;
 
-	my $logFolder='/usr/local/homeAutomation/bin/log/';
+	my $logFolder='/usr/local/homeAutomation/log';
 
 	$fn=~s/\[log\]/$logFolder/g;
 

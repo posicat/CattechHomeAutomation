@@ -36,7 +36,8 @@ public class homeAutomationConfiguration {
 		} catch (IOException | NullPointerException e) {
 			log.warn("Could not load jar-internal configuration", e);
 		}
-
+		
+		props.getProperty("mail.smtp.host", "localhost");
 		overridePropsWithEnvironment("homeAutomation.config", ENV_FOLDER_HOME);
 		overridePropsWithEnvironment("homeAutomation.config", ENV_FOLDER_CONFIG);
 		overridePropsWithEnvironment("homeAutomation.modules", ENV_FOLDER_MODULES);
