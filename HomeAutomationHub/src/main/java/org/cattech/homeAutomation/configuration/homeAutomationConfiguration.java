@@ -141,6 +141,10 @@ public class homeAutomationConfiguration {
 		return url;
 	}
 
+	public String getHost() {
+		return props.getProperty("hub.host", "localhost");
+	}
+
 	// ================================================================================
 
 }

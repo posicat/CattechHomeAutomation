@@ -37,6 +37,7 @@ public class X10InterfaceHandler extends HomeAutomationModule {
 			try {
 				pr = rt.exec(heyuCommand);
 				retVal = pr.waitFor();
+				pr.destroy();
 			} catch (IOException | InterruptedException e) {
 				log.error("Command failed to execute", e);
 			}

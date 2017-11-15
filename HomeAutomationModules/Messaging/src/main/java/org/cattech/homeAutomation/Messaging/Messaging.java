@@ -74,18 +74,21 @@ public class Messaging extends HomeAutomationModule {
 			try {
 				message.setFrom(configuration.getProps().getProperty("mail.from"));
 				String[] pthParts = pth.toString().split(":");
-				log.info("pth"+pthParts[1]);
+				log.info("Destination paths : "+pthParts[1]);
 				message.setRecipient(Message.RecipientType.TO, new InternetAddress(pthParts[1]));
+				
 				if (data.has("subject")) {
 					message.setHeader("Subject", data.getString("subject"));
+				}else {
+					message.setHeader("Subject", "HomeAutomation");
 				}
+				
 				if (data.has("body")) {
 					message.setText(data.getString("body"));
 				}else {
 					message.setText("");
 				}
 				Transport.send(message);
-
 			} catch (MessagingException e) {
 				log.error("Error creating message.", e);
 			}
