@@ -3,7 +3,7 @@ package org.cattech.homeAutomation.communicationHubTest;
 import org.apache.log4j.Logger;
 import org.cattech.homeAutomation.communicationHub.ChannelController;
 import org.cattech.homeAutomation.communicationHub.NodeInterfaceString;
-import org.cattech.homeAutomation.configuration.homeAutomationConfiguration;
+import org.cattech.homeAutomation.configuration.HomeAutomationConfiguration;
 import org.json.JSONArray;
 import org.junit.After;
 import org.junit.Before;
@@ -21,7 +21,7 @@ public class BaseTestWithController {
 
 	@Before
 	protected void setUp() throws Exception {
-		controller = new ChannelController(new homeAutomationConfiguration(false));
+		controller = new ChannelController(new HomeAutomationConfiguration(false));
 
 		testInterface = new NodeInterfaceString(controller);
 		registerChannel(testInterface, new String[] { TESTCHANNEL });

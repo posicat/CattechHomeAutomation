@@ -13,7 +13,7 @@ public class MessagingTest extends BaseTestForModules {
 	public void setUp() throws Exception {
 		super.setUp();
 		messaging = new Messaging(controller);
-		new Thread(messaging, "Testing DeviceEventHandler").start();
+		new Thread(messaging, "Testing EventHandler").start();
 		registerChannel(testInterface, new String[] { "DeviceResolver", "EventHandler" });
 	}
 
@@ -28,12 +28,12 @@ public class MessagingTest extends BaseTestForModules {
 //	public void testForwardsNativeDevicesToResolver() {
 //
 //		testInterface.sendDataToController(
-//				"{\"destination\":[\"DeviceEventHandler\"]," + testPacketSource + ",\"data\":{\"nativeDevice\":\"\"}}");
+//				"{\"destination\":[\"EventHandler\"]," + testPacketSource + ",\"data\":{\"nativeDevice\":\"\"}}");
 //
 //		String result = waitforResult(testInterface, 10000);
 //
 //		JSONAssert.assertEquals(
-//				"{\"nodeName\":\"DeviceEventHandler\",\"data\":{\"resolution\":\"toCommon\",\"nativeDevice\":\"\"},\"channel\":\"DeviceResolver\",\"source\":\"DeviceEventHandler\"}s",
+//				"{\"nodeName\":\"EventHandler\",\"data\":{\"resolution\":\"toCommon\",\"nativeDevice\":\"\"},\"channel\":\"DeviceResolver\",\"source\":\"EventHandler\"}s",
 //				result, false);
 //	}
 //
@@ -41,12 +41,12 @@ public class MessagingTest extends BaseTestForModules {
 //	public void testForwardsCommonDevicesToEventHandler() {
 //
 //		testInterface.sendDataToController(
-//				"{\"destination\":[\"DeviceEventHandler\"]," + testPacketSource + ",\"data\":{\"device\":[\"lamp\"]}}");
+//				"{\"destination\":[\"EventHandler\"]," + testPacketSource + ",\"data\":{\"device\":[\"lamp\"]}}");
 //
 //		String result = waitforResult(testInterface, 10000);
 //
 //		JSONAssert.assertEquals(
-//				"{\"nodeName\":\"DeviceEventHandler\",\"data\":{\"device\":[\"lamp\"]},\"channel\":\"EventHandler\",\"source\":\"DeviceEventHandler\"}",
+//				"{\"nodeName\":\"EventHandler\",\"data\":{\"device\":[\"lamp\"]},\"channel\":\"EventHandler\",\"source\":\"EventHandler\"}",
 //				result, false);
 //	}
 }

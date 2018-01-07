@@ -5,11 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
 import org.cattech.homeAutomation.communicationHub.ChannelController;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationModule;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
 
 public class ProcessManager extends HomeAutomationModule {
+	static Logger log = Logger.getLogger(ProcessManager.class.getName());
+
 	ArrayList<RestartableProcess> subProcesses = new ArrayList<RestartableProcess>();
 
 	public ProcessManager(ChannelController controller) {

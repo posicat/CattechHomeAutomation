@@ -50,4 +50,4 @@ if ( open(my $LOG,">>",$log) ) {
 my $channel='transient.heyuhelper';
 $::Gdebug=1;
 $::HA->registerToHub($channel,[$channel]);
-$::HA->sendDataToHub(['DeviceEventHandler'],$channel,$data);
+$::HA->sendDataToHub(['EventHandler'],$channel,$data);

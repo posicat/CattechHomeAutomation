@@ -2,9 +2,7 @@ package org.cattech.homeAutomation.communicationHub;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -14,16 +12,16 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import org.apache.log4j.Logger;
-import org.cattech.homeAutomation.configuration.homeAutomationConfiguration;
+import org.cattech.homeAutomation.configuration.HomeAutomationConfiguration;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationModule;
 
 public class ModuleManager {
 	private static Logger log = Logger.getLogger(ModuleManager.class);
 
 	static ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
-	homeAutomationConfiguration config;
+	HomeAutomationConfiguration config;
 
-	public ModuleManager(homeAutomationConfiguration config) throws Exception {
+	public ModuleManager(HomeAutomationConfiguration config) throws Exception {
 		this.config = config;
 		addSoftwareLibrary(config.getLibFolder());
 		log.info("Classpath:"+System.getProperty("java.class.path"));
@@ -53,7 +51,7 @@ public class ModuleManager {
 			log.info("Enumerating " + listOfFiles.length + " modules from " + config.getModulesFolder());
 
 			for (File jarName : listOfFiles) {
-				log.info("*** Found Jar : " + jarName);
+				log.info("Searching for modules in : " + jarName);
 
 				JarFile jarFile;
 				URLClassLoader classLoader;
@@ -80,17 +78,13 @@ public class ModuleManager {
 							e1.printStackTrace();
 						}
 						if (clazz != null && HomeAutomationModule.class.isAssignableFrom((Class<?>) clazz)) {
-							log.info("Module : " + ((Class<?>) clazz).getName());
+							log.info("========== Located module : " + ((Class<?>) clazz).getName() + " ==========");
 							try {
 								clazz = ((Class<?>) clazz).getConstructor(ChannelController.class).newInstance(controller);
 								modules.add((HomeAutomationModule) clazz);
 							} catch (Exception e1) {
-								log.info("Classpath : " + System.getProperty("java.class.path"));
 								log.error("Could not create instance of " + clazz.getClass().getName(), e1);
-							}
-						} else {
-							if (clazz != null) {
-								log.info("Library " + ((Class<?>) clazz).getName());
+								log.info("Classpath : " + System.getProperty("java.class.path"));
 							}
 						}
 					}

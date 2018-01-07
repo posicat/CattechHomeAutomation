@@ -16,12 +16,14 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import org.apache.log4j.Logger;
 import org.cattech.homeAutomation.communicationHub.ChannelController;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationModule;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
 import org.json.JSONObject;
 
 public class Messaging extends HomeAutomationModule {
+	static Logger log = Logger.getLogger(Messaging.class.getName());
 
 	public Messaging(ChannelController controller) {
 		super(controller);
@@ -68,7 +70,7 @@ public class Messaging extends HomeAutomationModule {
 
 		if ("mailto".equals(pth.getScheme())) {
 			Session mailSession = Session.getInstance(configuration.getProps());
-			mailSession.setDebug(true);
+//			mailSession.setDebug(true);
 			MimeMessage message = new MimeMessage(mailSession);
 
 			try {

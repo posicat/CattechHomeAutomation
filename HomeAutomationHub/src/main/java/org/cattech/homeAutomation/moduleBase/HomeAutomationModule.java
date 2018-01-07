@@ -1,65 +1,106 @@
 package org.cattech.homeAutomation.moduleBase;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.log4j.Logger;
 import org.cattech.homeAutomation.communicationHub.ChannelController;
 import org.cattech.homeAutomation.communicationHub.NodeInterfaceString;
-import org.cattech.homeAutomation.configuration.homeAutomationConfiguration;
+import org.cattech.homeAutomation.configuration.HomeAutomationConfiguration;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public abstract class HomeAutomationModule implements Runnable {
-	protected Logger log = Logger.getLogger(this.getClass());
+	private static final int WAIT_TIME_BETWEEN_PACKET_CHECKS = 1000;
+	private Logger log = Logger.getLogger(this.getClass());
 	protected NodeInterfaceString hubInterface;
 	protected boolean running = false;
-	protected homeAutomationConfiguration configuration;
+	protected HomeAutomationConfiguration configuration;
 
 	protected HomeAutomationModule(ChannelController controller) {
-		log.info("--- Initializing module, channels : " + getModuleChannelName() + " ---");
-		this.hubInterface = new NodeInterfaceString(controller);
-		// log.info(getModuleChannelName());
-		hubInterface.sendDataToController(
-				"{\"register\":[\"" + getModuleChannelName() + "\"],\"nodeName\":\"" + getModuleChannelName() + "\"}");
+		if (autoStartModule()) {
+			log.info("--- Initializing module, channels : " + getModuleChannelName() + " ---");
+			this.hubInterface = new NodeInterfaceString(controller);
+			// log.info(getModuleChannelName());
+			hubInterface.sendDataToController("{\"register\":[\"" + getModuleChannelName() + "\"],\"nodeName\":\""
+					+ getModuleChannelName() + "\"}");
 
-		String response = null;
-		while (null == response) {
-			response = hubInterface.getDataFromController();
-			sleepNoThrow(100);
+			String response = null;
+			while (null == response) {
+				response = hubInterface.getDataFromController();
+				sleepNoThrow(100);
+			}
+			log.info(response);
+			// log.info(response);
+			configuration = controller.getConfig();
+		} else {
+			log.info(" ! ! ! ! Module was not set to autoStart");
 		}
-		log.info(response);
-		// log.info(response);
-		configuration = controller.getConfig();
 	}
 
 	protected abstract void processPacketRequest(HomeAutomationPacket incoming, List<HomeAutomationPacket> outgoing);
+
 	public abstract String getModuleChannelName();
-	
+
 	public void run() {
-		running = true;
-		while (running) {
-			String packet = hubInterface.getDataFromController();
-			if (null != packet) {
-
-				HomeAutomationPacket incoming = new HomeAutomationPacket(this.getModuleChannelName(), packet);
-				List<HomeAutomationPacket> outgoing = new ArrayList<HomeAutomationPacket>();
-				processPacketRequest(incoming, outgoing);
-				
-				for (HomeAutomationPacket reply : outgoing) {
-					try {
-						hubInterface.sendDataToController(reply.toString());
-					} catch (Exception e) {
-						log.error("Error sending message back to node", e);
-					}
-				}
-
-			} else {
-				sleepNoThrow(1000);
-			}
+		running = autoStartModule();
+		while (this.running) {
+			checkForIncomingPacket();
 		}
 
+	}
+
+	public boolean autoStartModule() {
+		return true;
+	}
+
+	protected void sleepNoThrowWhileWatchingForIncomingPackets(int sleepThisLong) {
+		// Sleep for a specific amount of time, but keep checking packets
+		// Intermittently. Rounds to the nearest second effectively.
+		long doneAt = System.currentTimeMillis() + sleepThisLong;
+		while (doneAt > System.currentTimeMillis()) {
+			checkForIncomingPacket();
+		}
+	}
+
+	protected void checkForIncomingPacket() {
+		String packet = hubInterface.getDataFromController();
+		if (null != packet) {
+
+			HomeAutomationPacket incoming = new HomeAutomationPacket(this.getModuleChannelName(), packet);
+			List<HomeAutomationPacket> outgoing = new ArrayList<HomeAutomationPacket>();
+			processPacketRequest(incoming, outgoing);
+
+			processOutgoingPackets(outgoing);
+
+		} else {
+			sleepNoThrow(WAIT_TIME_BETWEEN_PACKET_CHECKS);
+		}
+	}
+
+	protected void processOutgoingPackets(List<HomeAutomationPacket> outgoing) {
+		for (HomeAutomationPacket reply : outgoing) {
+			try {
+				hubInterface.sendDataToController(reply.toString());
+			} catch (Exception e) {
+				log.error("Error sending message back to node", e);
+			}
+		}
 	}
 
 	public void sleepNoThrow(int delay) {
@@ -98,4 +139,68 @@ public abstract class HomeAutomationModule implements Runnable {
 			log.error("Error closeing DB connection", e);
 		}
 	}
+
+	protected Stack<JSONObject> getActionsForReactions(Connection conn, List<JSONObject> reactions) {
+		Stack<JSONObject> result = new Stack<JSONObject>();
+		for (JSONObject reaction : reactions) {
+			result.addAll(getActionsForReaction(conn, reaction));
+		}
+		return result;
+	}
+
+	protected Stack<JSONObject> getActionsForReaction(Connection conn, JSONObject reaction) {
+		Stack<JSONObject> result = new Stack<JSONObject>();
+		Statement stmt;
+		ResultSet rs;
+		log.debug("triggerMatches : " + reaction);
+		if (reaction != null && reaction.has("reactions")) {
+			try {
+				// log.debug("Processing : " + trigger.toString());
+				JSONArray reactionIDs = reaction.getJSONArray("reactions");
+
+				stmt = conn.createStatement();
+				String query = "SELECT action FROM reactions WHERE reactions_id in (" + reactionIDs.join(",") + ")";
+
+				log.debug("SQL : " + query);
+
+				rs = stmt.executeQuery(query);
+				while (rs.next()) {
+					log.debug("Adding action : " + rs.getString("action"));
+					JSONObject action = new JSONObject(rs.getString("action"));
+					result.add(action);
+					log.error("Action added." + action);
+				}
+			} catch (SQLException | JSONException e) {
+				log.error("Error while reading data from reactions table.", e);
+			}
+		}
+		return result;
+	}
+
+	protected String getDataFromURL(String devicesURL) throws IOException {
+		CloseableHttpClient httpClient = HttpClients.createDefault();
+		HttpPost postRequest = new HttpPost(devicesURL);
+		// NameValuePair[] data = {
+		// new NameValuePair("user", "joe"),
+		// new NameValuePair("password", "bloggs")
+		// };
+		// post.setRequestBody(data);
+		CloseableHttpResponse response = httpClient.execute(postRequest);
+
+		String responseString = new BasicResponseHandler().handleResponse(response);
+		response.close();
+
+		return responseString;
+	}
+
+	protected void writeFile(File authCache, String data) throws IOException {
+		FileUtils.writeStringToFile(authCache, data, "UTF-8");
+
+	}
+
+	protected String loadFile(File authCache) throws IOException {
+		String data = FileUtils.readFileToString(authCache, "UTF-8");
+		return data;
+	}
+
 }
