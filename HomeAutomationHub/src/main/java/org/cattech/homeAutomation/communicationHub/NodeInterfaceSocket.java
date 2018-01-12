@@ -6,6 +6,8 @@ import java.net.Socket;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
+import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
+
 public class NodeInterfaceSocket extends NodeInterface {
 
 	protected Socket clientSocket = null;
@@ -27,15 +29,26 @@ public class NodeInterfaceSocket extends NodeInterface {
 		}
 		while (super.isRunning()) {
 			try {
-				super.sendDataToController(input.nextLine(), this);
+				super.sendDataPacketToController(new HomeAutomationPacket(this.getNodeName(),input.nextLine()), this);
 			} catch (NoSuchElementException e) {
 				return;
 			}
 		}
 	}
-
+	
+	/**
+	 * @deprecated This method is replaced by sendDataPacketToNode 
+	 * 
+	 */
+	@Deprecated
 	@Override
 	public void sendDataToNode(String data) throws IOException {
 		output.write((data + "\r\n").getBytes());
+	}
+
+	@Override
+	public void sendDataPacketToNode(HomeAutomationPacket hap) throws Exception {
+		// TODO Auto-generated method stub
+		
 	}
 }

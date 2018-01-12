@@ -1,12 +1,7 @@
 package org.cattech.homeAutomation.nestInterfaceHandler;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 
@@ -14,9 +9,7 @@ import org.apache.log4j.Logger;
 import org.cattech.homeAutomation.communicationHub.ChannelController;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationModule;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
-import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONTokener;
 
 public class NestInterfaceHandler extends HomeAutomationModule {
 	static Logger log = Logger.getLogger(NestInterfaceHandler.class.getName());

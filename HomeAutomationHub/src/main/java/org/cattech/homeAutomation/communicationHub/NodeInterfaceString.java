@@ -3,20 +3,28 @@ package org.cattech.homeAutomation.communicationHub;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
+import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
 
-// Mainly for testing this implements a string based node controller.
+// Used for loadable module communications and testing.
 
 public class NodeInterfaceString extends NodeInterface {
 	private Logger log = Logger.getLogger(this.getClass());
 
 	boolean fullTrace = false;
 
-	private volatile ArrayList<String> dataFromController;
+	private volatile ArrayList<HomeAutomationPacket> dataFromController;
+
+	private String channel;
 
 	public NodeInterfaceString(ChannelController controller) {
 		super(controller);
-		this.dataFromController = new ArrayList<String>();
-		dataFromController = new ArrayList<String>();
+		this.dataFromController = new ArrayList<HomeAutomationPacket>();
+		dataFromController = new ArrayList<HomeAutomationPacket>();
+	}
+
+	public NodeInterfaceString(ChannelController controller, String channel) {
+		this(controller);
+		this.channel=channel;
 	}
 
 	// This method never really needs to be called, since we don't need to watch for
@@ -32,29 +40,55 @@ public class NodeInterfaceString extends NodeInterface {
 			}
 		}
 	}
-
+	/**
+	 *  @deprecated This method is replaced by getDataPacketFromController
+	 * 
+	 */
+	@Deprecated
 	@Override
 	synchronized public void sendDataToNode(String data) throws Exception {
 		if (fullTrace) {
 			log.info("<<<FROM CONTROL<<<" + data);
 		}
-		dataFromController.add(data);
+		dataFromController.add(new HomeAutomationPacket("hub",data));
 	}
 
+	@Override
+	synchronized public void sendDataPacketToNode(HomeAutomationPacket hap) throws Exception {
+		if (fullTrace) {
+			log.info("<<<FROM CONTROL<<<" + hap.toString());
+		}
+		dataFromController.add(hap);
+	}
+
+	/**
+	 *  @deprecated This method is replaced by getDataPacketFromController
+	 * 
+	 */
+	@Deprecated
 	synchronized public String getDataFromController() {
 		if (dataFromController.size() > 0) {
-			String data = dataFromController.remove(0);
-			return data;
+			return dataFromController.remove(0).toString();
 		} else {
 			return null;
 		}
 	}
 
-	synchronized public void sendDataToController(String data) {
-		if (fullTrace) {
-			log.info(">>>TO CONTROL>>>" + data);
+	synchronized public HomeAutomationPacket getDataPacketFromController() {
+		if (dataFromController.size() > 0) {
+			HomeAutomationPacket hap = dataFromController.remove(0);
+			return hap;
+		} else {
+			return null;
 		}
-		sendDataToController(data, this);
+	}
+
+	private String getModuleChannelName() {
+		return channel;
+	}
+	
+	private void setModuleChannelName(String moduleChannelName) {
+		this.channel=moduleChannelName;
 	}
 
 	public boolean isFullTrace() {
@@ -63,5 +97,24 @@ public class NodeInterfaceString extends NodeInterface {
 
 	public void setFullTrace(boolean fullTrace) {
 		this.fullTrace = fullTrace;
+	}
+
+	/**
+	 * @deprecated This method is replaced by sendDataPacketToController 
+	 * 
+	 */
+	@Deprecated
+	synchronized public void sendDataToController(String data) {
+		if (fullTrace) {
+			log.info(">>>TO CONTROL>>>" + data);
+		}
+		sendDataToController(data, this);
+	}
+	synchronized public void sendDataPacketToController(HomeAutomationPacket hap, String mqttBroker) {
+		if (fullTrace) {
+			log.info(">>>TO CONTROL>>>" + hap.toString() );
+		}
+		sendDataPacketToController(hap, this);
+		
 	}
 }

@@ -22,6 +22,9 @@ public class HomeAutomationPacketHelper {
 	}
 
 	public static JSONObject copyJSONObject(JSONObject jso) {
+		if (jso==null) {
+			return null;
+		}
 		return  new JSONObject(jso.toString());
 	}
 

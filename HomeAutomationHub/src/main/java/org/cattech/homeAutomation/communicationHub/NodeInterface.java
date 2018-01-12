@@ -1,5 +1,7 @@
 package org.cattech.homeAutomation.communicationHub;
 
+import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
+
 public abstract class NodeInterface implements Runnable {
 
 	private boolean running = false;
@@ -32,15 +34,29 @@ public abstract class NodeInterface implements Runnable {
 		return running;
 	}
 
+	/**
+	 * @deprecated This method is replaced by sendDataPacketToController 
+	 * 
+	 */
+	@Deprecated	
 	public void sendDataToController(String data, NodeInterface fromNode) {
 		this.controller.processIncomingData(data, fromNode);
+	}
 
+	public void sendDataPacketToController(HomeAutomationPacket hap, NodeInterface fromNode) {
+		this.controller.processIncomingDataPacket(hap, fromNode);
 	}
 
 	// Abstract Methods
 	public abstract void watchForData();
 
+	/**
+	 * @deprecated This method is replaced by sendDataPacketToNode 
+	 * 
+	 */
+	@Deprecated
 	public abstract void sendDataToNode(String data) throws Exception;
+	public abstract void sendDataPacketToNode(HomeAutomationPacket hap) throws Exception;
 
 	public String getNodeName() {
 		return nodeName;
@@ -49,5 +65,6 @@ public abstract class NodeInterface implements Runnable {
 	public void setNodeName(String nodeName) {
 		this.nodeName = nodeName;
 	}
+
 
 }

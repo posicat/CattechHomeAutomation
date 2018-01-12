@@ -82,9 +82,9 @@ public class WatchCatDatabaseHelper {
 				int delta = rs.getInt("delta");
 				if (null != mf) {
 					if (delta > 0) {
-						after = true;
+						after = Boolean.TRUE;
 					} else {
-						after = false;
+						after = Boolean.FALSE;
 					}
 				}
 			}
@@ -127,9 +127,9 @@ public class WatchCatDatabaseHelper {
 				int delta = rs.getInt("delta");
 				if (null != mf) {
 					if (delta > 0) {
-						after = true;
+						after = Boolean.TRUE;
 					} else {
-						after = false;
+						after = Boolean.FALSE;
 					}
 				}
 			}

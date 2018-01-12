@@ -83,7 +83,7 @@ public class EventHandler extends HomeAutomationModule {
 		log.info("Event signature:" + eventSignature);
 		log.debug("afterMin =  " + afterMin);
 
-		if (null==afterMin || afterMin) {
+		if (null==afterMin || afterMin.booleanValue()) {
 			boolean foundMatch = false;
 			try {
 				stmt = conn.createStatement();

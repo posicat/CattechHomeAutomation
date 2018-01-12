@@ -3,6 +3,7 @@ package org.cattech.homeAutomation.communicationHubTest;
 import static org.junit.Assert.assertEquals;
 
 import org.cattech.homeAutomation.communicationHub.NodeInterfaceString;
+import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
 import org.junit.Before;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -40,9 +41,9 @@ public class ChannelControllerTest extends BaseTestWithController {
 		testInterface
 				.sendDataToController("{\"destination\":[\"a\"],\"source\":\"a\",\"data\":{\"test\":\"success\"}}");
 
-		result = testInterface.getDataFromController();
+		HomeAutomationPacket hapResult = testInterface.getDataPacketFromController();
 		JSONAssert.assertEquals("{\"source\":\"a\",\"channel\":\"a\",\"nodeName\":\"" + testInterface.getNodeName()
-				+ "\",\"data\":{\"test\":\"success\"}}", result, true);
+				+ "\",\"data\":{\"test\":\"success\"}}", hapResult.toString(), true);
 	}
 
 	@Test

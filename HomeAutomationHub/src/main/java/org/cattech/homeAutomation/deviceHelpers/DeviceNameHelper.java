@@ -29,15 +29,16 @@ public class DeviceNameHelper {
 			if (!key.equals("controlChannel")) {
 				if (mightMatch.has(key)) {
 					mm = mightMatch.getString(key).toUpperCase();
-				}
-				if (toMatch.has(key)) {
-					tm = toMatch.getString(key).toUpperCase();
-				}
-				if (!mightMatch.has(key) || !mm.equals(tm)) {
-					keysMismatched++;
-					// log.debug("Didn't match " + key + " : " + mm + "::" + tm);
-				} else {
-					// log.debug("Matched " + key + " : " + mm + "::" + tm);
+					if (toMatch.has(key)) {
+						tm = toMatch.getString(key).toUpperCase();
+
+						if (!mightMatch.has(key) || !mm.equals(tm)) {
+							keysMismatched++;
+							// log.debug("Didn't match " + key + " : " + mm + "::" + tm);
+						} else {
+							// log.debug("Matched " + key + " : " + mm + "::" + tm);
+						}
+					}
 				}
 			}
 		}

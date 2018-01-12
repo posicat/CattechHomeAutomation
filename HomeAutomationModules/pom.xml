@@ -21,6 +21,7 @@
 		<module>WatchCat</module>
 		<module>NestInterfaceHandler</module>
 		<module>CommandHandler</module>
+		<module>MQTTBRoker</module>
 	</modules>
 	<build>
 		<plugins>

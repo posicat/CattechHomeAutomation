@@ -54,6 +54,8 @@ public class Messaging extends HomeAutomationModule {
 			if (incoming.getData().has("device")) {
 				// Sending a message to a user
 				String device = incoming.getData().getString("device");
+				
+				//TODO Add code to send to a device
 				handled = true;
 			}
 

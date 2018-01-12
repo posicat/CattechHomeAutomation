@@ -4,16 +4,12 @@ import java.util.List;
 import java.util.Stack;
 
 import org.cattech.homeAutomation.EventHandler.EventHandler;
-import org.cattech.homeAutomation.moduleBase.HomeAutomationModule;
-import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
 import org.cattech.homeAutomation.moduleBaseTest.BaseTestForModules;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.mockito.Mockito.*;
-import org.mockito.internal.matchers.Any;
 import org.skyscreamer.jsonassert.JSONAssert;
 
 public class EventHandlerTest extends BaseTestForModules {
