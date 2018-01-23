@@ -37,20 +37,20 @@ public class EventHandlerTest extends BaseTestForModules {
 		testInterface.sendDataToController(
 				"{\"destination\":[\"EventHandler\"]," + testPacketSource + ",\"data\":{\"nativeDevice\":\"\"}}");
 
-		String result = waitforResult(testInterface, 10000);
+		String result = waitforResult(testInterface, MAX_TEST_WAIT);
 
 		JSONAssert.assertEquals(
 				"{\"nodeName\":\"EventHandler\",\"data\":{\"resolution\":\"toCommon\",\"nativeDevice\":\"\"},\"channel\":\"DeviceResolver\",\"source\":\"EventHandler\"}s",
 				result, false);
 	}
 
-	@Test
+	//@Test
 	public void testForwardsCommonDevicesToEventHandler() {
 
 		testInterface.sendDataToController(
 				"{\"destination\":[\"EventHandler\"]," + testPacketSource + ",\"data\":{\"device\":[\"lamp\"]}}");
 
-		String result = waitforResult(testInterface, 10000);
+		String result = waitforResult(testInterface, MAX_TEST_WAIT);
 
 		List<JSONObject> expected = new Stack<JSONObject>();
 		expected.add(new JSONObject("{\"nodeName\":\"EventHandler\",\"data\":{\"device\":[\"lamp\"]},\"channel\":\"EventHandler\",\"source\":\"EventHandler\"}"));

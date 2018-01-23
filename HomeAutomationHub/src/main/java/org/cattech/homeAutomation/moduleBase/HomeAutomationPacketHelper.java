@@ -8,12 +8,12 @@ public class HomeAutomationPacketHelper {
 	public static HomeAutomationPacket generateReplyPacket(HomeAutomationPacket packet, String sourceChannel) {
 		HomeAutomationPacket reply = new HomeAutomationPacket();
 
-		if (packet.getWrapper().has(HomeAutomationPacket.PACKET_SOURCE)) {
+		if (packet.hasWrapper(HomeAutomationPacket.FIELD_SOURCE)) {
 			// Generate the default return header
 			JSONArray destination = new JSONArray();
-			destination.put(packet.getWrapper().get(HomeAutomationPacket.PACKET_SOURCE));
-			reply.getWrapper().put(HomeAutomationPacket.PACKET_DESTINATION, destination);
-			reply.getWrapper().put(HomeAutomationPacket.PACKET_SOURCE, sourceChannel);
+			destination.put(packet.getWrapper().get(HomeAutomationPacket.FIELD_SOURCE));
+			reply.putWrapper(HomeAutomationPacket.FIELD_DESTINATINO, destination);
+			reply.putWrapper(HomeAutomationPacket.FIELD_SOURCE, sourceChannel);
 
 			reply.setData(copyJSONObject(packet.getData()));
 		}

@@ -38,10 +38,10 @@ public class Messaging extends HomeAutomationModule {
 	protected void processPacketRequest(HomeAutomationPacket incoming, List<HomeAutomationPacket> outgoing) {
 		if (null != incoming.getWrapper()) {
 			boolean handled = false;
-			if (incoming.getData().has("user")) {
+			if (incoming.hasData("user")) {
 				// Sending a message to a user
-				String user = incoming.getData().getString("user");
-				String sendVia = incoming.getData().getString("sendVia");
+				String user = incoming.getDataString("user");
+				String sendVia = incoming.getDataString("sendVia");
 
 				List<URI> msgPaths = lookupUserMessagePath(user, sendVia);
 
@@ -51,9 +51,9 @@ public class Messaging extends HomeAutomationModule {
 
 				handled = true;
 			}
-			if (incoming.getData().has("device")) {
+			if (incoming.hasData("device")) {
 				// Sending a message to a user
-				String device = incoming.getData().getString("device");
+				String device = incoming.getDataString("device");
 				
 				//TODO Add code to send to a device
 				handled = true;

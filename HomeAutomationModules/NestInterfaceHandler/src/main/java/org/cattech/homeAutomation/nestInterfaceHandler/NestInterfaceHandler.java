@@ -42,6 +42,11 @@ public class NestInterfaceHandler extends HomeAutomationModule {
 	}
 
 	@Override
+	public boolean autoStartModule() {
+		return false;
+	}
+	
+	@Override
 	public void run() {
 		this.running = autoStartModule();
 		if (! this.running) {return;}
@@ -62,11 +67,11 @@ public class NestInterfaceHandler extends HomeAutomationModule {
 			log.debug("sensorPacket : \r\n" + sensorPacket);
 
 			sensorPacket.addDestination("sensorLogging");
-			sensorPacket.getWrapper().put("source", "nestInterfaceHandler");
+			sensorPacket.putWrapper("source", "nestInterfaceHandler");
 			String tempValue = null;
 			String humidValue = null;
-			sensorPacket.getData().put("temp", tempValue);
-			sensorPacket.getData().put("humid", humidValue);
+			sensorPacket.putData("temp", tempValue);
+			sensorPacket.putData("humid", humidValue);
 		}
 	}
 

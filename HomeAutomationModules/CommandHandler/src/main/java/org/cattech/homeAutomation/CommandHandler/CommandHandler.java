@@ -17,15 +17,15 @@ public class CommandHandler extends HomeAutomationModule {
 
 	@Override
 	protected void processPacketRequest(HomeAutomationPacket incoming, List<HomeAutomationPacket> outgoing) {
-		if (null != incoming.getWrapper()) {
-			if (!incoming.getWrapper().has("data")) {
+		if (incoming.hasWrapper()) {
+			if (!incoming.hasData()) {
 				log.error("Packet has no data element. " + incoming);
 			} else {
 				HomeAutomationPacket reply =HomeAutomationPacketHelper.generateReplyPacket(incoming, getModuleChannelName());
 				reply.setData(incoming.getData());
-				reply.getData().put("resolution", "toNative");
-				reply.getWrapper().remove("destination");
-				reply.getWrapper().put("destination", new String[] { "DeviceResolver" });
+				reply.putData("resolution", "toNative");
+				reply.removeFromWrapper("destination");
+				reply.putWrapper("destination", new String[] { "DeviceResolver" });
 				outgoing.add(reply);
 			}
 		}

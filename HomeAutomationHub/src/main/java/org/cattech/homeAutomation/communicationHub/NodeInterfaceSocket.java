@@ -29,7 +29,7 @@ public class NodeInterfaceSocket extends NodeInterface {
 		}
 		while (super.isRunning()) {
 			try {
-				super.sendDataPacketToController(new HomeAutomationPacket(this.getNodeName(),input.nextLine()), this);
+				super.sendDataPacketToController(new HomeAutomationPacket(input.nextLine()), this);
 			} catch (NoSuchElementException e) {
 				return;
 			}

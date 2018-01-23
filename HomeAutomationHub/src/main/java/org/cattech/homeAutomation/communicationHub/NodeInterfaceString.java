@@ -50,7 +50,7 @@ public class NodeInterfaceString extends NodeInterface {
 		if (fullTrace) {
 			log.info("<<<FROM CONTROL<<<" + data);
 		}
-		dataFromController.add(new HomeAutomationPacket("hub",data));
+		dataFromController.add(new HomeAutomationPacket(data));
 	}
 
 	@Override
@@ -58,7 +58,7 @@ public class NodeInterfaceString extends NodeInterface {
 		if (fullTrace) {
 			log.info("<<<FROM CONTROL<<<" + hap.toString());
 		}
-		dataFromController.add(hap);
+		dataFromController.add(new HomeAutomationPacket(hap.toString()));
 	}
 
 	/**
@@ -110,7 +110,7 @@ public class NodeInterfaceString extends NodeInterface {
 		}
 		sendDataToController(data, this);
 	}
-	synchronized public void sendDataPacketToController(HomeAutomationPacket hap, String mqttBroker) {
+	synchronized public void sendDataPacketToController(HomeAutomationPacket hap) {
 		if (fullTrace) {
 			log.info(">>>TO CONTROL>>>" + hap.toString() );
 		}

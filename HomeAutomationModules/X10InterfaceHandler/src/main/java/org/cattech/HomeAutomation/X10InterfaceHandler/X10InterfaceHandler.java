@@ -23,13 +23,13 @@ public class X10InterfaceHandler extends HomeAutomationModule {
 
 	@Override
 	protected void processPacketRequest(HomeAutomationPacket incoming, List<HomeAutomationPacket> outgoing) {
-		if (!incoming.getWrapper().has("data")) {
+		if (!incoming.hasWrapper("data")) {
 			log.error("Packet has no data element. " + incoming);
 		} else {
-			JSONObject device = incoming.getData().getJSONObject("nativeDevice");
+			JSONObject device = incoming.getDataJObj(HomeAutomationPacket.FIELD_DATA_NATIVE_DEVICE);
 			String unit = device.getString("unit");
 			String house = device.getString("house");
-			String action = incoming.getData().getString("action");
+			String action = incoming.getDataString("action");
 
 			String heyuCommand = "/usr/local/bin/heyu turn " + house.toLowerCase() + unit + " " + action.toLowerCase();
 			log.info("Executing : " + heyuCommand);

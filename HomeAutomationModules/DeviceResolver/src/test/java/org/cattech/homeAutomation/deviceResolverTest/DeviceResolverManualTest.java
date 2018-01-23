@@ -5,6 +5,7 @@ import org.cattech.homeAutomation.deviceResolver.DeviceResolver;
 import org.cattech.homeAutomation.moduleBaseTest.BaseTestForModules;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Test;
 
 public class DeviceResolverManualTest extends BaseTestForModules {
 	DeviceResolver deviceResolver;
@@ -25,9 +26,9 @@ public class DeviceResolverManualTest extends BaseTestForModules {
 		deviceResolver.setRunning(false);
 	}
 
-	// @Test
+	@Test
 	public void testCanTalkToLocalMySQL() throws HomeAutomationConfigurationException {
-		controller.getConfig().getProps().setProperty("homeAutomation.config", "d:/HomeAutomationHub/etc/");
+		controller.getConfig().getProps().setProperty("homeAutomation.config", "/etc/homeAutomation");
 		controller.getConfig().loadConfiguration();
 
 		deviceResolver.loadDeviceMappings();

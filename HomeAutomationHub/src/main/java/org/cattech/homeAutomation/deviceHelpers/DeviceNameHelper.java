@@ -2,10 +2,12 @@ package org.cattech.homeAutomation.deviceHelpers;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class DeviceNameHelper {
+	static Logger log = Logger.getLogger(DeviceNameHelper.class.getName());
 
 	public static boolean commonDescriptorsMatch(JSONArray mightMatch, JSONArray toMatch) {
 		int keysMatched = 0;
@@ -34,9 +36,9 @@ public class DeviceNameHelper {
 
 						if (!mightMatch.has(key) || !mm.equals(tm)) {
 							keysMismatched++;
-							// log.debug("Didn't match " + key + " : " + mm + "::" + tm);
+//							 log.debug("Didn't match " + key + " : " + mm + "::" + tm);
 						} else {
-							// log.debug("Matched " + key + " : " + mm + "::" + tm);
+//							 log.debug("Matched " + key + " : " + mm + "::" + tm);
 						}
 					}
 				}
@@ -44,11 +46,11 @@ public class DeviceNameHelper {
 		}
 		boolean matched = keysMismatched == 0;
 		if (matched) {
-			// log.debug("Match " + mightMatch + " <to> " + toMatch + "[" + keysMismatched +
-			// "/" + toMatch.length() + "]");
+//			 log.debug("Match " + mightMatch + " <to> " + toMatch + "[" + keysMismatched +
+//			 "/" + toMatch.length() + "]");
 		} else {
-			// log.debug("Differ " + mightMatch + " <to> " + toMatch + "[" + keysMismatched
-			// + "/" + toMatch.length() + "]");
+//			 log.debug("Differ " + mightMatch + " <to> " + toMatch + "[" + keysMismatched
+//			 + "/" + toMatch.length() + "]");
 		}
 		return (matched);
 	}

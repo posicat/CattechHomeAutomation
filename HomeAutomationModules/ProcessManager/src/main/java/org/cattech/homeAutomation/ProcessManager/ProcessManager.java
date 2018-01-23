@@ -63,7 +63,7 @@ public class ProcessManager extends HomeAutomationModule {
 				}
 			}
 
-			sleepNoThrow(10000);
+			sleepNoThrow(1000);
 		}
 	}
 }

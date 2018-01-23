@@ -1,7 +1,5 @@
 package org.cattech.homeAutomation.deviceResolverTest;
 
-import static org.junit.Assert.assertTrue;
-
 import org.cattech.homeAutomation.deviceResolver.DeviceResolver;
 import org.cattech.homeAutomation.moduleBaseTest.BaseTestForModules;
 import org.junit.After;
@@ -10,6 +8,7 @@ import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 
 public class DeviceResolverTest extends BaseTestForModules {
+	
 	DeviceResolver deviceResolver;
 	String commonDevMatches1 = "[\"upstairs\",\"marks bedroom\",\"nightstand\",\"lamp\"]";
 	String nativeDevMatches1 = "{\"source\":\"x10\",\"house\":\"B\",\"unit\":\"9\",\"controlChannel\":\"channelNative1\"}";
@@ -46,10 +45,10 @@ public class DeviceResolverTest extends BaseTestForModules {
 	public void testCanDecodeNativeDeviceToCommon() {
 
 		testInterface.sendDataToController("{\"destination\":[\"DeviceResolver\"]," + testPacketSource + ","
-				+ "\"data\":{\"resolution\":\"toCommon\",\"postResolv\":\"testEventHandler\",\"nativeDevice\":"
+				+ "\"data\":{\"resolution\":\"toCommon\",\"postResolve\":\"testEventHandler\",\"nativeDevice\":"
 				+ nativeDevMatches1 + ",\"action\":\"on\"}}");
 
-		String result = waitforResult(testInterface, 10000);
+		String result = waitforResult(testInterface, MAX_TEST_WAIT);
 
 		String expectedStr = "{\"nodeName\":\"DeviceResolver\",\"data\":{\"action\":\"on\"," + "\"device\":"
 				+ commonDevMatches1 + "},\"channel\":\"testEventHandler\",\"source\":\"DeviceResolver\"}";
@@ -62,10 +61,10 @@ public class DeviceResolverTest extends BaseTestForModules {
 	public void testCanDecodeCommonDeviceToNative() {
 
 		testInterface.sendDataToController("{\"destination\":[\"DeviceResolver\"]," + testPacketSource + ","
-				+ "\"data\":{\"resolution\":\"toNative\",\"postResolv\":\"testEventHandler\",\"device\":"
+				+ "\"data\":{\"resolution\":\"toNative\",\"postResolve\":\"testEventHandler\",\"device\":"
 				+ commonDevMatches1 + ",\"action\":\"on\"}}");
 
-		String result = waitforResult(testInterface, 10000);
+		String result = waitforResult(testInterface, MAX_TEST_WAIT);
 
 		JSONAssert.assertEquals(
 				"{\"nodeName\":\"DeviceResolver\",\"data\":{\"action\":\"on\"," + "\"nativeDevice\":"
@@ -74,12 +73,12 @@ public class DeviceResolverTest extends BaseTestForModules {
 	}
 
 	@Test
-	public void testCanDecodeCommonDeviceToNativeWithNoPostResolvGoesToNative() {
+	public void testCanDecodeCommonDeviceToNativeWithNoPostResolveGoesToNative() {
 
 		testInterface.sendDataToController("{\"destination\":[\"DeviceResolver\"]," + testPacketSource + ","
 				+ "\"data\":{\"resolution\":\"toNative\",\"device\":" + commonDevMatches1 + ",\"action\":\"on\"}}");
 
-		String result = waitforResult(testInterface, 10000);
+		String result = waitforResult(testInterface, MAX_TEST_WAIT);
 
 		JSONAssert.assertEquals(
 				"{\"nodeName\":\"DeviceResolver\",\"data\":{\"action\":\"on\"," + "\"nativeDevice\":"
@@ -91,7 +90,7 @@ public class DeviceResolverTest extends BaseTestForModules {
 	public void testCanDecodeCommonDeviceToMultipleNative() {
 
 		testInterface.sendDataToController("{\"destination\":[\"DeviceResolver\"]," + testPacketSource + ","
-				+ "\"data\":{\"resolution\":\"toNative\",\"postResolv\":\"testEventHandler\",\"device\":"
+				+ "\"data\":{\"resolution\":\"toNative\",\"postResolve\":\"testEventHandler\",\"device\":"
 				+ commonDevMatches2 + ",\"action\":\"on\"}}");
 
 		String[] expected = {
@@ -100,21 +99,15 @@ public class DeviceResolverTest extends BaseTestForModules {
 				"{\"nodeName\":\"DeviceResolver\",\"data\":{\"action\":\"on\"," + "\"nativeDevice\":" + nativeDevMatchB
 						+ "},\"channel\":\"testEventHandler\",\"source\":\"DeviceResolver\"}" };
 
-		String result1 = waitforResult(testInterface, 10000);
-		String result2 = waitforResult(testInterface, 10000);
+		String result1 = waitforResult(testInterface, MAX_TEST_WAIT);
+		String result2 = waitforResult(testInterface, MAX_TEST_WAIT);
 
-		int m1 = assertResultIsInArray(expected, result1);
-		int m2 = assertResultIsInArray(expected, result2);
-
-		assertTrue(m1 != -1);
-		assertTrue(m2 != -1);
-
-		assertTrue(m1 != m2);
-		assertTrue(m1 + m2 == 1);
+		assertResultIsInArray(expected, result1);
+		assertResultIsInArray(expected, result2);
 	}
 
 	@Test
-	public void testCanDecodeCommonDeviceToMultipleNativeWithNoPostResolvGoesToNative() {
+	public void testCanDecodeCommonDeviceToMultipleNativeWithNoPostResolveGoesToNative() {
 
 		testInterface.sendDataToController("{\"destination\":[\"DeviceResolver\"]," + testPacketSource + ","
 				+ "\"data\":{\"resolution\":\"toNative\",\"device\":" + commonDevMatches2 + ",\"action\":\"on\"}}");
@@ -125,17 +118,14 @@ public class DeviceResolverTest extends BaseTestForModules {
 				"{\"nodeName\":\"DeviceResolver\",\"data\":{\"action\":\"on\"," + "\"nativeDevice\":" + nativeDevMatchB
 						+ "},\"channel\":\"channelNativeB\",\"source\":\"DeviceResolver\"}" };
 
-		String result1 = waitforResult(testInterface, 10000);
-		String result2 = waitforResult(testInterface, 10000);
+		String result1 = waitforResult(testInterface, MAX_TEST_WAIT);
+		String result2 = waitforResult(testInterface, MAX_TEST_WAIT);
 
-		int m1 = assertResultIsInArray(expected, result1);
-		int m2 = assertResultIsInArray(expected, result2);
-
-		assertTrue(m1 != -1);
-		assertTrue(m2 != -1);
-
-		assertTrue(m1 != m2);
-		assertTrue(m1 + m2 == 1);
+		assertResultIsInArray(expected, result1);
+		assertResultIsInArray(expected, result2);
 	}
 
 }
+
+
+

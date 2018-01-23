@@ -36,17 +36,14 @@ public abstract class HomeAutomationModule implements Runnable {
 		if (autoStartModule()) {
 			log.info("--- Initializing module, channels : " + getModuleChannelName() + " ---");
 			this.hubInterface = new NodeInterfaceString(controller);
-			// log.info(getModuleChannelName());
-			hubInterface.sendDataToController("{\"register\":[\"" + getModuleChannelName() + "\"],\"nodeName\":\""
-					+ getModuleChannelName() + "\"}");
+			hubInterface.sendDataToController("{\"register\":[\"" + getModuleChannelName() + "\"],\"nodeName\":\"" + getModuleChannelName() + "\"}");
 
-			String response = null;
+			HomeAutomationPacket response = null;
 			while (null == response) {
-				response = hubInterface.getDataFromController();
 				sleepNoThrow(100);
+				response = hubInterface.getDataPacketFromController();
 			}
 			log.info(response);
-			// log.info(response);
 			configuration = controller.getConfig();
 		} else {
 			log.info(" ! ! ! ! Module was not set to autoStart");
@@ -79,14 +76,14 @@ public abstract class HomeAutomationModule implements Runnable {
 	}
 
 	protected void checkForIncomingPacket() {
-		String packet = hubInterface.getDataFromController();
-		if (null != packet) {
-
-			HomeAutomationPacket incoming = new HomeAutomationPacket(this.getModuleChannelName(), packet);
+		HomeAutomationPacket incoming = hubInterface.getDataPacketFromController();
+		if (null != incoming) {
 			List<HomeAutomationPacket> outgoing = new ArrayList<HomeAutomationPacket>();
-			processPacketRequest(incoming, outgoing);
-
-			processOutgoingPackets(outgoing);
+			try {
+				processPacketRequest(incoming, outgoing);
+			} finally {
+				processOutgoingPackets(outgoing);
+			}
 
 		} else {
 			sleepNoThrow(WAIT_TIME_BETWEEN_PACKET_CHECKS);
@@ -96,7 +93,7 @@ public abstract class HomeAutomationModule implements Runnable {
 	protected void processOutgoingPackets(List<HomeAutomationPacket> outgoing) {
 		for (HomeAutomationPacket reply : outgoing) {
 			try {
-				hubInterface.sendDataToController(reply.toString());
+				hubInterface.sendDataPacketToController(reply);
 			} catch (Exception e) {
 				log.error("Error sending message back to node", e);
 			}

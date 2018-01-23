@@ -6,9 +6,12 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Properties;
 
+import org.apache.commons.logging.impl.Log4JLogger;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.FileAppender;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.spi.LoggerFactory;
 
 public class HomeAutomationConfiguration {
 
@@ -45,21 +48,29 @@ public class HomeAutomationConfiguration {
 		overridePropsWithEnvironment("homeAutomation.lib", ENV_FOLDER_LIBRARIES);
 		overridePropsWithEnvironment("homeAutomation.log", ENV_FOLDER_LOGS);
 
-		String logFile = getLogFolder() + "/HomeautomationHub.log";
-		Logger rootLogger = Logger.getRootLogger();
-		ConsoleAppender consoleAppender = (ConsoleAppender) rootLogger.getAppender("console");
+		setLogFileForAppender("console", "org.cattech", "HomeautomationHub.log", Level.DEBUG);
 		StdOutErrLog.tieSystemOutAndErrToLog();
-		
-		FileAppender fileAppender;
-		try {
-			fileAppender = new FileAppender(consoleAppender.getLayout(), logFile);
-			fileAppender.setName("file");
-			rootLogger.addAppender(fileAppender);
-		} catch (IOException e) {
-			log.error("Couldn't set logfile.", e);
-		}
 
 		loadConfiguration();
+	}
+
+	public void setLogFileForAppender(String loggerName, String clazz, String logFile, Level level) {
+		Logger rootLogger = Logger.getRootLogger();
+		ConsoleAppender consoleAppender = (ConsoleAppender) rootLogger.getAppender("console"); // Matching format to original appender.
+
+		FileAppender fileAppender;
+		try {
+			fileAppender = new FileAppender(consoleAppender.getLayout(), getLogFolder() + "/" + logFile);
+			fileAppender.setName(loggerName);
+			fileAppender.activateOptions();
+			Logger classLogger = org.apache.log4j.Logger.getLogger(clazz);
+			classLogger.setAdditivity(false);
+			classLogger.setLevel(level);
+			classLogger.addAppender(fileAppender);
+		} catch (IOException e) {
+			log.error("Failed to add log file", e);
+		}
+
 	}
 
 	// ====================================================================================================
@@ -85,8 +96,7 @@ public class HomeAutomationConfiguration {
 		}
 	}
 
-	private static String overridePropsWithEnvironment(String propName, String envName)
-			throws HomeAutomationConfigurationException {
+	private static String overridePropsWithEnvironment(String propName, String envName) throws HomeAutomationConfigurationException {
 		if (null != System.getenv(envName)) {
 			props.setProperty(propName, System.getenv(envName));
 		}
@@ -106,8 +116,7 @@ public class HomeAutomationConfiguration {
 	}
 	// ====================================================================================================
 
-	private static void throwIfNotExistantDirectory(String prop, String dir)
-			throws HomeAutomationConfigurationException {
+	private static void throwIfNotExistantDirectory(String prop, String dir) throws HomeAutomationConfigurationException {
 		if (null == dir) {
 			throw (new HomeAutomationConfigurationException(prop + " : Null folder name"));
 		}
@@ -155,10 +164,14 @@ public class HomeAutomationConfiguration {
 	}
 
 	public String getDBURL() {
-		String url = "jdbc:mysql://" + props.getProperty("db.host") + "/" + props.getProperty("db.name") + "?"
-				+ "useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC"
-				+ "&user=" + props.getProperty("db.username") + "&password=" + props.getProperty("db.password");
-		// log.info(url);
+		String url = null;
+		if (null != props.getProperty("db.host")) {
+			url = "jdbc:mysql://" + props.getProperty("db.host") + "/" + props.getProperty("db.name") + "?" 
+		    + "useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC" 
+			+ "&user="+ props.getProperty("db.username") + "&password=" + props.getProperty("db.password");
+		} else {
+			log.info("No host set for SQL, returning null");
+		}
 		return url;
 	}
 

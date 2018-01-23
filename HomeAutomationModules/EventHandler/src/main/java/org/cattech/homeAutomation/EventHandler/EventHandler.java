@@ -14,6 +14,7 @@ import org.cattech.homeAutomation.moduleBase.HomeAutomationModule;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationPacketHelper;
 import org.cattech.homeAutomation.watchCat.WatchCatDatabaseHelper;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class EventHandler extends HomeAutomationModule {
@@ -39,18 +40,17 @@ public class EventHandler extends HomeAutomationModule {
 		log.debug("EventHandler request : " + incoming);
 
 		if (null != incoming.getWrapper()) {
-			if (!incoming.getWrapper().has("data")) {
+			if (!incoming.hasWrapper("data")) {
 				log.error("Packet has no data element. " + incoming);
 			} else {
-				HomeAutomationPacket reply = HomeAutomationPacketHelper.generateReplyPacket(incoming,
-						getModuleChannelName());
+				HomeAutomationPacket reply = HomeAutomationPacketHelper.generateReplyPacket(incoming, getModuleChannelName());
 
 				reply.setData(incoming.getData());
-				if (incoming.getData().has("nativeDevice")) {
-					reply.getData().put("resolution", "toCommon");
-					reply.getData().put("postResolv", "EventHandler");
-					reply.getWrapper().remove("destination");
-					reply.getWrapper().put("destination", new String[] { "DeviceResolver" });
+				if (incoming.hasData(HomeAutomationPacket.FIELD_DATA_NATIVE_DEVICE)) {
+					reply.putData(HomeAutomationPacket.FIELD_RESOLUTION, HomeAutomationPacket.RESOLUTION_TO_COMMON);
+					reply.putData(HomeAutomationPacket.FIELD_POST_RESOLVE, HomeAutomationPacket.CHANNEL_EVENT_HANDLER);
+					reply.removeDestination();
+					reply.setDestination(new String[] { HomeAutomationPacket.CHANNEL_DEVICE_RESOLVER });
 				} else {
 					List<JSONObject> actions = getActionsForEvent(incoming);
 
@@ -77,13 +77,13 @@ public class EventHandler extends HomeAutomationModule {
 		ResultSet rs;
 		List<JSONObject> triggerReactions = new Stack<JSONObject>();
 
-		String eventSignature = WatchCatDatabaseHelper.generateEventSignature(configuration.getHost(),incoming.getData());
+		String eventSignature = WatchCatDatabaseHelper.generateEventSignature(configuration.getHost(), incoming.getData());
 		Boolean afterMin = WatchCatDatabaseHelper.afterMinDelay(conn, eventSignature);
 
 		log.info("Event signature:" + eventSignature);
 		log.debug("afterMin =  " + afterMin);
 
-		if (null==afterMin || afterMin.booleanValue()) {
+		if (null == afterMin || afterMin.booleanValue()) {
 			boolean foundMatch = false;
 			try {
 				stmt = conn.createStatement();
@@ -93,18 +93,20 @@ public class EventHandler extends HomeAutomationModule {
 
 				while (rs.next()) {
 					JSONObject triggerEvent = new JSONObject(rs.getString("event"));
-					boolean match = DeviceNameHelper.commonDescriptorsMatch(triggerEvent.getJSONArray("device"),
-							incoming.getData().getJSONArray("device"))
-							&& triggerEvent.getString("action").equals(incoming.getData().getString("action"));
+					boolean match = DeviceNameHelper.commonDescriptorsMatch(triggerEvent.getJSONArray("device"), incoming.getDataJArr("device"))
+							&& triggerEvent.getString("action").equals(incoming.getDataString("action"));
 					if (match) {
-						log.debug("Matched : " + rs.getString("event"));
-						triggerReactions.add(new JSONObject(rs.getString("reaction")));
-						foundMatch = true;
+						String reaction = rs.getString("reaction");
+						log.debug("Matched : " + rs.getString("event") + "->" + reaction);
+						if (null != reaction) {
+							triggerReactions.add(new JSONObject(reaction));
+							foundMatch = true;
+						}
 					} else {
 						log.debug("No Match : " + rs.getString("event"));
 					}
 				}
-			} catch (SQLException e) {
+			} catch (SQLException | JSONException e) {
 				log.error("Error while reading data from triggers table.", e);
 			}
 

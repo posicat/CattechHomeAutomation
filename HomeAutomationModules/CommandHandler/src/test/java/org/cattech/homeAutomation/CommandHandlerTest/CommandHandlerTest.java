@@ -1,7 +1,9 @@
 package org.cattech.homeAutomation.CommandHandlerTest;
 
 import org.cattech.homeAutomation.CommandHandler.CommandHandler;
+import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
 import org.cattech.homeAutomation.moduleBaseTest.BaseTestForModules;
+import org.json.JSONArray;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,7 +18,7 @@ public class CommandHandlerTest extends BaseTestForModules {
 		super.setUp();
 		commandHandler = new CommandHandler(controller);
 		new Thread(commandHandler, "Testing DeviceCommandHandler").start();
-		registerChannel(testInterface, new String[] { "DeviceResolver", "EventHandler" });
+		registerChannel(testInterface, new String[] { HomeAutomationPacket.CHANNEL_DEVICE_RESOLVER, HomeAutomationPacket.CHANNEL_EVENT_HANDLER });
 	}
 
 	@Override
@@ -29,23 +31,29 @@ public class CommandHandlerTest extends BaseTestForModules {
 	@Test
 	public void testForwardsNativeDevicesToDeviceResolver() {
 
-		testInterface.sendDataToController("{\"destination\":[\"DeviceCommandHandler\"]," + testPacketSource + ","
-				+ "\"data\":{\"nativeDevice\":\"\"}}");
+		HomeAutomationPacket send = new HomeAutomationPacket();
+		send.addDestination("DeviceCommandHandler");
+		send.putWrapper(HomeAutomationPacket.FIELD_SOURCE, TESTCHANNEL);
+		send.putData(HomeAutomationPacket.FIELD_DATA_NATIVE_DEVICE, "device");
+		testInterface.sendDataPacketToController(send);
 
-		String result = waitforResult(testInterface, 10000);
+		String result = waitforResult(testInterface, MAX_TEST_WAIT);
 
 		JSONAssert.assertEquals(
-				"{\"nodeName\":\"DeviceCommandHandler\",\"data\":{\"nativeDevice\":\"\",\"resolution\":\"toNative\"},\"channel\":\"DeviceResolver\",\"source\":\"DeviceCommandHandler\"}",
+				"{\"nodeName\":\"DeviceCommandHandler\",\"data\":{\"nativeDevice\":\"device\",\"resolution\":\"toNative\"},\"channel\":\"DeviceResolver\",\"source\":\"DeviceCommandHandler\"}",
 				result, false);
 	}
 
 	@Test
 	public void testForwardsCommonDevicesToResolverAsWell() {
 
-		testInterface.sendDataToController("{\"destination\":[\"DeviceCommandHandler\"]," + testPacketSource + ","
-				+ "\"data\":{\"device\":[\"lamp\"]}}");
+		HomeAutomationPacket send = new HomeAutomationPacket();
+		send.addDestination("DeviceCommandHandler");
+		send.putWrapper(HomeAutomationPacket.FIELD_SOURCE, TESTCHANNEL);
+		send.putData(HomeAutomationPacket.FIELD_DATA_DEVICE, new JSONArray("[lamp]"));
+		testInterface.sendDataPacketToController(send);
 
-		String result = waitforResult(testInterface, 10000);
+		String result = waitforResult(testInterface, MAX_TEST_WAIT);
 
 		JSONAssert.assertEquals(
 				"{\"nodeName\":\"DeviceCommandHandler\",\"data\":{\"device\":[\"lamp\"],\"resolution\":\"toNative\"},\"channel\":\"DeviceResolver\",\"source\":\"DeviceCommandHandler\"}",

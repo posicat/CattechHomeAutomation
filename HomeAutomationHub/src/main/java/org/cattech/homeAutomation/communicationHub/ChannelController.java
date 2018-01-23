@@ -11,25 +11,8 @@ import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-//import org.json.JSONArray;
-//import org.json.JSONObject;
-
 public class ChannelController {
 	private Logger log = Logger.getLogger(this.getClass());
-
-	// Data packet field names
-	public static final String NODE_DATA_SOURCE = "source";
-	public static final String NODE_DATA_DESTINATION = "destination";
-	public static final String NODE_DATA_BLOCK = "data";
-	public static final String NODE_REGISTER_CHANNELS = "register";
-	public static final String NODE_STATUS_BLOCK = "status";
-	public static final String NODE_ERROR_MESSAGE = "error";
-	public static final String NODE_NODE_NAME = "nodeName";
-	private static final String NODE_DATA_CHANNEL = "channel";
-
-	// Channel constants
-	public static final String NODE_CHANNEL_CONTROLLER = "ChannelController";
-	public static final String NODE_SEND_TO_ALL_ADDRESS = "all";
 
 	Hashtable<String, ArrayList<NodeInterface>> masterChannelList = new Hashtable<String, ArrayList<NodeInterface>>();
 	ArrayList<NodeInterface> masterNodeList = new ArrayList<NodeInterface>();
@@ -88,7 +71,8 @@ public class ChannelController {
 	 */
 	@Deprecated	
 	public void processIncomingData(String incoming, NodeInterface fromNode) {
-		processIncomingDataPacket(new HomeAutomationPacket(fromNode.getNodeName(),incoming),fromNode);
+		HomeAutomationPacket hap = new HomeAutomationPacket(incoming);
+		processIncomingDataPacket(hap,fromNode);
 	}
 		
 	public void processIncomingDataPacket(HomeAutomationPacket hapIn, NodeInterface fromNode) {
@@ -98,43 +82,44 @@ public class ChannelController {
 
 			HomeAutomationPacket hapOut = new HomeAutomationPacket();
 
-			if (hapIn.getWrapper().has(NODE_REGISTER_CHANNELS)) {
-				if (hapIn.getWrapper().has(NODE_NODE_NAME)) {
-					fromNode.setNodeName(hapIn.getWrapper().getString(NODE_NODE_NAME));
+			if (hapIn.hasWrapper(HomeAutomationPacket.FIELD_REGISTER)) {
+				if (hapIn.hasWrapper(HomeAutomationPacket.FIELD_NODE_NAME)) {
+					fromNode.setNodeName(hapIn.getWrapperString(HomeAutomationPacket.FIELD_NODE_NAME));
 				} else {
 					fromNode.setNodeName(UUID.randomUUID().toString());
 				}
 
-				JSONArray registerChannels = hapIn.getWrapper().getJSONArray(NODE_REGISTER_CHANNELS);
+				JSONArray registerChannels = hapIn.getWrapperJArr(HomeAutomationPacket.FIELD_REGISTER);
 				for (int i = 0; i < registerChannels.length(); i++) {
 					addNodeToChannel(registerChannels.getString(i), fromNode);
 					// log.info("Registered "+registerChannels.getString(i)+" to
 					// "+fromNode);
 				}
 
-				hapOut.getWrapper().put(NODE_STATUS_BLOCK, "registered");
-				hapOut.getWrapper().put(NODE_DATA_SOURCE, NODE_CHANNEL_CONTROLLER);
-				hapOut.getWrapper().put(NODE_DATA_CHANNEL, registerChannels);
-				hapOut.getWrapper().put(NODE_NODE_NAME, fromNode.getNodeName());
+				hapOut.putWrapper(HomeAutomationPacket.FIELD_STATUS, "registered");
+				hapOut.putWrapper(HomeAutomationPacket.FIELD_SOURCE, HomeAutomationPacket.CHANNEL_CONTROLLER);
+				hapOut.putWrapper(HomeAutomationPacket.FIELD_CHANNEL, registerChannels);
+				hapOut.putWrapper(HomeAutomationPacket.FIELD_NODE_NAME , fromNode.getNodeName());
 				fromNode.sendDataPacketToNode(hapOut);
-				log.debug("---> TO " + registerChannels + " " + hapOut.getWrapper());
+				log.debug("---> TO " + registerChannels + " " + hapOut);
 
 			}
 
-			if (hapIn.getWrapper().has(NODE_DATA_DESTINATION) && hapIn.getWrapper().has(NODE_DATA_BLOCK)) {
-				JSONObject channelData = hapIn.getWrapper().getJSONObject(NODE_DATA_BLOCK);
-				hapOut.getWrapper().put(NODE_NODE_NAME, fromNode.getNodeName());
-				hapOut.getWrapper().put(NODE_DATA_SOURCE, hapIn.getWrapper().get(NODE_DATA_SOURCE));
+			if (hapIn.hasWrapper(HomeAutomationPacket.FIELD_DESTINATINO) && hapIn.hasData()) {
+				JSONObject channelData = hapIn.getData();
+				hapOut.putWrapper(HomeAutomationPacket.FIELD_NODE_NAME, fromNode.getNodeName());
+				hapOut.putWrapper(HomeAutomationPacket.FIELD_SOURCE, hapIn.getWrapperString(HomeAutomationPacket.FIELD_SOURCE));
 				hapOut.setData(channelData);
 
-				JSONArray destinations = hapIn.getWrapper().getJSONArray(NODE_DATA_DESTINATION);
+				JSONArray destinations = hapIn.getWrapperJArr(HomeAutomationPacket.FIELD_DESTINATINO);
 				for (int i = 0; i < destinations.length(); i++) {
 					String channel = destinations.getString(i);
-					hapOut.getWrapper().put(NODE_DATA_CHANNEL, channel);
+					hapOut.putWrapper(HomeAutomationPacket.FIELD_CHANNEL, channel);
 					sendToChannel(channel, hapOut, true);
-					log.debug("---> TO " + channel + " " + hapOut.getWrapper());
+					log.debug("---> TO " + channel + " " + hapOut);
 				}
-				hapOut.getWrapper().put("all_channels", destinations.toString());
+				hapOut.removeFromWrapper(HomeAutomationPacket.FIELD_CHANNEL);
+				hapOut.putWrapper(HomeAutomationPacket.FIELD_ALL_CHANNELS, destinations.toString());
 				sendToChannel("all", hapOut, false);
 			}
 		} catch (Exception e) {
@@ -144,9 +129,12 @@ public class ChannelController {
 		if (errors != "") {
 			try {
 				HomeAutomationPacket hapOut = new HomeAutomationPacket();
-				hapOut.getWrapper().put(NODE_ERROR_MESSAGE, errors);
+				hapOut.setDestination(hapIn.getWrapperString(HomeAutomationPacket.FIELD_SOURCE));
+				hapOut.putWrapper(HomeAutomationPacket.FIELD_ERROR, errors);
+				hapOut.putWrapper(HomeAutomationPacket.FIELD_SOURCE, HomeAutomationPacket.CHANNEL_CONTROLLER);
 				log.error("Error :" + errors);
-				log.error(hapIn);
+				log.error("IN:"+hapIn);
+				log.error("OUT:"+hapOut);
 				fromNode.sendDataPacketToNode(hapOut);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -156,7 +144,7 @@ public class ChannelController {
 
 	private void sendToChannel(String channel, HomeAutomationPacket hapOut, boolean throwNoChannel) throws Exception {
 		ArrayList<NodeInterface> nodes;
-		// if (NODE_SEND_TO_ALL_ADDRESS.equals(channel)) {
+		// if (HomeAutomationPacket.SEND_TO_ALL_ADDRESS.equals(channel)) {
 		// nodes = allNodes;
 		// } else {
 		nodes = masterChannelList.get(channel);
