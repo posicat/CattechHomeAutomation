@@ -26,7 +26,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public abstract class HomeAutomationModule implements Runnable {
-	private static final int WAIT_TIME_BETWEEN_PACKET_CHECKS = 1000;
+	private static final int WAIT_TIME_BETWEEN_PACKET_CHECKS = 100;
 	private Logger log = Logger.getLogger(this.getClass());
 	protected NodeInterfaceString hubInterface;
 	protected boolean running = false;

@@ -25,7 +25,6 @@ public class DeviceResolver extends HomeAutomationModule {
 
 	public DeviceResolver(ChannelController controller) {
 		super(controller);
-		loadDeviceMappings();
 	}
 
 	@Override
@@ -47,6 +46,8 @@ public class DeviceResolver extends HomeAutomationModule {
 				outgoing.add(reply);
 			}
 			if ("toCommon".equals(resolution)) {
+				loadDeviceMappings();
+
 				log.debug("Resolving to common :"+incoming);
 				Set<JSONArray> cDevs = new HashSet<JSONArray>();
 				if (incoming.hasData(HomeAutomationPacket.FIELD_DATA_NATIVE_DEVICE)) {
@@ -60,8 +61,8 @@ public class DeviceResolver extends HomeAutomationModule {
 
 						// Remove output destinations, so we can set our own.
 						reply.removeDestination();
-						reply.addDestination(incoming.getDataString(HomeAutomationPacket.FIELD_POST_RESOLVE));
-						reply.removeFromData(HomeAutomationPacket.FIELD_POST_RESOLVE);
+						reply.addDestination(incoming.getDataString(HomeAutomationPacket.FIELD_DATA_POST_RESOLVE));
+						reply.removeFromData(HomeAutomationPacket.FIELD_DATA_POST_RESOLVE);
 
 						// Clear fields we don't need to send back from the DataOut
 						reply.removeFromData(HomeAutomationPacket.FIELD_RESOLUTION);
@@ -73,16 +74,19 @@ public class DeviceResolver extends HomeAutomationModule {
 				}
 			}
 			if ("toNative".equals(resolution)) {
+				loadDeviceMappings();
+
 				Set<JSONObject> nDevs = new HashSet<JSONObject>();
 				if (incoming.hasData("device")) {
 
 					String postResolve = null;
-					if (incoming.hasData(HomeAutomationPacket.FIELD_POST_RESOLVE)) {
-						postResolve = incoming.getDataString(HomeAutomationPacket.FIELD_POST_RESOLVE);
+					if (incoming.hasData(HomeAutomationPacket.FIELD_DATA_POST_RESOLVE)) {
+						postResolve = incoming.getDataString(HomeAutomationPacket.FIELD_DATA_POST_RESOLVE);
 					}
 					// Resolve native devices, then clear it out of the data
 					nDevs = convertToNativeNames(incoming.getDataJArr("device"));
 
+					log.debug("Found " + nDevs.size() + " native Devices.");
 					for (JSONObject nDev : nDevs) {
 						// Copy data from In to Out as we want to send back most of it.
 						HomeAutomationPacket reply = HomeAutomationPacketHelper.generateReplyPacket(incoming,getModuleChannelName());
@@ -104,7 +108,7 @@ public class DeviceResolver extends HomeAutomationModule {
 						} else {
 							reply.addDestination(postResolve);
 						}
-						reply.removeFromData(HomeAutomationPacket.FIELD_POST_RESOLVE);
+						reply.removeFromData(HomeAutomationPacket.FIELD_DATA_POST_RESOLVE);
 						reply.putData(HomeAutomationPacket.FIELD_DATA_NATIVE_DEVICE, nDev);
 						outgoing.add(reply);
 					}
@@ -147,6 +151,8 @@ public class DeviceResolver extends HomeAutomationModule {
 	}
 
 	public void loadDeviceMappings() {
+		this.lookupTable = new Hashtable<JSONObject, JSONArray>();
+		
 		Connection conn = getHomeAutomationDBConnection();
 		if (null == conn) {
 			log.error("Could not obtain connection to HomeAutomation database");

@@ -9,18 +9,18 @@ import org.json.JSONObject;
 public class DeviceNameHelper {
 	static Logger log = Logger.getLogger(DeviceNameHelper.class.getName());
 
-	public static boolean commonDescriptorsMatch(JSONArray mightMatch, JSONArray toMatch) {
+	public static boolean commonDescriptorsMatch(JSONArray fullDescriptor, JSONArray possibleSubDescriptor) {
 		int keysMatched = 0;
 
-		for (Object entry : toMatch) {
-			List<Object> mightEntries = mightMatch.toList();
+		for (Object entry : possibleSubDescriptor) {
+			List<Object> mightEntries = fullDescriptor.toList();
 			if (mightEntries.contains(entry)) {
 				keysMatched++;
 			}
 		}
 		// log.debug("Matching " + mightMatch + " <to> " + toMatch +
 		// "["+keysMatched+"/"+toMatch.length()+"]");
-		return (keysMatched == toMatch.length());
+		return (keysMatched == possibleSubDescriptor.length());
 	}
 
 	public static boolean nativeKeysMatch(JSONObject mightMatch, JSONObject toMatch) {

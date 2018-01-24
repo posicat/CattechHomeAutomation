@@ -36,9 +36,6 @@ public class EventHandler extends HomeAutomationModule {
 
 	@Override
 	protected void processPacketRequest(HomeAutomationPacket incoming, List<HomeAutomationPacket> outgoing) {
-
-		log.debug("EventHandler request : " + incoming);
-
 		if (null != incoming.getWrapper()) {
 			if (!incoming.hasWrapper("data")) {
 				log.error("Packet has no data element. " + incoming);
@@ -48,7 +45,7 @@ public class EventHandler extends HomeAutomationModule {
 				reply.setData(incoming.getData());
 				if (incoming.hasData(HomeAutomationPacket.FIELD_DATA_NATIVE_DEVICE)) {
 					reply.putData(HomeAutomationPacket.FIELD_RESOLUTION, HomeAutomationPacket.RESOLUTION_TO_COMMON);
-					reply.putData(HomeAutomationPacket.FIELD_POST_RESOLVE, HomeAutomationPacket.CHANNEL_EVENT_HANDLER);
+					reply.putData(HomeAutomationPacket.FIELD_DATA_POST_RESOLVE, HomeAutomationPacket.CHANNEL_EVENT_HANDLER);
 					reply.removeDestination();
 					reply.setDestination(new String[] { HomeAutomationPacket.CHANNEL_DEVICE_RESOLVER });
 				} else {
@@ -76,7 +73,7 @@ public class EventHandler extends HomeAutomationModule {
 		Statement stmt;
 		ResultSet rs;
 		List<JSONObject> triggerReactions = new Stack<JSONObject>();
-
+		
 		String eventSignature = WatchCatDatabaseHelper.generateEventSignature(configuration.getHost(), incoming.getData());
 		Boolean afterMin = WatchCatDatabaseHelper.afterMinDelay(conn, eventSignature);
 
@@ -93,8 +90,8 @@ public class EventHandler extends HomeAutomationModule {
 
 				while (rs.next()) {
 					JSONObject triggerEvent = new JSONObject(rs.getString("event"));
-					boolean match = DeviceNameHelper.commonDescriptorsMatch(triggerEvent.getJSONArray("device"), incoming.getDataJArr("device"))
-							&& triggerEvent.getString("action").equals(incoming.getDataString("action"));
+					boolean match = DeviceNameHelper.commonDescriptorsMatch(triggerEvent.getJSONArray(HomeAutomationPacket.FIELD_DATA_DEVICE), incoming.getDataJArr(HomeAutomationPacket.FIELD_DATA_DEVICE))
+							&& triggerEvent.getString(HomeAutomationPacket.FIELD_DATA_ACTION).equals(incoming.getDataString(HomeAutomationPacket.FIELD_DATA_ACTION));
 					if (match) {
 						String reaction = rs.getString("reaction");
 						log.debug("Matched : " + rs.getString("event") + "->" + reaction);
@@ -122,5 +119,4 @@ public class EventHandler extends HomeAutomationModule {
 		closeNoThrow(conn);
 		return result;
 	}
-
 }

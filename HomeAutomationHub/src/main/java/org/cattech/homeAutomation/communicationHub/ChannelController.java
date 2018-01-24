@@ -105,13 +105,13 @@ public class ChannelController {
 
 			}
 
-			if (hapIn.hasWrapper(HomeAutomationPacket.FIELD_DESTINATINO) && hapIn.hasData()) {
+			if (hapIn.hasWrapper(HomeAutomationPacket.FIELD_DESTINATION) && hapIn.hasData()) {
 				JSONObject channelData = hapIn.getData();
 				hapOut.putWrapper(HomeAutomationPacket.FIELD_NODE_NAME, fromNode.getNodeName());
 				hapOut.putWrapper(HomeAutomationPacket.FIELD_SOURCE, hapIn.getWrapperString(HomeAutomationPacket.FIELD_SOURCE));
 				hapOut.setData(channelData);
-
-				JSONArray destinations = hapIn.getWrapperJArr(HomeAutomationPacket.FIELD_DESTINATINO);
+				
+				JSONArray destinations = hapIn.getWrapperJArr(HomeAutomationPacket.FIELD_DESTINATION);
 				for (int i = 0; i < destinations.length(); i++) {
 					String channel = destinations.getString(i);
 					hapOut.putWrapper(HomeAutomationPacket.FIELD_CHANNEL, channel);
@@ -123,6 +123,7 @@ public class ChannelController {
 				sendToChannel("all", hapOut, false);
 			}
 		} catch (Exception e) {
+			log.debug("Error processing packet : "+hapIn,e);
 			errors += e.getMessage();
 		}
 
@@ -137,7 +138,7 @@ public class ChannelController {
 				log.error("OUT:"+hapOut);
 				fromNode.sendDataPacketToNode(hapOut);
 			} catch (Exception e) {
-				e.printStackTrace();
+				log.error("Could not build output packet",e);
 			}
 		}
 	}

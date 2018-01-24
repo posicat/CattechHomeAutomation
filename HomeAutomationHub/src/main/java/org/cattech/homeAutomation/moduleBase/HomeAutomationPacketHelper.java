@@ -11,8 +11,8 @@ public class HomeAutomationPacketHelper {
 		if (packet.hasWrapper(HomeAutomationPacket.FIELD_SOURCE)) {
 			// Generate the default return header
 			JSONArray destination = new JSONArray();
-			destination.put(packet.getWrapper().get(HomeAutomationPacket.FIELD_SOURCE));
-			reply.putWrapper(HomeAutomationPacket.FIELD_DESTINATINO, destination);
+			destination.put(packet.getWrapperString(HomeAutomationPacket.FIELD_SOURCE));
+			reply.putWrapper(HomeAutomationPacket.FIELD_DESTINATION, destination);
 			reply.putWrapper(HomeAutomationPacket.FIELD_SOURCE, sourceChannel);
 
 			reply.setData(copyJSONObject(packet.getData()));

@@ -23,9 +23,12 @@ public class CommandHandler extends HomeAutomationModule {
 			} else {
 				HomeAutomationPacket reply =HomeAutomationPacketHelper.generateReplyPacket(incoming, getModuleChannelName());
 				reply.setData(incoming.getData());
-				reply.putData("resolution", "toNative");
+				reply.putData(HomeAutomationPacket.FIELD_RESOLUTION, HomeAutomationPacket.RESOLUTION_TO_NATIVE);
+//				!! No post-resolve so that deviceResolver will deliver the packet based on the controlChannel
+//				reply.putData(HomeAutomationPacket.FIELD_POST_RESOLVE, getModuleChannelName()); 
 				reply.removeFromWrapper("destination");
-				reply.putWrapper("destination", new String[] { "DeviceResolver" });
+				reply.setDestination("DeviceResolver");
+				log.debug("Outgoing CommandHandler : "+reply);
 				outgoing.add(reply);
 			}
 		}

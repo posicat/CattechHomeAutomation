@@ -1,15 +1,22 @@
 package org.cattech.homeAutomation.moduleBase;
 
+import java.util.Arrays;
+
+import org.apache.log4j.Logger;
+import org.cattech.homeAutomation.watchCat.WatchCatDatabaseHelper;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class HomeAutomationPacket {
+	static Logger log = Logger.getLogger(HomeAutomationPacket.class.getName());
+
 	// Data packet field names - lowercase first letter by convention
 	public static final String FIELD_REGISTER = "register";
 	public static final String FIELD_NODE_NAME = "nodeName";
 	public static final String FIELD_STATUS = "status";
 	public static final String FIELD_SOURCE = "source";
-	public static final String FIELD_DESTINATINO = "destination";
+	public static final String FIELD_DESTINATION = "destination";
 	public static final String FIELD_CHANNEL = "channel";
 	public static final String FIELD_ALL_CHANNELS = "all_channels";
 	public static final String FIELD_ERROR = "error";
@@ -17,10 +24,11 @@ public class HomeAutomationPacket {
 	public static final String FIELD_DATA = "data";
 	public static final String FIELD_DATA_NATIVE_DEVICE = "nativeDevice";
 	public static final String FIELD_DATA_DEVICE = "device";
-	public static final String FIELD_POST_RESOLVE = "postResolve";
+	public static final String FIELD_DATA_POST_RESOLVE = "postResolve";
+	public static final String FIELD_DATA_ACTION = "action";
 
 	public static final String RESOLUTION_TO_COMMON = "toCommon";
-	public static final String RESOLUTION_TO_NNATIVE = "toNative";
+	public static final String RESOLUTION_TO_NATIVE = "toNative";
 
 	// Channel constants - Capital first letter by convention
 	public static final String CHANNEL_ALL = "All";
@@ -37,11 +45,14 @@ public class HomeAutomationPacket {
 	}
 
 	public HomeAutomationPacket(String packet) {
-		wrapper = new JSONObject(packet);
+		this.wrapper = new JSONObject(packet);
+		this.data = new JSONObject();
 		if (wrapper.has(FIELD_DATA)) {
-			data = wrapper.getJSONObject(FIELD_DATA);
-		} else {
-			data = new JSONObject();
+			try {
+				this.data = wrapper.getJSONObject(FIELD_DATA);
+			} catch (JSONException e) {
+				log.error("Error in JSON format : " + packet, e);
+			}
 		}
 	}
 
@@ -70,7 +81,7 @@ public class HomeAutomationPacket {
 
 	public void setDestination(String[] strings) {
 		removeDestination();
-		wrapper.put(FIELD_DESTINATINO, new JSONArray(strings));
+		wrapper.put(FIELD_DESTINATION, new JSONArray(strings));
 	}
 
 	public void setDestination(String string) {
@@ -83,14 +94,14 @@ public class HomeAutomationPacket {
 	}
 
 	public void addDestination(String channel) {
-		if (!wrapper.has(FIELD_DESTINATINO)) {
-			wrapper.put(FIELD_DESTINATINO, new JSONArray());
+		if (!wrapper.has(FIELD_DESTINATION)) {
+			wrapper.put(FIELD_DESTINATION, new JSONArray());
 		}
-		wrapper.getJSONArray(FIELD_DESTINATINO).put(channel);
+		wrapper.getJSONArray(FIELD_DESTINATION).put(channel);
 	}
 
 	public void removeDestination() {
-		wrapper.remove(FIELD_DESTINATINO);
+		wrapper.remove(FIELD_DESTINATION);
 	}
 
 	public void setData(JSONObject data) {

@@ -29,7 +29,7 @@ public class X10InterfaceHandler extends HomeAutomationModule {
 			JSONObject device = incoming.getDataJObj(HomeAutomationPacket.FIELD_DATA_NATIVE_DEVICE);
 			String unit = device.getString("unit");
 			String house = device.getString("house");
-			String action = incoming.getDataString("action");
+			String action = incoming.getDataString(HomeAutomationPacket.FIELD_DATA_ACTION);
 
 			String heyuCommand = "/usr/local/bin/heyu turn " + house.toLowerCase() + unit + " " + action.toLowerCase();
 			log.info("Executing : " + heyuCommand);

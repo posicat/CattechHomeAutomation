@@ -95,16 +95,17 @@ public class WatchCatDatabaseHelper {
 	}
 
 	private static String dumpResultSet(ResultSet rs) {
-		String result = "\r\n";
+		String result = "{";
 
 		ResultSetMetaData rsmd;
 		try {
 			rsmd = rs.getMetaData();
 			if (rsmd.getColumnCount() > 0) {
 				for (int i = 1; i <= rsmd.getColumnCount(); i++) {
-					result = result + "\r\n" + rsmd.getColumnLabel(i) + "\t" + rs.getString(i);
+					result = result + "'" + rsmd.getColumnLabel(i) + "':'" + rs.getString(i)+",";
 				}
 			}
+			result+="}";
 		} catch (SQLException e1) {
 			log.error("Failed to display ResultSet", e1);
 		}

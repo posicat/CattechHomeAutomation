@@ -22,6 +22,7 @@ import io.moquette.server.Server;
 import io.moquette.server.config.FilesystemConfig;
 
 public class MQTTBroker extends HomeAutomationModule {
+	private static final String PAYLOAD = "payload";
 	private static final String MQTT_BROKER = "MQTTBroker";
 	static Logger log = Logger.getLogger(MQTTBroker.class.getName());
 	final Server mqttBroker = new Server();
@@ -58,29 +59,39 @@ public class MQTTBroker extends HomeAutomationModule {
 
 	@Override
 	protected void processPacketRequest(HomeAutomationPacket incoming, List<HomeAutomationPacket> outgoing) {
-		// {"data":{
-		// HomeAutomationPacket.FIELD_DATA_NATIVE_DEVICE:{
+		// {
+		// "data":{
+		// "native_device":{
+		// "topic":"home/commands/IR_GC",
 		// "protocol":"MQTT",
-		// "clientID":"posicat212701762",
-		// "payload":"38000,1,69,341,171,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,64,21,64,21,64,21,64,21,64,21,64,21,64,21,21,21,21,21,64,21,21,21,64,21,21,21,21,21,21,21,21,21,64,21,21,21,64,21,21,21,64,21,64,21,64,21,64,21,1558,341,86,21,3650",
-		// "topic":"home/commands/IR_GC"
+		// "controlChannel:"MQTTBroker",
+		// "packet":"38000,1,69,341,171,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,64,21,64,21,64,21,64,21,64,21,64,21,64,21,21,21,21,21,64,21,21,21,64,21,21,21,21,21,21,21,21,21,64,21,21,21,64,21,21,21,64,21,64,21,64,21,64,21,1558,341,86,21,3650"
 		// },
-		// },"channel":"MQTTBroker","source":"*"}
+		// "action":"send"
+		// },
+		// "channel":"MQTTBroker",
+		// "source":"*"
+		// }
 
-		if (incoming.hasData()) {
+		if (incoming.getDataString(HomeAutomationPacket.FIELD_DATA_ACTION).equals("send")) {
 			JSONObject nativeDevice = incoming.getDataJObj(HomeAutomationPacket.FIELD_DATA_NATIVE_DEVICE);
 
 			PublishMessage message = new PublishMessage();
 			message.setTopicName(nativeDevice.getString("topic"));
 			message.setRetainFlag(false);
 			message.setQos(QOSType.EXACTLY_ONCE);
-			message.setPayload(ByteBuffer.wrap(nativeDevice.getString("payload").getBytes()));
+			message.setPayload(ByteBuffer.wrap(nativeDevice.getString(PAYLOAD).getBytes()));
 
 			mqttBroker.internalPublish(message);
 		}
 	}
 
 	class PublisherListener extends AbstractInterceptHandler {
+		private static final String RECEIVED = "receive";
+		private static final String MQTT = "MQTT";
+		private static final String PROTOCOL = "protocol";
+		private static final String TOPIC = "topic";
+		private static final String CLIENT_ID = "clientID";
 		private NodeInterfaceString hubInterface;
 
 		public PublisherListener(ChannelController controller) {
@@ -96,10 +107,11 @@ public class MQTTBroker extends HomeAutomationModule {
 			hap.setSource(MQTT_BROKER);
 			hap.setDestination(HomeAutomationPacket.CHANNEL_EVENT_HANDLER);
 			JSONObject nativeDevice = new JSONObject();
-			nativeDevice.put("protocol", "MQTT");
-			nativeDevice.put("topic", message.getTopicName());
-			nativeDevice.put("clientID", message.getClientID());
-			nativeDevice.put("payload", payload);
+			nativeDevice.put(PROTOCOL, MQTT);
+			nativeDevice.put(TOPIC, message.getTopicName());
+			nativeDevice.put(CLIENT_ID, message.getClientID());
+			nativeDevice.put(PAYLOAD, payload);
+			hap.putData(HomeAutomationPacket.FIELD_DATA_ACTION, RECEIVED);
 			hap.putData(HomeAutomationPacket.FIELD_DATA_NATIVE_DEVICE, nativeDevice);
 			hap.putData(HomeAutomationPacket.FIELD_RESOLUTION, HomeAutomationPacket.RESOLUTION_TO_COMMON);
 
