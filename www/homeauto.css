@@ -1,18 +1,35 @@
-.debug
-{
+.debug {
 	background-color:#777777;
 	color:blue;
 	border:1px dashed pink;
 }
-A
-{
+
+A{
 	text-decoration:none;
 }
-.ha_popup
-{
+
+.ha_popup {
 	position:absolute;
 	z-index:100;
+	background-color:#999;
 }
+
+.ha_icon {
+	position:absolute;
+	top:0px;
+	left:0px;
+	width:100px;
+	height:100px;
+	max-width:100px;
+	max-height:100px;
+}
+
+.ha_image {
+	position:absolute;
+	top:0px;
+	left:0px;
+}
+
 .ha_groups
 {
 	position:relative;
@@ -47,12 +64,12 @@ A
 	color:#CCCCCC;
 	text-shadow: #888888 -1px -1px 2px,#000000 1px 1px 2px;	
 }
+
 .titlebar {
 	position:relative;
 	z-index:10;
 	top:0px;
 }
-
 
 .module
 {
@@ -105,70 +122,95 @@ A
 	border:2px solid #909;
 	background-color:#909
 }
+
 .ON {
 	border:2px inset #FF4;
 	background-color:#FF4
 	color:#000;
 }
+
 .OFF {
 	border:2px outset #000;
 	background-color:#000
 }
-.dim {
+
+.DIM {
 	border:2px solid #887;
 	background-color:#887
 }
 
-
 /* Menu Styles */
 .menuTable {
-        width:100%;
-        background-color:#666;
-        border-collapse: collapse;
+	width:100%;
+	background-color:#666;
+	border-collapse: collapse;
 }
 
 .menuButton {
-        position:fixed;
-        top:0px;
+	position:fixed;
+	top:0px;
 	right:0px;
-        border:.25em outset #33F;
+	border:.25em outset #33F;
 
-        width:2.5em;
-        height:1.5em;
+	width:2.5em;
+	height:1.5em;
 
-        background-color:#33F;
-        color:#FFF;
-        text-align:center;
-        z-index:1000;
+	background-color:#33F;
+	color:#FFF;
+	text-align:center;
+	z-index:1000;
 }
+
 .menuContents {
-        position:absolute;
-        top:2em;
+	position:absolute;
+	top:2em;
 	right:0px;
-        z-index:100;
+	z-index:100;
 }
+
 .menuItem {
-        border:2px outset #555;
-        background-color:#777;
-        color:#FFF;
-        display:block;
-        padding:.75em;
-        text-decoration:none;
-        z-index:100;
+	border:2px outset #555;
+	background-color:#777;
+	color:#FFF;
+	display:block;
+	padding:.75em;
+	text-decoration:none;
+	z-index:100;
 }
+
 .menuItem a {
-        display:block;
-        text-decoration:none;
+	display:block;
+	text-decoration:none;
 }
+
 .backgroundMask {
-        position:absolute;
-        top:0px;
-        left:0px;
-        width:100%;
-        height:100%;
-        z-index:10;
+	position:absolute;
+	top:0px;
+	left:0px;
+	width:100%;
+	height:100%;
+	z-index:10;
 
-        display: none;
-        background-color:rgba(0,0,0,0.2);
+	display: none;
+	background-color:rgba(0,0,0,0.2);
 }
 
+.protocolRight {
+	float:right;
+	color:#FFF;
+}
+
+.deviceConfig {
+	display:inline-block;
+	border:3px inset grey;
+}
+.deviceControl {
+	display:inline-block;
+	border:3px inset grey;
+}
+.deviceSubControl {
+	display:inpline-block;
+	float:left;
+	verticalAlign:center;
+}
+	

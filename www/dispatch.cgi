@@ -15,6 +15,7 @@ $|=1;
 
 print "Content-type:text/html\n\n";
 
+#{"nodeName":"test","register":["all"]}
 
 my %input;
 ReadParse(\%input);
@@ -70,6 +71,9 @@ if ($mode eq '') {
 }
 if ($mode eq 'popup') {
 	popUP();
+}
+if ($mode eq 'send') {
+	sendPacket($input{packet});
 }
 if ($mode eq 'cmd') {
 	command($input{command});
@@ -184,6 +188,12 @@ sub command {
 
 	print "<script>console.log('".encode_json($data)."')</script>\n";
 
+}
+sub sendPacket {
+	my ($packet)=@_;
+	
+	$::HA->registerToHub("dispatch.transient",[]);
+	$::HA->sendPacketToHub($packet);
 }
 #====================================================================================================
 sub getStatus {

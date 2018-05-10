@@ -1,0 +1,43 @@
+<head>
+        <title>Home Automation</title>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <link rel="stylesheet" type="text/css" href="/include/common_style.css" />
+        <script type="text/javascript" src="/include/jquery.js"></script>
+        <script language="javascript" type="text/javascript" src="/include/override_getelementbyid.js"></script>
+        <script language="javascript" type="text/javascript" src="/include/getElementsByClassName.js"></script>
+        <script language="javascript" type="text/javascript" src="/include/drag-drop.js"></script>
+
+        <link rel="stylesheet" type="text/css" href="homeauto.css" />
+        <script language="javascript" type="text/javascript" src="homeauto.js"></script>
+        <script language="javascript" type="text/javascript" src="lib/Devices/devices.js"></script>
+        <script language="javascript" type="text/javascript" src="lib/Devices/X10.js"></script>
+        <script language="javascript" type="text/javascript" src="lib/Devices/MQTT.js"></script>
+        <xscript language="javascript" type="text/javascript" src="lib/Devices/Common.js"></xscript>
+</head>
+
+<span id="devControl" class="deviceControl"></span>
+
+Configuration : 
+
+<blockquote>
+	<span id="devConfig" class="deviceConfig"></span>
+</blockquote>
+
+<button onClick="devices_ha.renderIcon('devIcon',hap1)">Go</button>
+
+<hr>
+
+Icon :
+
+<blockquote>
+	<span id="devIcon" class="module"></span>
+</blockquote>
+
+
+<script>
+devices_ha.protocols=['Common','X10','MQTT'];
+
+var hap1=devices_ha.addHAP({"data":{"action":"off","device":["light","Mark","night stand"]}});
+devices_ha.renderDeviceConfig('devConfig',hap1);
+</script>
+

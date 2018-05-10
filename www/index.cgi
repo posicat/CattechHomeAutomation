@@ -31,31 +31,35 @@ $::session=Cattech::WebSession->new();
 $::session->setParam('_base','./index.cgi');
 $::session->setParam('_method','put');
 
-my @menuItems=(
+my @cornerMenu = (
 	['Menu Mode'	,{mode=>'menu'} ],
-        ['Map Mode'	,{mode=>'map'} ],
+    ['Map Mode'	,{mode=>'map'} ],
 	['All X10'	,{mode=>'allX10'} ],
-        ['Setup'	,{mode=>'setup'} ],
+    ['Setup'	,{mode=>'setup'} ],
 );
 
 my $renderModes = {
-	'menu'		=>{ 'fmt'=>'html',	'render'=>\&displayLoadGroup },
-	'map'		=>{ 'fmt'=>'html',	'render'=>\&displayMap },
-	'allX10'	=>{ 'fmt'=>'html',	'render'=>\&displayAllX10 },
-	'setup'		=>{ 'fmt'=>'html',	'render'=>\&displaySetupScreen },
+	'menu'			=>{ 'fmt'=>'html',	'render'=>\&displayLoadGroup },
+	'map'			=>{ 'fmt'=>'html',	'render'=>\&displayMap },
+	'allX10'		=>{ 'fmt'=>'html',	'render'=>\&displayAllX10 },
+	'setup'			=>{ 'fmt'=>'html',	'render'=>\&displaySetupScreen },
+	'devices'		=>{ 'fmt'=>'html',	'render'=>\&displaySetupDevices },
 
-	'groups'	=>{ 'fmt'=>'ajax',	'render'=>\&displayAjaxGroupData },
-	'controls'	=>{ 'fmt'=>'ajax',	'render'=>\&displayAjaxGroupControls },
+	'groups'		=>{ 'fmt'=>'ajax',	'render'=>\&displayAjaxGroupData },
+	'controls'		=>{ 'fmt'=>'ajax',	'render'=>\&displayAjaxGroupControls },
 };
 
-
+my $menu=$input{menu};
 
 if ( $ENV{HTTP_HOST} eq "" ) {
-        print "\n\n**COMMAND LINE DEBUG**\n\n\n";
-        $input{mode}="";
+	print "\n\n**COMMAND LINE DEBUG**\n\n\n";
+
+	$input{mode}="groups";
+	$input{group}=1;
 }
 
-my $homeautoSH=Cattech::SQLHelper->new('HomeAutomation','homeauto','6C5a3PtSqtNHAACD');
+$::HA=Cattech::HomeAutomation->new(); 
+$::HA->connectToSQLDatabase(); 
 
 my $ocll="onClick=\"load_link(this);return false\";";
 
@@ -87,16 +91,59 @@ print "No render mode for mode=$input{mode}<br>\n";
 #================================================================================
 #================================================================================
 sub displaySetupScreen {
-	print "<div class=titlebar>Setup</div>\n";
-	print "<hr>\n";
-        print "<div class=\"ha_groups\">\n";
-	print "	<a href=\"userImages.cgi\" class=\"groupitem\" $ocll target=\"setupScreen\">User Images</a>\n";	
-	print "	<a href=\"userImages.cgi\" class=\"groupitem\" $ocll target=\"setupScreen\">Triggers</a>\n";	
-	print "	<a href=\"userImages.cgi\" class=\"groupitem\" $ocll target=\"setupScreen\">Watchcat</a>\n";	
-	print "	<a href=\"userImages.cgi\" class=\"groupitem\" $ocll target=\"setupScreen\">Schedule</a>\n";	
-	print "	<a href=\"userImages.cgi\" class=\"groupitem\" $ocll target=\"setupScreen\">Reactions</a>\n";	
-        print "</div>\n";
-	print "<div id=\"setupScreen\"></div>\n";
+print <<EOB;
+<div id="setupScreen">
+<div class="ha_groups">
+	<div class=titlebar>Setup</div>
+	<a href="userImages.cgi" class="groupitem" $ocll target="setupScreen">User Images</a>	
+	<a href="index.cgi?mode=devices" class="groupitem" $ocll target="setupScreen">Devices</a>	
+	<a href="index.cgi?mode=watchcat" class="groupitem" $ocll target="setupScreen">Schedules</a>	
+	<a href="index.cgi?mode=triggers" class="groupitem" $ocll target="setupScreen">Triggers</a>	
+	<a href="index.cgi?mode=reactions" class="groupitem" $ocll target="setupScreen">Reactions</a>	
+</div>
+</div>
+EOB
+}
+#================================================================================
+sub displaySetupDevices {
+
+print <<EOB;
+<div class="ha_groups">
+	<div class=titlebar>Devices</div>
+EOB
+
+	my $dev={};
+	my $devices={};
+	$::HA->{SH}->select_data($devices,'deviceMap');
+	while ( $::HA->{SH}->next_row($devices) ) {
+		push @{$dev->{$devices->{commonDevice}}},[$devices->{deviceMap_id},$devices->{nativeDevice}];
+	}
+
+	my $url="index.cgi?mode=setup";
+	print "<a href=\"$url\" class=\"groupitem\">&bull;&bull;</a>\n";
+	$url="index.cgi?mode=devices&deviceID=ADD";
+	print "<a href=\"$url\" class=\"groupitem\" style=\"text-align:center;color:#944\">Add New</a>\n";
+
+	foreach my $key (sort keys %$dev) {
+		my @devs=@{$dev->{$key}};
+
+		my $protocols="";
+		for(my $i=0;$i<@devs;$i++) {
+			my $d=$devs[0];
+			my $native = decode_json($$d[1]);
+			$protocols.="$native->{protocol} ";
+		}
+		$url="index.cgi?mode=devices&deviceID=$key";
+
+		$key="{\"key\":".$key."}";
+		my $j = decode_json($key);
+		my $prot ="<span class=\"protocolRight\">[$protocols]</span>";
+		print "<a class=\"groupitem\" href=\"$url\>".join(' , ',@{$j->{key}})."$prot</a>\n";
+	}
+
+print <<EOB;
+</div>
+EOB
 }
 #================================================================================
 sub displayAllX10 {
@@ -125,10 +172,13 @@ sub displayAjaxGroupControls {
 	}
 
 	my $scr="";
+	my $sql = "SELECT * FROM menuControl mc LEFT JOIN deviceMap dm ON dm.deviceMap_id=mc.deviceMap_id"
+		." WHERE menuGrpID=?";
 
-	my $menuCtl={menuGrpID=>$input{group}};
-	$homeautoSH->select_data($menuCtl,'menuControl');
-        while ( $homeautoSH->next_row($menuCtl) ) {
+	my $menuCtl={};
+	my $sth = $::HA->{SH}->execute_raw_sql($menuCtl,$sql,($input{group}));
+
+        while ( $::HA->{SH}->next_row($menuCtl) ) {
 		my $id ="ctl_$menuCtl->{ctlID}";
 
 		my $style ="position:absolute;";
@@ -143,18 +193,27 @@ sub displayAjaxGroupControls {
 		$scr .= "\$('#$id').load('dispatch.cgi?commonDevice=".
 			uri_escape($menuCtl->{commonDevice}).
 			"&id=ctl_$menuCtl->{ctlID}".
-			"&title=".uri_escape($menuCtl->{controlName}).
-			"&image=".uri_escape($menuCtl->{image}).
 		"');\n";
+
+		my $cd=$menuCtl->{commonDevice};
+		my $if=$menuCtl->{interfaceType};
+		my $dn=$menuCtl->{deviceName};
+		my $im=$menuCtl->{image};
+		
+		print <<EOB;
+<script>
+	devices_ha.renderIcon('$id',devices_ha.addHAP({"data":{"device":$cd,"interfaceType":"$if","deviceName":"$dn","image":"$im"}}));
+</script>
+EOB
 	}
-	print "<script>\n$scr</script>";
 }
 #================================================================================
 sub displayAjaxGroupData() {
 	my $groupQuery={};
 	$groupQuery->{grpID}=$input{group};
-	$homeautoSH->select_data($groupQuery,'group');
-        $homeautoSH->next_row($groupQuery);
+
+	$::HA->{SH}->select_data($groupQuery,'group');
+        $::HA->{SH}->next_row($groupQuery);
 
 	my $url = $::session->url({tab=>undef});
 
@@ -168,8 +227,8 @@ sub displayAjaxGroupData() {
 	print "<div class=indent1>\n";
 	my $subGroup={};
 	$subGroup->{parentGrpID}=$input{group};
-	$homeautoSH->select_data($subGroup,'group');
-        while ( $homeautoSH->next_row($subGroup) ) {
+	$::HA->{SH}->select_data($subGroup,'group');
+        while ( $::HA->{SH}->next_row($subGroup) ) {
 		print "<a class=\"groupitem\" href=\"$url&mode=groups&group=$subGroup->{grpID}\" target=\"ha_groups\" $ocll>";
 		print "$subGroup->{name}\n";
 		print "</a>\n";
@@ -187,9 +246,17 @@ sub displayCornerMenu {
         print "<div class=\"backgroundMask\" id=\"menuMask\" onClick=\"\$('#menuMask').toggle();\">\n";
 
         print "<div class=\"menuContents\">\n";
-        foreach my $item (@menuItems) {
-                my $url=$::session->url($$item[1]);
-                my $title=$$item[0];
+        foreach my $item (@cornerMenu) {
+		my $url;
+		my $title;
+		if (exists $$item[1]->{url}) {
+			$url = $$item[1];
+                        $title=$$item[0];
+		}
+		if (exists $$item[1]->{mode}) {
+	                $url=$::session->url($$item[1]);
+        	        $title=$$item[0];
+		}
                 print "<a class=\"menuItem\" href=\"$url\">$title</a>\n";
         }
         print "</div>\n";
@@ -210,6 +277,10 @@ print <<EOB;
         <script language="javascript" type="text/javascript" src="/include/getElementsByClassName.js"></script>
         <script language="javascript" type="text/javascript" src="/include/drag-drop.js"></script>
         <script language="javascript" type="text/javascript" src="homeauto.js"></script>
+	<script language="javascript" type="text/javascript" src="lib/Devices/devices_ha.js"></script>
+	<script language="javascript" type="text/javascript" src="lib/Devices/X10.js"></script>
+        <script language="javascript" type="text/javascript" src="lib/Devices/MQTT.js"></script>
+        <script language="javascript" type="text/javascript" src="lib/Devices/Common.js"></script>
 	<script>
 		window.onclick=function() {
 			document.getElementById('ha_popup').innerHTML='';

@@ -1,7 +1,9 @@
 #mvn clean install
+cd /homeAutomation/www
 
 # Deploy the web code
-cp -v  	www/*				/home/homeAutomation/public_html/
+#cp -v  	www/*				/home/homeAutomation/public_html/
+#DONE LIVE
 
 # Deoploy Java applications
 mkdir /usr/local/homeAutomation/bin/
@@ -28,4 +30,4 @@ cp -v SupportApplications/* 		/usr/local/homeAutomation/bin/
 
 
 # Deploy website
-cp -v -rpd www/*				/home/homeauto/public_html
+#cp -v -rpd www/*				/home/homeauto/public_html

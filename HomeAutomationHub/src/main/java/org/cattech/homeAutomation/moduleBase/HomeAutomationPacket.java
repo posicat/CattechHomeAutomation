@@ -45,14 +45,14 @@ public class HomeAutomationPacket {
 	}
 
 	public HomeAutomationPacket(String packet) {
-		this.wrapper = new JSONObject(packet);
-		this.data = new JSONObject();
-		if (wrapper.has(FIELD_DATA)) {
-			try {
+		try {
+			this.wrapper = new JSONObject(packet);
+			this.data = new JSONObject();
+			if (wrapper.has(FIELD_DATA)) {
 				this.data = wrapper.getJSONObject(FIELD_DATA);
-			} catch (JSONException e) {
-				log.error("Error in JSON format : " + packet, e);
 			}
+		} catch (JSONException e) {
+			log.error("Error in JSON format : " + packet, e);
 		}
 	}
 

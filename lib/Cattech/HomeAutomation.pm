@@ -49,7 +49,7 @@ sub registerToHub {
 	};
 
 	my $json = JSON->new->utf8->canonical->encode($packet);
-	$self->_transmitDataToTCPHub($json);
+	$self->sendPacketToHub($json);
 }
 #================================================================================
 sub sendDataToHub {
@@ -63,26 +63,20 @@ sub sendDataToHub {
 
 	my $json = JSON->new->utf8->canonical->encode($packet);
 
-	if ($self->{transmitMode} eq 'url') {
-		my $url = $self->{reg}->{baseUrl};
-		$url.="eventHandler.cgi";
-		$url.="?event=".URI::Escape::uri_escape($json);
-		my $content = LWP::Simple::get $url;
-	}
-	if ($self->{transmitMode} eq 'hub') {
-		$self->_transmitDataToTCPHub($json);
-	}
+	$self->sendPacketToHub($json);
 }
 #================================================================================
 sub getDataFromHub {
 	my ($self,$channel,$data)=@_;
 }
 #================================================================================
-sub _transmitDataToTCPHub {
+sub sendPacketToHub {
 	my ($self,$data)=@_;
 	$self->_openTCPSocket();
+
+	print {$self->{_socket}} $data."\r\n";
+
 	if ($::Gdebug) {
-		print {$self->{_socket}} $data."\r\n";
 		print "Sent : $data<br>\n";
 	}
 }

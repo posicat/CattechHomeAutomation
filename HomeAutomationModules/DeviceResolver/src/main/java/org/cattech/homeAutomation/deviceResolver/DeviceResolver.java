@@ -181,6 +181,7 @@ public class DeviceResolver extends HomeAutomationModule {
 			e.printStackTrace();
 		}
 
+		closeNoThrow(conn);
 	}
 
 }
