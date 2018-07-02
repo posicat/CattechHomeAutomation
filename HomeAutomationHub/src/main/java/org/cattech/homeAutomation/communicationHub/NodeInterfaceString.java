@@ -14,17 +14,10 @@ public class NodeInterfaceString extends NodeInterface {
 
 	private volatile ArrayList<HomeAutomationPacket> dataFromController;
 
-	private String channel;
-
 	public NodeInterfaceString(ChannelController controller) {
 		super(controller);
 		this.dataFromController = new ArrayList<HomeAutomationPacket>();
 		dataFromController = new ArrayList<HomeAutomationPacket>();
-	}
-
-	public NodeInterfaceString(ChannelController controller, String channel) {
-		this(controller);
-		this.channel=channel;
 	}
 
 	// This method never really needs to be called, since we don't need to watch for
@@ -61,19 +54,6 @@ public class NodeInterfaceString extends NodeInterface {
 		dataFromController.add(new HomeAutomationPacket(hap.toString()));
 	}
 
-	/**
-	 *  @deprecated This method is replaced by getDataPacketFromController
-	 * 
-	 */
-	@Deprecated
-	synchronized public String getDataFromController() {
-		if (dataFromController.size() > 0) {
-			return dataFromController.remove(0).toString();
-		} else {
-			return null;
-		}
-	}
-
 	synchronized public HomeAutomationPacket getDataPacketFromController() {
 		if (dataFromController.size() > 0) {
 			HomeAutomationPacket hap = dataFromController.remove(0);
@@ -82,15 +62,7 @@ public class NodeInterfaceString extends NodeInterface {
 			return null;
 		}
 	}
-
-	private String getModuleChannelName() {
-		return channel;
-	}
 	
-	private void setModuleChannelName(String moduleChannelName) {
-		this.channel=moduleChannelName;
-	}
-
 	public boolean isFullTrace() {
 		return fullTrace;
 	}
@@ -99,22 +71,10 @@ public class NodeInterfaceString extends NodeInterface {
 		this.fullTrace = fullTrace;
 	}
 
-	/**
-	 * @deprecated This method is replaced by sendDataPacketToController 
-	 * 
-	 */
-	@Deprecated
-	synchronized public void sendDataToController(String data) {
-		if (fullTrace) {
-			log.info(">>>TO CONTROL>>>" + data);
-		}
-		sendDataToController(data, this);
-	}
 	synchronized public void sendDataPacketToController(HomeAutomationPacket hap) {
 		if (fullTrace) {
 			log.info(">>>TO CONTROL>>>" + hap.toString() );
 		}
 		sendDataPacketToController(hap, this);
-		
 	}
 }

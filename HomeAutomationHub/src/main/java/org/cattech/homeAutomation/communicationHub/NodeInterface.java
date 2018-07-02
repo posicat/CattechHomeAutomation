@@ -5,7 +5,7 @@ import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
 public abstract class NodeInterface implements Runnable {
 
 	private boolean running = false;
-	private ChannelController controller = null;
+	protected ChannelController controller = null;
 	protected String nodeName;
 
 	public NodeInterface(ChannelController controller) {
@@ -32,15 +32,6 @@ public abstract class NodeInterface implements Runnable {
 
 	public boolean isRunning() {
 		return running;
-	}
-
-	/**
-	 * @deprecated This method is replaced by sendDataPacketToController 
-	 * 
-	 */
-	@Deprecated	
-	public void sendDataToController(String data, NodeInterface fromNode) {
-		this.controller.processIncomingData(data, fromNode);
 	}
 
 	public void sendDataPacketToController(HomeAutomationPacket hap, NodeInterface fromNode) {

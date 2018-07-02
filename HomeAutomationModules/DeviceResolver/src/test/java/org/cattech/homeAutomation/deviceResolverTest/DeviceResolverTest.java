@@ -1,6 +1,9 @@
 package org.cattech.homeAutomation.deviceResolverTest;
 
+import static org.junit.Assert.assertNotNull;
+
 import org.cattech.homeAutomation.deviceResolver.DeviceResolver;
+import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
 import org.cattech.homeAutomation.moduleBaseTest.BaseTestForModules;
 import org.junit.After;
 import org.junit.Before;
@@ -44,11 +47,12 @@ public class DeviceResolverTest extends BaseTestForModules {
 	@Test
 	public void testCanDecodeNativeDeviceToCommon() {
 
-		testInterface.sendDataToController("{\"destination\":[\"DeviceResolver\"]," + testPacketSource + ","
-				+ "\"data\":{\"resolution\":\"toCommon\",\"postResolve\":\"testEventHandler\",\"nativeDevice\":"
-				+ nativeDevMatches1 + ",\"action\":\"on\"}}");
+		HomeAutomationPacket hap = new HomeAutomationPacket("{\"destination\":[\"DeviceResolver\"]," + testPacketSource + ","
+						+ "\"data\":{\"resolution\":\"toCommon\",\"postResolve\":\"testEventHandler\",\"nativeDevice\":"
+						+ nativeDevMatches1 + ",\"action\":\"on\"}}");
+		testInterface.sendDataPacketToController(hap);
 
-		String result = waitforResult(testInterface, MAX_TEST_WAIT);
+		String result = waitforResultPacket(testInterface, (long) MAX_TEST_WAIT).toString();
 
 		String expectedStr = "{\"nodeName\":\"DeviceResolver\",\"data\":{\"action\":\"on\"," + "\"device\":"
 				+ commonDevMatches1 + "},\"channel\":\"testEventHandler\",\"source\":\"DeviceResolver\"}";
@@ -60,11 +64,12 @@ public class DeviceResolverTest extends BaseTestForModules {
 	@Test
 	public void testCanDecodeCommonDeviceToNative() {
 
-		testInterface.sendDataToController("{\"destination\":[\"DeviceResolver\"]," + testPacketSource + ","
-				+ "\"data\":{\"resolution\":\"toNative\",\"postResolve\":\"testEventHandler\",\"device\":"
-				+ commonDevMatches1 + ",\"action\":\"on\"}}");
+		HomeAutomationPacket hap = new HomeAutomationPacket("{\"destination\":[\"DeviceResolver\"]," + testPacketSource + ","
+						+ "\"data\":{\"resolution\":\"toNative\",\"postResolve\":\"testEventHandler\",\"device\":"
+						+ commonDevMatches1 + ",\"action\":\"on\"}}");
+		testInterface.sendDataPacketToController(hap);
 
-		String result = waitforResult(testInterface, MAX_TEST_WAIT);
+		String result = waitforResultPacket(testInterface, (long) MAX_TEST_WAIT).toString();
 
 		JSONAssert.assertEquals(
 				"{\"nodeName\":\"DeviceResolver\",\"data\":{\"action\":\"on\"," + "\"nativeDevice\":"
@@ -75,23 +80,26 @@ public class DeviceResolverTest extends BaseTestForModules {
 	@Test
 	public void testCanDecodeCommonDeviceToNativeWithNoPostResolveGoesToNative() {
 
-		testInterface.sendDataToController("{\"destination\":[\"DeviceResolver\"]," + testPacketSource + ","
-				+ "\"data\":{\"resolution\":\"toNative\",\"device\":" + commonDevMatches1 + ",\"action\":\"on\"}}");
+		HomeAutomationPacket hap = new HomeAutomationPacket("{\"destination\":[\"DeviceResolver\"]," + testPacketSource + ","
+						+ "\"data\":{\"resolution\":\"toNative\",\"device\":" + commonDevMatches1 + ",\"action\":\"on\"}}");
+		testInterface.sendDataPacketToController(hap);
 
-		String result = waitforResult(testInterface, MAX_TEST_WAIT);
-
+		HomeAutomationPacket result = waitforResultPacket(testInterface, (long) MAX_TEST_WAIT);
+		
+	    assertNotNull(result);
 		JSONAssert.assertEquals(
 				"{\"nodeName\":\"DeviceResolver\",\"data\":{\"action\":\"on\"," + "\"nativeDevice\":"
 						+ nativeDevMatches1 + "},\"channel\":\"channelNative1\",\"source\":\"DeviceResolver\"}",
-				result, false);
+				result.toString(), false);
 	}
 
 	@Test
 	public void testCanDecodeCommonDeviceToMultipleNative() {
 
-		testInterface.sendDataToController("{\"destination\":[\"DeviceResolver\"]," + testPacketSource + ","
-				+ "\"data\":{\"resolution\":\"toNative\",\"postResolve\":\"testEventHandler\",\"device\":"
-				+ commonDevMatches2 + ",\"action\":\"on\"}}");
+		HomeAutomationPacket hap = new HomeAutomationPacket("{\"destination\":[\"DeviceResolver\"]," + testPacketSource + ","
+						+ "\"data\":{\"resolution\":\"toNative\",\"postResolve\":\"testEventHandler\",\"device\":"
+						+ commonDevMatches2 + ",\"action\":\"on\"}}");
+		testInterface.sendDataPacketToController(hap);
 
 		String[] expected = {
 				"{\"nodeName\":\"DeviceResolver\",\"data\":{\"action\":\"on\"," + "\"nativeDevice\":" + nativeDevMatchA
@@ -99,8 +107,8 @@ public class DeviceResolverTest extends BaseTestForModules {
 				"{\"nodeName\":\"DeviceResolver\",\"data\":{\"action\":\"on\"," + "\"nativeDevice\":" + nativeDevMatchB
 						+ "},\"channel\":\"testEventHandler\",\"source\":\"DeviceResolver\"}" };
 
-		String result1 = waitforResult(testInterface, MAX_TEST_WAIT);
-		String result2 = waitforResult(testInterface, MAX_TEST_WAIT);
+		String result1 = waitforResultPacket(testInterface, (long) MAX_TEST_WAIT).toString();
+		String result2 = waitforResultPacket(testInterface, (long) MAX_TEST_WAIT).toString();
 
 		assertResultIsInArray(expected, result1);
 		assertResultIsInArray(expected, result2);
@@ -109,8 +117,9 @@ public class DeviceResolverTest extends BaseTestForModules {
 	@Test
 	public void testCanDecodeCommonDeviceToMultipleNativeWithNoPostResolveGoesToNative() {
 
-		testInterface.sendDataToController("{\"destination\":[\"DeviceResolver\"]," + testPacketSource + ","
-				+ "\"data\":{\"resolution\":\"toNative\",\"device\":" + commonDevMatches2 + ",\"action\":\"on\"}}");
+		HomeAutomationPacket hap = new HomeAutomationPacket("{\"destination\":[\"DeviceResolver\"]," + testPacketSource + ","
+						+ "\"data\":{\"resolution\":\"toNative\",\"device\":" + commonDevMatches2 + ",\"action\":\"on\"}}");
+		testInterface.sendDataPacketToController(hap);
 
 		String[] expected = {
 				"{\"nodeName\":\"DeviceResolver\",\"data\":{\"action\":\"on\"," + "\"nativeDevice\":" + nativeDevMatchA
@@ -118,8 +127,8 @@ public class DeviceResolverTest extends BaseTestForModules {
 				"{\"nodeName\":\"DeviceResolver\",\"data\":{\"action\":\"on\"," + "\"nativeDevice\":" + nativeDevMatchB
 						+ "},\"channel\":\"channelNativeB\",\"source\":\"DeviceResolver\"}" };
 
-		String result1 = waitforResult(testInterface, MAX_TEST_WAIT);
-		String result2 = waitforResult(testInterface, MAX_TEST_WAIT);
+		String result1 = waitforResultPacket(testInterface, (long) MAX_TEST_WAIT).toString();
+		String result2 = waitforResultPacket(testInterface, (long) MAX_TEST_WAIT).toString();
 
 		assertResultIsInArray(expected, result1);
 		assertResultIsInArray(expected, result2);

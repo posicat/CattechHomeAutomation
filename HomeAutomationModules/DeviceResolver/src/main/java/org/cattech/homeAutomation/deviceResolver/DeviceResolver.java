@@ -151,13 +151,13 @@ public class DeviceResolver extends HomeAutomationModule {
 	}
 
 	public void loadDeviceMappings() {
-		this.lookupTable = new Hashtable<JSONObject, JSONArray>();
-		
 		Connection conn = getHomeAutomationDBConnection();
 		if (null == conn) {
 			log.error("Could not obtain connection to HomeAutomation database");
 			return;
 		}
+
+		this.lookupTable = new Hashtable<JSONObject, JSONArray>();
 
 		Statement stmt;
 		ResultSet rs;

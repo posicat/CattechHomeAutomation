@@ -38,7 +38,8 @@ public class WatchCat extends HomeAutomationModule {
 						action.put("source", "WatchCat");
 						String identifier = event.getIdentifier();
 						log.error("Action away ..." + action);
-						hubInterface.sendDataToController(action.toString());
+						HomeAutomationPacket hap = new HomeAutomationPacket(action.toString());
+						hubInterface.sendDataPacketToController(hap);
 						WatchCatDatabaseHelper.updateNextTrigger(conn, identifier);
 					} else {
 						log.error("Action has no destination." + action);

@@ -38,8 +38,8 @@ public class ChannelControllerTest extends BaseTestWithController {
 						+ testInterface.getNodeName() + "\"}",
 				result, true);
 
-		testInterface
-				.sendDataToController("{\"destination\":[\"a\"],\"source\":\"a\",\"data\":{\"test\":\"success\"}}");
+		HomeAutomationPacket hap = new HomeAutomationPacket("{\"destination\":[\"a\"],\"source\":\"a\",\"data\":{\"test\":\"success\"}}");
+		testInterface.sendDataPacketToController(hap);
 
 		HomeAutomationPacket hapResult = testInterface.getDataPacketFromController();
 		JSONAssert.assertEquals("{\"source\":\"a\",\"channel\":\"a\",\"nodeName\":\"" + testInterface.getNodeName()
@@ -57,12 +57,12 @@ public class ChannelControllerTest extends BaseTestWithController {
 						+ testInterface.getNodeName() + "\"}",
 				result, true);
 
-		testInterface.sendDataToController(
-				"{\"destination\":[\"b\"],\"source\":\"a\",\"data\":{\"test\":\"should not send, no node b\"}}");
+		HomeAutomationPacket hap = new HomeAutomationPacket("{\"destination\":[\"b\"],\"source\":\"a\",\"data\":{\"test\":\"should not send, no node b\"}}");
+		testInterface.sendDataPacketToController(hap);
 		// This will display a "No node regitered" error on the server, can be ignored.
 
-		result = testInterface.getDataFromController();
-		assertEquals(null, result);
+		HomeAutomationPacket resultHAP = testInterface.getDataPacketFromController();
+		assertEquals(null, resultHAP);
 	}
 
 	@Test
@@ -84,36 +84,36 @@ public class ChannelControllerTest extends BaseTestWithController {
 				result, true);
 
 		// Send from A to A, should be received by A only
-		testInterfaceA
-				.sendDataToController("{\"destination\":[\"a\"],\"source\":\"a\",\"data\":{\"test\":\"success1\"}}");
+		HomeAutomationPacket hap = new HomeAutomationPacket("{\"destination\":[\"a\"],\"source\":\"a\",\"data\":{\"test\":\"success1\"}}");
+		testInterfaceA.sendDataPacketToController(hap);
 
-		result = testInterfaceA.getDataFromController();
+		result = testInterfaceA.getDataPacketFromController().toString();
 		JSONAssert.assertEquals("{\"source\":\"a\",\"channel\":\"a\",\"nodeName\":\"" + testInterfaceA.getNodeName()
 				+ "\",\"data\":{\"test\":\"success1\"}}", result, true);
 
-		result = testInterfaceB.getDataFromController();
-		assertEquals(null, result);
+		HomeAutomationPacket resultHAP = testInterfaceB.getDataPacketFromController();
+		assertEquals(null, resultHAP);
 
 		// Send from A to B, should be received by B only
-		testInterfaceA
-				.sendDataToController("{\"destination\":[\"b\"],\"source\":\"a\",\"data\":{\"test\":\"success2\"}}");
+		hap = new HomeAutomationPacket("{\"destination\":[\"b\"],\"source\":\"a\",\"data\":{\"test\":\"success2\"}}");
+		testInterfaceA.sendDataPacketToController(hap);
 
-		result = testInterfaceA.getDataFromController();
-		assertEquals(null, result);
+		resultHAP = testInterfaceA.getDataPacketFromController();
+		assertEquals(null, resultHAP);
 
-		result = testInterfaceB.getDataFromController();
+		result = testInterfaceB.getDataPacketFromController().toString();
 		JSONAssert.assertEquals("{\"source\":\"a\",\"channel\":\"b\",\"nodeName\":\"" + testInterfaceA.getNodeName()
 				+ "\",\"data\":{\"test\":\"success2\"}}", result, true);
 
 		// Send from B to A, should be received by A only
-		testInterfaceB
-				.sendDataToController("{\"destination\":[\"a\"],\"source\":\"b\",\"data\":{\"test\":\"success3\"}}");
+		hap = new HomeAutomationPacket("{\"destination\":[\"a\"],\"source\":\"b\",\"data\":{\"test\":\"success3\"}}");
+		testInterfaceB.sendDataPacketToController(hap);
 
-		result = testInterfaceA.getDataFromController();
+		result = testInterfaceA.getDataPacketFromController().toString();
 		JSONAssert.assertEquals("{\"source\":\"b\",\"channel\":\"a\",\"nodeName\":\"" + testInterfaceB.getNodeName()
 				+ "\",\"data\":{\"test\":\"success3\"}}", result, true);
 
-		result = testInterfaceB.getDataFromController();
-		assertEquals(null, result);
+		resultHAP = testInterfaceB.getDataPacketFromController();
+		assertEquals(null, resultHAP);
 	}
 }

@@ -1,9 +1,6 @@
 package org.cattech.homeAutomation.moduleBase;
 
-import java.util.Arrays;
-
 import org.apache.log4j.Logger;
-import org.cattech.homeAutomation.watchCat.WatchCatDatabaseHelper;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,16 +37,16 @@ public class HomeAutomationPacket {
 	private JSONObject data = null;
 
 	public HomeAutomationPacket() {
-		this.wrapper = new JSONObject();
-		this.data = new JSONObject();
+		this.setWrapper(new JSONObject());
+		this.setData(new JSONObject());
 	}
 
 	public HomeAutomationPacket(String packet) {
 		try {
-			this.wrapper = new JSONObject(packet);
-			this.data = new JSONObject();
-			if (wrapper.has(FIELD_DATA)) {
-				this.data = wrapper.getJSONObject(FIELD_DATA);
+			this.setWrapper(new JSONObject(packet));
+			this.setData(new JSONObject());
+			if (getWrapper().has(FIELD_DATA)) {
+				this.setData(getWrapper().getJSONObject(FIELD_DATA));
 			}
 		} catch (JSONException e) {
 			log.error("Error in JSON format : " + packet, e);
@@ -57,31 +54,21 @@ public class HomeAutomationPacket {
 	}
 
 	public String toString() {
-		JSONObject toStr = HomeAutomationPacketHelper.copyJSONObject(wrapper);
-		if (data != null && data.length() > 0) {
-			JSONObject dataCopy = HomeAutomationPacketHelper.copyJSONObject(data);
-			toStr.put(FIELD_DATA, dataCopy);
+		JSONObject toStr = HomeAutomationPacketHelper.copyJSONObject(getWrapper());
+		JSONObject packetData = getData();
+		if (packetData != null && packetData.length() > 0) {
+			toStr.put(FIELD_DATA, HomeAutomationPacketHelper.copyJSONObject(packetData));
 		}
-		return toStr.toString();
+	    return toStr.toString();
 	}
 
 	// ====================================================================================================//
 	// Simple access helper methods
 	// ====================================================================================================//
 
-	@Deprecated
-	public JSONObject getData() {
-		return data;
-	}
-
-	@Deprecated
-	public JSONObject getWrapper() {
-		return wrapper;
-	}
-
 	public void setDestination(String[] strings) {
 		removeDestination();
-		wrapper.put(FIELD_DESTINATION, new JSONArray(strings));
+		getWrapper().put(FIELD_DESTINATION, new JSONArray(strings));
 	}
 
 	public void setDestination(String string) {
@@ -90,18 +77,18 @@ public class HomeAutomationPacket {
 	}
 
 	public void setSource(String value) {
-		wrapper.put(FIELD_SOURCE, value);
+		getWrapper().put(FIELD_SOURCE, value);
 	}
 
 	public void addDestination(String channel) {
-		if (!wrapper.has(FIELD_DESTINATION)) {
-			wrapper.put(FIELD_DESTINATION, new JSONArray());
+		if (!getWrapper().has(FIELD_DESTINATION)) {
+			getWrapper().put(FIELD_DESTINATION, new JSONArray());
 		}
-		wrapper.getJSONArray(FIELD_DESTINATION).put(channel);
+		getWrapper().getJSONArray(FIELD_DESTINATION).put(channel);
 	}
 
 	public void removeDestination() {
-		wrapper.remove(FIELD_DESTINATION);
+		getWrapper().remove(FIELD_DESTINATION);
 	}
 
 	public void setData(JSONObject data) {
@@ -109,58 +96,70 @@ public class HomeAutomationPacket {
 	}
 
 	public void putWrapper(String key, Object value) {
-		wrapper.put(key, value);
+		getWrapper().put(key, value);
 	}
 
 	public void putData(String key, Object value) {
-		data.put(key, value);
+		getData().put(key, value);
 	}
 
 	public void removeFromWrapper(String key) {
-		wrapper.remove(key);
+		getWrapper().remove(key);
 	}
 
 	public void removeFromData(String key) {
-		data.remove(key);
+		getData().remove(key);
 	}
 
 	public boolean hasWrapper() {
-		return (null != wrapper && wrapper.length() > 0);
+		return (null != getWrapper() && getWrapper().length() > 0);
 	}
 
 	public boolean hasData() {
-		return (null != data && data.length() > 0);
+		return (null != getData() && getData().length() > 0);
 	}
 
 	public boolean hasWrapper(String key) {
-		return wrapper.has(key);
+		return getWrapper().has(key);
 	}
 
 	public boolean hasData(String key) {
-		return data.has(key);
+		return getData().has(key);
 	}
 
 	public String getWrapperString(String key) {
-		return wrapper.getString(key);
+		return getWrapper().getString(key);
 	}
 
 	public String getDataString(String key) {
-		return data.getString(key);
+		return getData().getString(key);
 	}
 
 	public JSONObject getWrapperJObj(String key) {
-		return wrapper.getJSONObject(key);
+		return getWrapper().getJSONObject(key);
 	}
 
 	public JSONObject getDataJObj(String key) {
-		return data.getJSONObject(key);
+		return getData().getJSONObject(key);
 	}
 
 	public JSONArray getWrapperJArr(String key) {
-		return wrapper.getJSONArray(key);
+		return getWrapper().getJSONArray(key);
 	}
 
 	public JSONArray getDataJArr(String key) {
-		return data.getJSONArray(key);
+		return getData().getJSONArray(key);
+	}
+
+	public JSONObject getData() {
+		return data;
+	}
+
+	public JSONObject getWrapper() {
+		return wrapper;
+	}
+
+	public void setWrapper(JSONObject wrapper) {
+		this.wrapper = wrapper;
 	}
 }

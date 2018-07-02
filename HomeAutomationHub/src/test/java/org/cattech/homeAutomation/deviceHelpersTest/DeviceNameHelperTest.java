@@ -1,20 +1,17 @@
 package org.cattech.homeAutomation.deviceHelpersTest;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.cattech.homeAutomation.deviceHelpers.DeviceNameHelper;
 import org.json.JSONArray;
-import org.json.JSONObject;
 import org.junit.Test;
-import org.skyscreamer.jsonassert.JSONAssert;
 
 public class DeviceNameHelperTest {
 
 	@Test
 	public void testVariousSubMatcesForCommonDescriptorsMatch() {
 		
-		JSONArray arrayOfDevices = new JSONArray();
-
 		verifyMatch("['upstairs','bedroom','master','desk','light']","['light']");
 		verifyMatch("['upstairs','bedroom','master','desk','light']","['light','desk']");
 		verifyMatch("['upstairs','bedroom','master','desk','light']","['master','light']");

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Stack;
 
 import org.cattech.homeAutomation.EventHandler.EventHandler;
+import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
 import org.cattech.homeAutomation.moduleBaseTest.BaseTestForModules;
 import org.json.JSONObject;
 import org.junit.After;
@@ -34,10 +35,10 @@ public class EventHandlerTest extends BaseTestForModules {
 	@Test
 	public void testForwardsNativeDevicesToResolver() {
 
-		testInterface.sendDataToController(
-				"{\"destination\":[\"EventHandler\"]," + testPacketSource + ",\"data\":{\"nativeDevice\":\"\"}}");
+		HomeAutomationPacket hap = new HomeAutomationPacket("{\"destination\":[\"EventHandler\"]," + testPacketSource + ",\"data\":{\"nativeDevice\":\"\"}}");
+		testInterface.sendDataPacketToController(hap);
 
-		String result = waitforResult(testInterface, MAX_TEST_WAIT);
+		String result = waitforResultPacket(testInterface, (long) MAX_TEST_WAIT).toString();
 
 		JSONAssert.assertEquals(
 				"{\"nodeName\":\"EventHandler\",\"data\":{\"resolution\":\"toCommon\",\"nativeDevice\":\"\"},\"channel\":\"DeviceResolver\",\"source\":\"EventHandler\"}s",
@@ -47,10 +48,10 @@ public class EventHandlerTest extends BaseTestForModules {
 	//@Test
 	public void testForwardsCommonDevicesToEventHandler() {
 
-		testInterface.sendDataToController(
-				"{\"destination\":[\"EventHandler\"]," + testPacketSource + ",\"data\":{\"device\":[\"lamp\"]}}");
+		HomeAutomationPacket hap = new HomeAutomationPacket("{\"destination\":[\"EventHandler\"]," + testPacketSource + ",\"data\":{\"device\":[\"lamp\"]}}");
+		testInterface.sendDataPacketToController(hap);
 
-		String result = waitforResult(testInterface, MAX_TEST_WAIT);
+		String result = waitforResultPacket(testInterface, (long) MAX_TEST_WAIT).toString();
 
 		List<JSONObject> expected = new Stack<JSONObject>();
 		expected.add(new JSONObject("{\"nodeName\":\"EventHandler\",\"data\":{\"device\":[\"lamp\"]},\"channel\":\"EventHandler\",\"source\":\"EventHandler\"}"));

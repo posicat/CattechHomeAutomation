@@ -56,8 +56,9 @@ public class EventHandler extends HomeAutomationModule {
 					for (JSONObject action : actions) {
 						if (action.has("destination")) {
 							action.put("source", "EventHandler");
-							log.error("Action away..." + action);
-							hubInterface.sendDataToController(action.toString());
+							log.info("Action away..." + action);
+							HomeAutomationPacket hap = new HomeAutomationPacket(action.toString());
+							hubInterface.sendDataPacketToController(hap);
 						} else {
 							log.error("Action has no destination." + action);
 						}
@@ -114,7 +115,7 @@ public class EventHandler extends HomeAutomationModule {
 
 		List<JSONObject> result = getActionsForReactions(conn, triggerReactions);
 
-		log.error("Action done");
+		log.info("Action done");
 
 		closeNoThrow(conn);
 		return result;

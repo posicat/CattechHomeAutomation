@@ -27,7 +27,7 @@ import org.json.JSONObject;
 
 public abstract class HomeAutomationModule implements Runnable {
 	private static final int WAIT_TIME_BETWEEN_PACKET_CHECKS = 100;
-	private Logger log = Logger.getLogger(this.getClass());
+	private Logger log = Logger.getLogger("HomeAutomationModule");
 	protected NodeInterfaceString hubInterface;
 	protected boolean running = false;
 	protected HomeAutomationConfiguration configuration;
@@ -36,7 +36,8 @@ public abstract class HomeAutomationModule implements Runnable {
 		if (autoStartModule()) {
 			log.info("--- Initializing module, channels : " + getModuleChannelName() + " ---");
 			this.hubInterface = new NodeInterfaceString(controller);
-			hubInterface.sendDataToController("{\"register\":[\"" + getModuleChannelName() + "\"],\"nodeName\":\"" + getModuleChannelName() + "\"}");
+			HomeAutomationPacket hap = new HomeAutomationPacket("{\"register\":[\"" + getModuleChannelName() + "\"],\"nodeName\":\"" + getModuleChannelName() + "\"}");
+			hubInterface.sendDataPacketToController(hap);
 
 			HomeAutomationPacket response = null;
 			while (null == response) {

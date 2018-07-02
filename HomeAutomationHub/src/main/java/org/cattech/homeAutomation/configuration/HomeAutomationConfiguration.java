@@ -6,12 +6,10 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Properties;
 
-import org.apache.commons.logging.impl.Log4JLogger;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggerFactory;
 
 public class HomeAutomationConfiguration {
 

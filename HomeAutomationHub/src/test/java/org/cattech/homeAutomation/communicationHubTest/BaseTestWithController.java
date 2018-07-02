@@ -14,7 +14,6 @@ import org.skyscreamer.jsonassert.JSONCompare;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.skyscreamer.jsonassert.JSONCompareResult;
 
-import junit.framework.Assert;
 
 public class BaseTestWithController {
 	private Logger log = Logger.getLogger(this.getClass());
@@ -42,15 +41,16 @@ public class BaseTestWithController {
 
 	protected String registerChannel(NodeInterfaceString inter, String[] channels) {
 		JSONArray channelArr = new JSONArray(channels);
-		inter.sendDataToController("{\"register\":" + channelArr + ",\"nodeName\":\"BaseTestWithController\",\"data\":{\"testrunner\":\"true\"}}");
-		return waitforResult(inter, MAX_TEST_WAIT);
+		HomeAutomationPacket hap = new HomeAutomationPacket("{\"register\":" + channelArr + ",\"nodeName\":\"BaseTestWithController\",\"data\":{\"testrunner\":\"true\"}}");
+		inter.sendDataPacketToController(hap);
+		return waitforResultPacket(inter, (long) MAX_TEST_WAIT).toString();
 	}
 
-	protected String waitforResult(NodeInterfaceString inter, long timeout) {
+	protected HomeAutomationPacket waitforResultPacket(NodeInterfaceString inter, long timeout) {
 		timeout += System.currentTimeMillis();
-		String result = null;
+		HomeAutomationPacket result = null;
 		while (null == result && timeout > System.currentTimeMillis()) {
-			result = inter.getDataFromController();
+			result = inter.getDataPacketFromController();
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
@@ -63,10 +63,11 @@ public class BaseTestWithController {
 		String message = "{\"destination\":[\"DeviceResolver\"]," + testPacketSource + ",\"data\":{" + "\"resolution\":\"addLookup\"," + "\""+HomeAutomationPacket.FIELD_DATA_NATIVE_DEVICE+"\":" + nativeDevice + "," + "\""+HomeAutomationPacket.FIELD_DATA_DEVICE+"\":" + commonDevice
 				+ "}}";
 
-		testInterface.sendDataToController(message);
+		HomeAutomationPacket hap = new HomeAutomationPacket(message);
+		testInterface.sendDataPacketToController(hap);
 
-		String result = waitforResult(testInterface, MAX_TEST_WAIT);
-		log.info(result);
+		hap = waitforResultPacket(testInterface, (long) MAX_TEST_WAIT);
+		log.info(hap);
 	}
 
 	protected void assertResultIsInArray(String[] expected, String result) {

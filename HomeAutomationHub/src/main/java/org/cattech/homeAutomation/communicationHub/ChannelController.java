@@ -65,16 +65,6 @@ public class ChannelController {
 	}
 
 
-	/**
-	 * @deprecated This method will be replaced by sendDataPacketToController 
-	 * 
-	 */
-	@Deprecated	
-	public void processIncomingData(String incoming, NodeInterface fromNode) {
-		HomeAutomationPacket hap = new HomeAutomationPacket(incoming);
-		processIncomingDataPacket(hap,fromNode);
-	}
-		
 	public void processIncomingDataPacket(HomeAutomationPacket hapIn, NodeInterface fromNode) {
 		String errors = "";
 		try {

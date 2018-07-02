@@ -95,7 +95,7 @@ public class MQTTBroker extends HomeAutomationModule {
 		private NodeInterfaceString hubInterface;
 
 		public PublisherListener(ChannelController controller) {
-			this.hubInterface = new NodeInterfaceString(controller, MQTT_BROKER);
+			this.hubInterface = new NodeInterfaceString(controller);
 		}
 
 		@Override
