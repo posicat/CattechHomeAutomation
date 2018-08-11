@@ -1,15 +1,18 @@
-package org.cattech.homeAutomation.communicationHub;
+package org.cattech.homeAutomation.commandLine;
 
 import java.io.IOException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.cattech.homeAutomation.configuration.HomeAutomationConfigurationException;
+import org.cattech.homeAutomation.communicationHub.ChannelController;
+import org.cattech.homeAutomation.communicationHub.ModuleManager;
+import org.cattech.homeAutomation.communicationHub.NodeSocketConnectionManager;
 import org.cattech.homeAutomation.configuration.HomeAutomationConfiguration;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationModule;
 
-public class Hub {
-	private static Logger log = Logger.getLogger(Hub.class);
+public class HomeAutomationHub {
+	private static Logger log = Logger.getLogger(HomeAutomationHub.class);
 
 	private static ChannelController controller = null;
 

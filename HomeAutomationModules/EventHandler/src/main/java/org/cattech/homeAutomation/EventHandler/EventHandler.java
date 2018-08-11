@@ -19,14 +19,9 @@ import org.json.JSONObject;
 
 public class EventHandler extends HomeAutomationModule {
 	static Logger log = Logger.getLogger(EventHandler.class.getName());
-	private String urlPrefix;
 
 	public EventHandler(ChannelController controller) {
 		super(controller);
-
-		final String baseUrl = controller.getConfig().getBaseURL();
-		this.urlPrefix = baseUrl + "eventHandler.cgi";
-		log.info("Enabling webrelay to " + this.urlPrefix);
 	}
 
 	@Override
@@ -44,6 +39,7 @@ public class EventHandler extends HomeAutomationModule {
 
 				reply.setData(incoming.getData());
 				if (incoming.hasData(HomeAutomationPacket.FIELD_DATA_NATIVE_DEVICE)) {
+					log.debug("Resolving");
 					reply.putData(HomeAutomationPacket.FIELD_RESOLUTION, HomeAutomationPacket.RESOLUTION_TO_COMMON);
 					reply.putData(HomeAutomationPacket.FIELD_DATA_POST_RESOLVE, HomeAutomationPacket.CHANNEL_EVENT_HANDLER);
 					reply.removeDestination();

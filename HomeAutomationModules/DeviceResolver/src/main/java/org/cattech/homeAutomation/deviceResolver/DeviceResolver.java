@@ -171,9 +171,10 @@ public class DeviceResolver extends HomeAutomationModule {
 					JSONArray commonDevice = new JSONArray(rs.getString("commonDevice"));
 					addLookup(nativeDevice, commonDevice);
 				} catch (JSONException je) {
-					log.error("Error loading device mapping", je);
-					log.error("nativeDevice : " + rs.getString(HomeAutomationPacket.FIELD_DATA_NATIVE_DEVICE));
-					log.error("commonDevice : " + rs.getString("commonDevice"));
+					log.error("Error loading device mapping\n" + 
+					"\tnativeDevice : " + rs.getString(HomeAutomationPacket.FIELD_DATA_NATIVE_DEVICE)+
+					"\tcommonDevice : " + rs.getString("commonDevice")
+					, je);
 				}
 			}
 		} catch (SQLException e) {

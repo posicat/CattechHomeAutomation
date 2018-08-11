@@ -33,18 +33,6 @@ public class NodeInterfaceString extends NodeInterface {
 			}
 		}
 	}
-	/**
-	 *  @deprecated This method is replaced by getDataPacketFromController
-	 * 
-	 */
-	@Deprecated
-	@Override
-	synchronized public void sendDataToNode(String data) throws Exception {
-		if (fullTrace) {
-			log.info("<<<FROM CONTROL<<<" + data);
-		}
-		dataFromController.add(new HomeAutomationPacket(data));
-	}
 
 	@Override
 	synchronized public void sendDataPacketToNode(HomeAutomationPacket hap) throws Exception {

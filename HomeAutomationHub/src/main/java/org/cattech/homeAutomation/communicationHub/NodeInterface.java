@@ -41,12 +41,6 @@ public abstract class NodeInterface implements Runnable {
 	// Abstract Methods
 	public abstract void watchForData();
 
-	/**
-	 * @deprecated This method is replaced by sendDataPacketToNode 
-	 * 
-	 */
-	@Deprecated
-	public abstract void sendDataToNode(String data) throws Exception;
 	public abstract void sendDataPacketToNode(HomeAutomationPacket hap) throws Exception;
 
 	public String getNodeName() {

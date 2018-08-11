@@ -36,7 +36,7 @@
 					<archive>
 						<manifest>
 							<addClasspath>false</addClasspath>
-							<mainClass>org.cattech.homeAutomation.communicationHub.Hub</mainClass>
+							<mainClass>org.cattech.homeAutomation.commandLine.HomeAutomationHub</mainClass>
 							<classpathPrefix>../lib/*</classpathPrefix>
 						</manifest>
 						<manifestEntries>

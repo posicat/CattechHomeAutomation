@@ -46,7 +46,7 @@ public class HomeAutomationConfiguration {
 		overridePropsWithEnvironment("homeAutomation.lib", ENV_FOLDER_LIBRARIES);
 		overridePropsWithEnvironment("homeAutomation.log", ENV_FOLDER_LOGS);
 
-		setLogFileForAppender("console", "org.cattech", "HomeautomationHub.log", Level.DEBUG);
+		setLogFileForAppender("console", "org.cattech", "HomeautomationHub.log", null);
 		StdOutErrLog.tieSystemOutAndErrToLog();
 
 		loadConfiguration();
@@ -63,7 +63,9 @@ public class HomeAutomationConfiguration {
 			fileAppender.activateOptions();
 			Logger classLogger = org.apache.log4j.Logger.getLogger(clazz);
 			classLogger.setAdditivity(false);
-			classLogger.setLevel(level);
+			if (level != null) {
+				classLogger.setLevel(level);
+			}
 			classLogger.addAppender(fileAppender);
 		} catch (IOException e) {
 			log.error("Failed to add log file", e);
@@ -164,9 +166,8 @@ public class HomeAutomationConfiguration {
 	public String getDBURL() {
 		String url = null;
 		if (null != props.getProperty("db.host")) {
-			url = "jdbc:mysql://" + props.getProperty("db.host") + "/" + props.getProperty("db.name") + "?" 
-		    + "useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC" 
-			+ "&user="+ props.getProperty("db.username") + "&password=" + props.getProperty("db.password");
+			url = "jdbc:mysql://" + props.getProperty("db.host") + "/" + props.getProperty("db.name") + "?" + "useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC" + "&user="
+					+ props.getProperty("db.username") + "&password=" + props.getProperty("db.password");
 		} else {
 			log.info("No host set for SQL, returning null");
 		}

@@ -44,7 +44,7 @@ public class NodeSocketConnectionManager implements Runnable {
 		this.stop();
 	}
 
-	synchronized boolean isStopped() {
+	public synchronized boolean isStopped() {
 		return this.isStopped;
 	}
 

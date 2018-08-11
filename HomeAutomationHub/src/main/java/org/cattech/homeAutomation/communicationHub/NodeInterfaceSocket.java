@@ -11,7 +11,6 @@ import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
 public class NodeInterfaceSocket extends NodeInterface {
 
 	protected Socket clientSocket = null;
-	private OutputStream output;
 	private Scanner input;
 
 	public NodeInterfaceSocket(Socket clientSocket, ChannelController controller) {
@@ -22,7 +21,6 @@ public class NodeInterfaceSocket extends NodeInterface {
 	@Override
 	public void watchForData() {
 		try {
-			output = clientSocket.getOutputStream();
 			input = new Scanner(clientSocket.getInputStream());
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -34,16 +32,6 @@ public class NodeInterfaceSocket extends NodeInterface {
 				return;
 			}
 		}
-	}
-	
-	/**
-	 * @deprecated This method is replaced by sendDataPacketToNode 
-	 * 
-	 */
-	@Deprecated
-	@Override
-	public void sendDataToNode(String data) throws IOException {
-		output.write((data + "\r\n").getBytes());
 	}
 
 	@Override

@@ -28,26 +28,27 @@ import org.json.JSONObject;
 public abstract class HomeAutomationModule implements Runnable {
 	private static final int WAIT_TIME_BETWEEN_PACKET_CHECKS = 100;
 	private Logger log = Logger.getLogger("HomeAutomationModule");
-	protected NodeInterfaceString hubInterface;
+	protected static NodeInterfaceString hubInterface;
 	protected boolean running = false;
 	protected HomeAutomationConfiguration configuration;
 
 	protected HomeAutomationModule(ChannelController controller) {
 		if (autoStartModule()) {
 			log.info("--- Initializing module, channels : " + getModuleChannelName() + " ---");
-			this.hubInterface = new NodeInterfaceString(controller);
+			hubInterface = new NodeInterfaceString(controller);
 			HomeAutomationPacket hap = new HomeAutomationPacket("{\"register\":[\"" + getModuleChannelName() + "\"],\"nodeName\":\"" + getModuleChannelName() + "\"}");
 			hubInterface.sendDataPacketToController(hap);
 
 			HomeAutomationPacket response = null;
 			while (null == response) {
+				log.info(getModuleChannelName() + " waiting");
 				sleepNoThrow(100);
 				response = hubInterface.getDataPacketFromController();
 			}
-			log.info(response);
+			log.info(getModuleChannelName() + " started");
 			configuration = controller.getConfig();
 		} else {
-			log.info(" ! ! ! ! Module was not set to autoStart");
+			log.info(" ! ! ! ! Module "+getModuleChannelName()+"was not set to autoStart");
 		}
 	}
 
@@ -78,14 +79,16 @@ public abstract class HomeAutomationModule implements Runnable {
 
 	protected void checkForIncomingPacket() {
 		HomeAutomationPacket incoming = hubInterface.getDataPacketFromController();
+		
+		
 		if (null != incoming) {
+			log.debug("Incoming packet:"+incoming.toString());
 			List<HomeAutomationPacket> outgoing = new ArrayList<HomeAutomationPacket>();
 			try {
 				processPacketRequest(incoming, outgoing);
 			} finally {
 				processOutgoingPackets(outgoing);
 			}
-
 		} else {
 			sleepNoThrow(WAIT_TIME_BETWEEN_PACKET_CHECKS);
 		}

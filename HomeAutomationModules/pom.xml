@@ -14,14 +14,13 @@
 		<module>DeviceResolver</module>
 		<module>ProcessManager</module>
 		<module>Messaging</module>
-		
-		
 		<module>X10InterfaceHandler</module>
 		<module>EventHandler</module>
 		<module>WatchCat</module>
 		<module>NestInterfaceHandler</module>
 		<module>CommandHandler</module>
 		<module>MQTTBroker</module>
+		<module>RainforestPowerlineMonitor</module>
 	</modules>
 	<build>
 		<plugins>
