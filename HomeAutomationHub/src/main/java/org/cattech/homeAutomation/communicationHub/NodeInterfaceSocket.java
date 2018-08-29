@@ -5,9 +5,11 @@ import java.net.Socket;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
+import org.apache.log4j.Logger;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
 
 public class NodeInterfaceSocket extends NodeInterface {
+	private Logger log = Logger.getLogger(this.getClass());
 
 	protected Socket clientSocket = null;
 	private Scanner input;
@@ -22,12 +24,13 @@ public class NodeInterfaceSocket extends NodeInterface {
 		try {
 			input = new Scanner(clientSocket.getInputStream());
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.error("IOException",e);
 		}
 		while (super.isRunning()) {
 			try {
 				super.sendDataPacketToController(new HomeAutomationPacket(input.nextLine()), this);
 			} catch (NoSuchElementException e) {
+				// Ok if there are no more elements, just return.
 				return;
 			}
 		}

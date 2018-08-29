@@ -43,7 +43,7 @@ public class HomeAutomationHub {
 				Thread.sleep(1000);
 			}
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			log.error("InterruptedException : ",e);
 		}
 		log.info("Stopping Server");
 		server.stop();

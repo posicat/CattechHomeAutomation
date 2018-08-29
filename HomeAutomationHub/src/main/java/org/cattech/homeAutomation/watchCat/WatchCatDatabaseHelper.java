@@ -106,8 +106,8 @@ public class WatchCatDatabaseHelper {
 				}
 			}
 			result+="}";
-		} catch (SQLException e1) {
-			log.error("Failed to display ResultSet", e1);
+		} catch (SQLException e) {
+			log.error("Failed to display ResultSet", e);
 		}
 		return result;
 	}

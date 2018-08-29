@@ -57,7 +57,7 @@ public class RestartableProcess {
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error("IOException",e);
 		}
 		try {
 			String stdout = getStdout();
@@ -65,7 +65,7 @@ public class RestartableProcess {
 			Files.write(Paths.get(logFile), stdout.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error("IOException",e);
 		}
 	}
 
@@ -78,6 +78,7 @@ public class RestartableProcess {
 		try {
 			output = IOUtils.toString(process.getInputStream(), "UTF-8");
 		} catch (IOException e) {
+			log.error("IOException",e);
 		}
 		return output;
 	}
@@ -87,6 +88,7 @@ public class RestartableProcess {
 		try {
 			output = IOUtils.toString(process.getErrorStream(), "UTF-8");
 		} catch (IOException e) {
+			log.error("IOException",e);
 		}
 		return output;
 	}

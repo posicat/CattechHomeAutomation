@@ -50,7 +50,7 @@ public class PowerlineMonitor extends HomeAutomationModule {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Exception, shutting down",e);
 			callback.onShutdown(e);
 		} finally {
 			serialCommunication.shutDown();
