@@ -48,7 +48,7 @@ public abstract class HomeAutomationModule implements Runnable {
 			log.info(getModuleChannelName() + " started");
 			configuration = controller.getConfig();
 		} else {
-			log.info(" ! ! ! ! Module "+getModuleChannelName()+"was not set to autoStart");
+			log.info(" ! ! ! ! Module " + getModuleChannelName() + "was not set to autoStart");
 		}
 	}
 
@@ -86,6 +86,8 @@ public abstract class HomeAutomationModule implements Runnable {
 			List<HomeAutomationPacket> outgoing = new ArrayList<HomeAutomationPacket>();
 			try {
 				processPacketRequest(incoming, outgoing);
+			}catch (Exception e) {
+				log.error("Error occured while processing packet",e);
 			} finally {
 				processOutgoingPackets(outgoing);
 			}

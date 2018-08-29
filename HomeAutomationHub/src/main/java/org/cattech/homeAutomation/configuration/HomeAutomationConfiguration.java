@@ -36,7 +36,7 @@ public class HomeAutomationConfiguration {
 		try {
 			props.load(getClass().getClassLoader().getResourceAsStream("homeAutomation.properties"));
 		} catch (IOException | NullPointerException e) {
-			log.warn("Could not load jar-internal configuration", e);
+			log.error("Could not load jar-internal configuration", e);
 		}
 
 		props.getProperty("mail.smtp.host", "localhost");
@@ -45,7 +45,7 @@ public class HomeAutomationConfiguration {
 		overridePropsWithEnvironment("homeAutomation.modules", ENV_FOLDER_MODULES);
 		overridePropsWithEnvironment("homeAutomation.lib", ENV_FOLDER_LIBRARIES);
 		overridePropsWithEnvironment("homeAutomation.log", ENV_FOLDER_LOGS);
-
+	
 		setLogFileForAppender("console", "org.cattech", "HomeautomationHub.log", null);
 		StdOutErrLog.tieSystemOutAndErrToLog();
 

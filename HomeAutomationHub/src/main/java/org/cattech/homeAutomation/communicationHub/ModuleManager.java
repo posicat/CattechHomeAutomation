@@ -73,7 +73,7 @@ public class ModuleManager {
 						Object clazz = null;
 						try {
 							clazz = classLoader.loadClass(className);
-						} catch (ClassNotFoundException e1) {
+						} catch (Throwable e1) {
 							log.error("Class we found was not found - should never happen");
 							e1.printStackTrace();
 						}
@@ -82,7 +82,7 @@ public class ModuleManager {
 							try {
 								clazz = ((Class<?>) clazz).getConstructor(ChannelController.class).newInstance(controller);
 								modules.add((HomeAutomationModule) clazz);
-							} catch (Exception e1) {
+							} catch (Throwable e1) {
 								log.error("Could not create instance of " + clazz.getClass().getName(), e1);
 								log.info("Classpath : " + System.getProperty("java.class.path"));
 							}

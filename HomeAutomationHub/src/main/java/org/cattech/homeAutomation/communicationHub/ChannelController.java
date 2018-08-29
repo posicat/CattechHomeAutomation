@@ -105,8 +105,8 @@ public class ChannelController {
 				for (int i = 0; i < destinations.length(); i++) {
 					String channel = destinations.getString(i);
 					hapOut.putWrapper(HomeAutomationPacket.FIELD_CHANNEL, channel);
-					sendToChannel(channel, hapOut, true);
 					log.debug("---> TO " + channel + " " + hapOut);
+					sendToChannel(channel, hapOut, true);
 				}
 				hapOut.removeFromWrapper(HomeAutomationPacket.FIELD_CHANNEL);
 				hapOut.putWrapper(HomeAutomationPacket.FIELD_ALL_CHANNELS, destinations.toString());

@@ -50,6 +50,9 @@ public abstract class NodeInterface implements Runnable {
 	public void setNodeName(String nodeName) {
 		this.nodeName = nodeName;
 	}
-
+	
+	public String toString() {
+		return("Node : " + this.getNodeName());
+	}
 
 }

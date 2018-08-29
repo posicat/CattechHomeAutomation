@@ -16,7 +16,6 @@ public class NodeInterfaceString extends NodeInterface {
 
 	public NodeInterfaceString(ChannelController controller) {
 		super(controller);
-		this.dataFromController = new ArrayList<HomeAutomationPacket>();
 		dataFromController = new ArrayList<HomeAutomationPacket>();
 	}
 
@@ -36,21 +35,26 @@ public class NodeInterfaceString extends NodeInterface {
 
 	@Override
 	synchronized public void sendDataPacketToNode(HomeAutomationPacket hap) throws Exception {
-		if (fullTrace) {
-			log.info("<<<FROM CONTROL<<<" + hap.toString());
+		synchronized (dataFromController) {
+			if (fullTrace) {
+				log.info("<<<FROM CONTROL<<<" + hap.toString());
+			}
+			dataFromController.add(new HomeAutomationPacket(hap.toString()));
 		}
-		dataFromController.add(new HomeAutomationPacket(hap.toString()));
 	}
 
 	synchronized public HomeAutomationPacket getDataPacketFromController() {
-		if (dataFromController.size() > 0) {
-			HomeAutomationPacket hap = dataFromController.remove(0);
-			return hap;
-		} else {
-			return null;
+		synchronized (dataFromController) {
+			if (dataFromController.size() > 0) {
+				HomeAutomationPacket hap = dataFromController.remove(0);
+				return hap;
+			} else {
+				return null;
+			}
 		}
+
 	}
-	
+
 	public boolean isFullTrace() {
 		return fullTrace;
 	}
@@ -61,7 +65,7 @@ public class NodeInterfaceString extends NodeInterface {
 
 	synchronized public void sendDataPacketToController(HomeAutomationPacket hap) {
 		if (fullTrace) {
-			log.info(">>>TO CONTROL>>>" + hap.toString() );
+			log.info(">>>TO CONTROL>>>" + hap.toString());
 		}
 		sendDataPacketToController(hap, this);
 	}
