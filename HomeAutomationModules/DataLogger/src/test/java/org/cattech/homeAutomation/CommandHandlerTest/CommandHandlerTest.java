@@ -1,6 +1,6 @@
 package org.cattech.homeAutomation.CommandHandlerTest;
 
-import org.cattech.homeAutomation.CommandHandler.CommandHandler;
+import org.cattech.homeAutomation.CommandHandler.DataLogger;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
 import org.cattech.homeAutomation.moduleBaseTest.BaseTestForModules;
 import org.json.JSONArray;
@@ -10,14 +10,14 @@ import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 
 public class CommandHandlerTest extends BaseTestForModules {
-	CommandHandler commandHandler;
+	DataLogger dataLogger;
 
 	@Override
 	@Before
 	public void setUp() throws Exception {
 		super.setUp();
-		commandHandler = new CommandHandler(controller);
-		new Thread(commandHandler, "Testing DeviceCommandHandler").start();
+		dataLogger = new DataLogger(controller);
+		new Thread(dataLogger, "Testing DeviceCommandHandler").start();
 		registerChannel(testInterface, new String[] { HomeAutomationPacket.CHANNEL_DEVICE_RESOLVER, HomeAutomationPacket.CHANNEL_EVENT_HANDLER });
 	}
 
@@ -25,7 +25,7 @@ public class CommandHandlerTest extends BaseTestForModules {
 	@After
 	public void tearDown() throws Exception {
 		super.tearDown();
-		commandHandler.setRunning(false);
+		dataLogger.setRunning(false);
 	}
 
 	@Test

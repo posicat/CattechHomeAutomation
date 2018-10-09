@@ -38,5 +38,3 @@ cp -v SupportApplications/* 		/usr/local/homeAutomation/bin/
 
 # Deploy website
 cp -v -rpd www/*				/home/homeauto/public_html
-
-sudo service homeAutomation start

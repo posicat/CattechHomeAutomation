@@ -110,4 +110,8 @@
 			</plugin>
 		</plugins>
 	</build>
+	<modules>
+		<module>DebianPackage</module>
+		<module>TestFolder</module>
+	</modules>
 </project>

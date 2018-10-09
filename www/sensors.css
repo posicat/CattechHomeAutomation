@@ -1,0 +1,53 @@
+a {
+	color:#77F;
+}
+form {
+	display:inline-block;
+}
+body {
+	width:100%;
+	height:100%;
+	margin:0px;
+	background-color:black;
+	color:white;
+}
+.pageTable {
+	position:absolute;
+	width:95%;
+	height:95%;
+	margin-left:auto;
+	margin-right:auto;
+	top:5px;
+	bottom:5px;
+	left:5px;
+	right:5px;
+}
+.sensor {
+	float:left;
+	width:10em;
+	height:5em;
+	border:1px solid #FFF;
+	text-align:center;
+}
+.sensor a {
+	color:#00F;
+}
+.section {
+	clear: both;
+	background-color:#252;
+	color:#FFF;
+	text-align:center;
+}
+.nodeName {
+	text-shadow: 5px 5px 3px #000;
+}
+.sensorName {
+	
+}
+.sensorNote {
+	font-size:120%;
+}
+.subNode {
+	font-size:60%;
+	border:1px solid black;
+}

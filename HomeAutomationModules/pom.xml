@@ -21,6 +21,7 @@
 		<module>CommandHandler</module>
 		<module>MQTTBroker</module>
 		<module>RainforestPowerlineMonitor</module>
+		<module>DataLogger</module>
 	</modules>
 	<build>
 		<plugins>

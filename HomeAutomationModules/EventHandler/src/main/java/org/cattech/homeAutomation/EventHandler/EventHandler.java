@@ -31,6 +31,7 @@ public class EventHandler extends HomeAutomationModule {
 
 	@Override
 	protected void processPacketRequest(HomeAutomationPacket incoming, List<HomeAutomationPacket> outgoing) {
+		log.debug("Incoming packet : "+incoming);
 		if (null != incoming.getWrapper()) {
 			if (!incoming.hasWrapper("data")) {
 				log.error("Packet has no data element. " + incoming);
@@ -74,7 +75,7 @@ public class EventHandler extends HomeAutomationModule {
 		String eventSignature = WatchCatDatabaseHelper.generateEventSignature(configuration.getHost(), incoming.getData());
 		Boolean afterMin = WatchCatDatabaseHelper.afterMinDelay(conn, eventSignature);
 
-		log.info("Event signature:" + eventSignature);
+		log.debug("Event signature:" + eventSignature);
 		log.debug("afterMin =  " + afterMin);
 
 		if (null == afterMin || afterMin.booleanValue()) {
@@ -111,7 +112,7 @@ public class EventHandler extends HomeAutomationModule {
 
 		List<JSONObject> result = getActionsForReactions(conn, triggerReactions);
 
-		log.info("Action done");
+		log.debug("Action done");
 
 		closeNoThrow(conn);
 		return result;

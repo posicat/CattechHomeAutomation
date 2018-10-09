@@ -14,19 +14,17 @@ import org.cattech.homeAutomation.moduleBase.HomeAutomationModule;
 public class HomeAutomationHub {
 	private static Logger log = Logger.getLogger(HomeAutomationHub.class);
 
-	private static ChannelController controller = null;
-
 	public static void main(String[] args) throws IOException, HomeAutomationConfigurationException {
-		controller = new ChannelController(new HomeAutomationConfiguration());
+		ChannelController controller =  new ChannelController(new HomeAutomationConfiguration());
 
 		ModuleManager loader;
 		try {
 			loader = new ModuleManager(controller.getConfig());
-
 			List<HomeAutomationModule> modules = loader.findLoadableModules(controller);
 
 			for (HomeAutomationModule mod : modules) {
-				new Thread(mod, mod.getModuleChannelName()).start();
+				String moduleChannelName = mod.getModuleChannelName();
+				new Thread(mod, moduleChannelName).start();
 			}
 		} catch (Exception e) {
 			log.error("Could not initialize module loader, skipping module load.", e);

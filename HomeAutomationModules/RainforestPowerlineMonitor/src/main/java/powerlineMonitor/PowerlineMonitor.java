@@ -19,12 +19,12 @@ import org.xml.sax.SAXException;
 public class PowerlineMonitor extends HomeAutomationModule {
 
 	private static final String RAINFOREST_EMU_PORT = "rainforestEmuPort";
+	Logger log = Logger.getLogger(PowerlineMonitor.class);
 
-	private static SerialRainforestCommunications serialCommunication;
-	static RainforestCommunicationsInterface callback;
-	static Logger log = Logger.getLogger(PowerlineMonitor.class.getName());
-	static String port = null;
-	static String rainforestMAC;
+	private SerialRainforestCommunications serialCommunication;
+	RainforestCommunicationsInterface callback;
+	String port = null;
+	String rainforestMAC;
 
 	public PowerlineMonitor(ChannelController controller) {
 		super(controller);
@@ -70,10 +70,10 @@ public class PowerlineMonitor extends HomeAutomationModule {
 		}
 	}
 
-	static class RainforestEMU2Callback implements RainforestCommunicationsInterface {
+	class RainforestEMU2Callback implements RainforestCommunicationsInterface {
 
 		private static final String POWER_LINE_MONITOR = "PowerLineMonitor";
-		static boolean grabMacineInformation = true;
+		boolean grabMacineInformation = true;
 
 		public RainforestEMU2Callback() {
 		}
@@ -113,15 +113,17 @@ public class PowerlineMonitor extends HomeAutomationModule {
 					log.error("Broke!", e);
 				}
 			} else {
-				HomeAutomationPacket reply = new HomeAutomationPacket();
-				reply.setSource(POWER_LINE_MONITOR);
-				reply.setDestination(HomeAutomationPacket.CHANNEL_EVENT_HANDLER);
-				reply.setData(new JSONObject(json));
+				HomeAutomationPacket readPacket = new HomeAutomationPacket();
+				readPacket.setSource(POWER_LINE_MONITOR);
+				readPacket.setDestination(HomeAutomationPacket.CHANNEL_EVENT_HANDLER);
+				readPacket.setData(new JSONObject(json));
 				JSONObject nativeDevice = new JSONObject();
 				nativeDevice.put("meter", rainforestMAC);
 				nativeDevice.put("protocol", "Rainforest");
-				reply.putData(HomeAutomationPacket.FIELD_DATA_NATIVE_DEVICE, nativeDevice);
-				hubInterface.sendDataPacketToController(reply);
+				readPacket.putData(HomeAutomationPacket.FIELD_DATA_NATIVE_DEVICE, nativeDevice);
+				log.debug(hubInterface);
+				log.info(readPacket);
+				hubInterface.sendDataPacketToController(readPacket);
 			}
 		}
 

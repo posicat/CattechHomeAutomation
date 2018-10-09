@@ -9,7 +9,8 @@ BEGIN {
 use Cattech::HTMLHelper;
 use Cattech::WebSession;
 use Cattech::SQLHelper;
-use Cattech::HomeAutomation;
+use HomeAutomation::Database;
+use HomeAutomation::DataLogging;
 use URI::Escape;
 use JSON;
 use Carp;
@@ -32,16 +33,20 @@ $::session->setParam('_base','./index.cgi');
 $::session->setParam('_method','put');
 
 my @cornerMenu = (
-	['Menu Mode'	,{mode=>'menu'} ],
-    ['Map Mode'	,{mode=>'map'} ],
-	['All X10'	,{mode=>'allX10'} ],
-    ['Setup'	,{mode=>'setup'} ],
+	['Menu Controls'	,{mode=>'menu'} ],
+    ['House Map'		,{mode=>'map'} ],
+    ['Current Sensors'	,{mode=>'dataLogTable'} ],
+    ['Graphed Sensors'	,{mode=>'dataLogGraph'} ],
+#	['All X10'			,{mode=>'allX10'} ],
+    ['Setup'			,{mode=>'setup'} ],
 );
 
 my $renderModes = {
 	'menu'			=>{ 'fmt'=>'html',	'render'=>\&displayLoadGroup },
 	'map'			=>{ 'fmt'=>'html',	'render'=>\&displayMap },
 	'allX10'		=>{ 'fmt'=>'html',	'render'=>\&displayAllX10 },
+	'dataLogTable'  =>{ 'fmt'=>'html',	'render'=>\&displayDataLogTable },
+	'dataLogGraph'	=>{ 'fmt'=>'html',	'render'=>\&displayDataLogGraph },
 	'setup'			=>{ 'fmt'=>'html',	'render'=>\&displaySetupScreen },
 	'devices'		=>{ 'fmt'=>'html',	'render'=>\&displaySetupDevices },
 
@@ -54,11 +59,11 @@ my $menu=$input{menu};
 if ( $ENV{HTTP_HOST} eq "" ) {
 	print "\n\n**COMMAND LINE DEBUG**\n\n\n";
 
-	$input{mode}="groups";
-	$input{group}=1;
+	$input{mode}="dataLogGraph";
+#	$input{group}=1;
 }
 
-$::HA=Cattech::HomeAutomation->new(); 
+$::HA=HomeAutomation::Database->new(); 
 $::HA->connectToSQLDatabase(); 
 
 my $ocll="onClick=\"load_link(this);return false\";";
@@ -269,23 +274,29 @@ sub displayHead {
 print <<EOB;
 <head>
 	<title>Home Automation</title>
-	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-        <link rel="stylesheet" type="text/css" href="/include/common_style.css" />
-        <link rel="stylesheet" type="text/css" href="homeauto.css" />
-	<script type="text/javascript" src="/include/jquery.js"></script>
-        <script language="javascript" type="text/javascript" src="/include/override_getelementbyid.js"></script>
-        <script language="javascript" type="text/javascript" src="/include/getElementsByClassName.js"></script>
-        <script language="javascript" type="text/javascript" src="/include/drag-drop.js"></script>
-        <script language="javascript" type="text/javascript" src="homeauto.js"></script>
-	<script language="javascript" type="text/javascript" src="lib/Devices/devices_ha.js"></script>
-	<script language="javascript" type="text/javascript" src="lib/Devices/X10.js"></script>
-        <script language="javascript" type="text/javascript" src="lib/Devices/MQTT.js"></script>
-        <script language="javascript" type="text/javascript" src="lib/Devices/Common.js"></script>
-	<script>
-		window.onclick=function() {
-			document.getElementById('ha_popup').innerHTML='';
-		}
-	</script>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+    <script language="javascript" type="text/javascript" src="/include/jquery.js"></script>
+    <script language="javascript" type="text/javascript" src="/include/override_getelementbyid.js"></script>
+    <script language="javascript" type="text/javascript" src="/include/getElementsByClassName.js"></script>
+    <script language="javascript" type="text/javascript" src="/include/drag-drop.js"></script>
+    <script language="javascript" type="text/javascript" src="homeauto.js"></script>
+    <script language="javascript" type="text/javascript" src="lib/Devices/devices_ha.js"></script>
+    <script language="javascript" type="text/javascript" src="lib/Devices/X10.js"></script>
+    <script language="javascript" type="text/javascript" src="lib/Chart.bundle.js"></script>
+    <script language="javascript" type="text/javascript" src="lib/Devices/MQTT.js"></script>
+    <script language="javascript" type="text/javascript" src="lib/Devices/Common.js"></script>
+    <script language="javascript" type="text/javascript" src="lib/calendar.js"></script>
+
+    <script>
+        window.onclick=function() {
+        document.getElementById('ha_popup').innerHTML='';
+    }
+    </script>
+
+    <link rel="stylesheet" type="text/css" href="/include/common_style.css" />
+    <link rel="stylesheet" type="text/css" href="homeauto.css" />
+    <link rel="stylesheet" href="sensors.css"/>
 </head>
 EOB
 }
@@ -369,8 +380,69 @@ sub displayLoadGroup {
 	print "</script>\n";
 }
 #================================================================================
+sub displayDataLogTable {
+	# my ($devices)=@_;
+    
+    my @dataTables = HomeAutomation::DataLogging::getDataTables();
+
+    my $devices={};
+    HomeAutomation::DataLogging::loadDevices(\@dataTables,$devices);
+
+	print "<meta http-equiv=\"refresh\" content=\"60\">\n";
+
+	my $data={};
+
+	foreach my $section (keys %$devices) {
+		displaySectionHeader($section);
+		foreach my $device (keys %{$devices->{$section}}) {
+			displaySensor($section,$device,$devices->{$section}->{$device});
+		}
+	}
+}
 #================================================================================
+sub displayDataLogGraph {
+	my ($devices)=@_;
+    
+    my @dataTables = HomeAutomation::DataLogging::getDataTables();
 
+    my $devices={};
+    HomeAutomation::DataLogging::loadDevices(\@dataTables,$devices);
 
+    my $limiters = HomeAutomation::DataLogging::returnLimiters($devices,
+        {startTime=>'',endTime=>'',resolution=>'','mode'=>$input{mode}}, \%input);
+    
+	print "<div style=\"menuBar\">$limiters</div>\n";
+	print "<div class=\"pageTable\" style=\"margin-top:3em\">\n";
+	print "<canvas id=\"dataGraph\" style=\"width:100%;height:100%\"></canvas>\n";
+	print "</div>\n";
 
+    my $start = $input{startTime};
+    my $end = $input{endTime};
+    my $resolution = 0+$input{resolution};
+    my $graphData = HomeAutomation::DataLogging::returnGraphData($devices,$resolution,$start,$end);
+
+print <<EOB;
+<script>
+function drawChart(id,dat) {
+    var ctx = document.getElementById(id).getContext('2d');
+    var myLine = new Chart(ctx,dat);
+}
+drawChart("dataGraph",$graphData);
+</script>
+EOB
+}
+#================================================================================
+sub displaySectionHeader {
+	my ($section)=@_;
+	print "<div class=\"section\">$section</div>\n";
+}
+#================================================================================
+sub displaySensor {
+	my ($section,$id,$sensor)=@_;
+
+	my $sensorLoad=HomeAutomation::DataLogging::returnSensorData($section,$id,$sensor);
+
+	print "<div class=\"sensor\" id=\"$id\">$sensorLoad</div>";
+}#================================================================================
+#================================================================================
 1;

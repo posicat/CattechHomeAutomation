@@ -16,7 +16,7 @@ public class NodeInterfaceString extends NodeInterface {
 
 	public NodeInterfaceString(ChannelController controller) {
 		super(controller);
-		dataFromController = new ArrayList<HomeAutomationPacket>();
+		this.dataFromController = new ArrayList<HomeAutomationPacket>();
 	}
 
 	// This method never really needs to be called, since we don't need to watch for
@@ -35,24 +35,20 @@ public class NodeInterfaceString extends NodeInterface {
 
 	@Override
 	synchronized public void sendDataPacketToNode(HomeAutomationPacket hap) throws Exception {
-		synchronized (dataFromController) {
-			if (fullTrace) {
-				log.info("<<<FROM CONTROL<<<" + hap.toString());
-			}
-			dataFromController.add(new HomeAutomationPacket(hap.toString()));
+		if (fullTrace) {
+			log.info("<<<FROM CONTROL<<<" + hap.toString());
 		}
+		dataFromController.add(new HomeAutomationPacket(hap.toString()));
 	}
 
 	synchronized public HomeAutomationPacket getDataPacketFromController() {
-		synchronized (dataFromController) {
-			if (dataFromController.size() > 0) {
-				HomeAutomationPacket hap = dataFromController.remove(0);
-				return hap;
-			} else {
-				return null;
-			}
+		if (dataFromController.size() > 0) {
+			HomeAutomationPacket hap = dataFromController.remove(0);
+			log.debug(this.toString() + " : "+hap);
+			return hap;
+		} else {
+			return null;
 		}
-
 	}
 
 	public boolean isFullTrace() {

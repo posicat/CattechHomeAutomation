@@ -14,6 +14,7 @@ import java.util.Stack;
 import org.apache.commons.io.FileUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -28,7 +29,7 @@ import org.json.JSONObject;
 public abstract class HomeAutomationModule implements Runnable {
 	private static final int WAIT_TIME_BETWEEN_PACKET_CHECKS = 100;
 	private Logger log = Logger.getLogger("HomeAutomationModule");
-	protected static NodeInterfaceString hubInterface;
+	protected NodeInterfaceString hubInterface;
 	protected boolean running = false;
 	protected HomeAutomationConfiguration configuration;
 
@@ -178,22 +179,6 @@ public abstract class HomeAutomationModule implements Runnable {
 			}
 		}
 		return result;
-	}
-
-	protected String getDataFromURL(String devicesURL) throws IOException {
-		CloseableHttpClient httpClient = HttpClients.createDefault();
-		HttpPost postRequest = new HttpPost(devicesURL);
-		// NameValuePair[] data = {
-		// new NameValuePair("user", "joe"),
-		// new NameValuePair("password", "bloggs")
-		// };
-		// post.setRequestBody(data);
-		CloseableHttpResponse response = httpClient.execute(postRequest);
-
-		String responseString = new BasicResponseHandler().handleResponse(response);
-		response.close();
-
-		return responseString;
 	}
 
 	protected void writeFile(File authCache, String data) throws IOException {

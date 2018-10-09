@@ -41,15 +41,6 @@ public class NestInterfaceHandlerTestManual extends BaseTestForModules {
 	public void tearDown() {
 		nestHandler.setRunning(false);
 	}
-	
-	
-	@Test 
-	public void nestHandlerCanRetrieveProdCodes() {
-		props.setProperty("homeAutomation.log", testFolder.getAbsolutePath());
-		
-		nestHandler.loadNestAPIProductCodes();
-		
-		System.out.println(nestHandler.authData);
-	}
+
 	
 }

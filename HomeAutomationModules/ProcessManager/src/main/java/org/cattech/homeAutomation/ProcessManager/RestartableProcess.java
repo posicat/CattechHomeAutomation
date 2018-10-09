@@ -50,8 +50,8 @@ public class RestartableProcess {
 	public void handleOutputLogging() {
 		try {
 			String stderr = getStderr();
-			if (null != stderr) {
-				log.error(stderr);
+			if (null!=stderr && !stderr.isEmpty()) {
+				log.error("STDERR "+command+" : "+stderr);
 				Files.write(Paths.get(logFile), stderr.getBytes(), StandardOpenOption.CREATE,
 						StandardOpenOption.APPEND);
 			}
@@ -61,7 +61,8 @@ public class RestartableProcess {
 		}
 		try {
 			String stdout = getStdout();
-			log.error(stdout);
+			if (null!=stdout && !stdout.isEmpty())
+			log.error("STDOUT "+command+" : "+stdout);
 			Files.write(Paths.get(logFile), stdout.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
