@@ -6,7 +6,7 @@
 		<artifactId>HomeAutomationParent</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<artifactId>Deploy</artifactId>
+	<artifactId>Packaging</artifactId>
 	<packaging>pom</packaging>
 	<build>
 		<plugins>
