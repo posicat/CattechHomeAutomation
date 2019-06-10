@@ -97,6 +97,6 @@
 	<modules>
 		<module>HomeAutomationModules</module>
 		<module>HomeAutomationHub</module>
-		<module>Deploy</module>
+		<!--<module>Deploy</module>-->
 	</modules>
 </project>
