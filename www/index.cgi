@@ -14,7 +14,7 @@ use URI::Escape;
 use JSON;
 use Carp;
 require "cgi-lib.pm";
-require "lib/debug.pl";
+require "debug.pl";
 require "web_tabs.pm";
 
 $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };

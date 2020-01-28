@@ -4,6 +4,7 @@
 	<groupId>org.cattech.homeAutomation</groupId>
 	<artifactId>HomeAutomationParent</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<description>Cattech Home Automation Hub</description>
 	<packaging>pom</packaging>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -97,6 +98,6 @@
 	<modules>
 		<module>HomeAutomationModules</module>
 		<module>HomeAutomationHub</module>
-		<!--<module>Deploy</module>-->
+		<module>deploy</module>
 	</modules>
 </project>

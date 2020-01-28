@@ -1,0 +1,11 @@
+Section: Miscellaneous
+Priority: optional
+Maintainer: Mark Balliet <posicat@pobox.com>
+Standards-VErsion: 4.4.0
+Homepage: https://github.com/posicat/HomeAutomation
+
+Package: CattechHomeAuto
+Version: 0.0.1
+Architecture: any
+Depends: openjdk-12
+Description: Home automation hub, for more details see https://github.com/posicat/HomeAutomation

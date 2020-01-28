@@ -1,15 +1,128 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.cattech.homeAutomation</groupId>
     <artifactId>HomeAutomationParent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
   <artifactId>deploy</artifactId>
-  <packaging>pom</packaging>
-	<modules>
-		<module>docker</module>
-	</modules>
+
+  <profiles>
+    <profile>
+      <id>deb</id>
+        <build>
+          <plugins>
+            <plugin>
+              <groupId>net.sf.debian-maven</groupId>
+              <artifactId>debian-maven-plugin</artifactId>
+              <version>1.0.6</version>
+            </plugin>
+          </plugins>
+        </build>
+    </profile>
+  </profiles>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>3.0.2</version>
+        <executions>
+          <execution>
+            <id>copy-homeAutomation-configuration</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${basedir}/target/deb/etc/</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>src/main/resources/etc</directory>
+                  <filtering>true</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy-homeAutomation-hub</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${basedir}/target/</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>../HomeAutomationHub/target/deb/usr/lib/home-automation</directory>
+                  <includes>
+                    <indlude>HomeAutomationHub.jar</indlude>
+                  </includes>
+                  <filtering>false</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy-homeAutomation-hub-lib</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${basedir}/target/deb/usr/lib/home-automation/lib</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>../HomeAutomationHub/target/lib/</directory>
+                  <includes>
+                    <indlude>*.jar</indlude>
+                  </includes>
+                  <filtering>false</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy-homeAutomation-modules</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${basedir}/target/deb/usr/lib/home-automation/modules</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>../HomeAutomationModules/target/</directory>
+                  <includes>
+                    <indlude>*.jar</indlude>
+                  </includes>
+                  <filtering>false</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy-homeAutomation-modules-libs</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${basedir}/target/deb/usr/lib/home-automation/lib</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>../HomeAutomationModules/target/lib/</directory>
+                  <includes>
+                    <indlude>*.jar</indlude>
+                  </includes>
+                  <filtering>false</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>
