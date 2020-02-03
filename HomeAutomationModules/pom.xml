@@ -13,10 +13,15 @@
 	<modules>
 		<module>DeviceResolver</module>
 		<module>ProcessManager</module>
-		<module>EventHandlerWebRelay</module>
-		<module>DeviceEventHandler</module>
-		<module>DeviceCommandHandler</module>
+		<module>Messaging</module>
 		<module>X10InterfaceHandler</module>
+		<module>EventHandler</module>
+		<module>WatchCat</module>
+		<module>NestInterfaceHandler</module>
+		<module>CommandHandler</module>
+		<module>MQTTBroker</module>
+		<module>RainforestPowerlineMonitor</module>
+		<module>DataLogger</module>
 	</modules>
 	<build>
 		<plugins>
@@ -25,7 +30,7 @@
 				<artifactId>maven-dependency-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>copy-artifact</id>
+						<id>copy-modules</id>
 						<phase>package</phase>
 						<goals>
 							<goal>copy</goal>
@@ -41,6 +46,29 @@
 							</artifactItems>
 							<outputDirectory>../target/</outputDirectory>
 							<stripVersion>true</stripVersion>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin><plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-libs</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>${project.groupId}</groupId>
+									<artifactId>${project.artifactId}</artifactId>
+									<version>${project.version}</version>
+									<type>${project.packaging}</type>
+								</artifactItem>
+							</artifactItems>
+							<outputDirectory>../target/lib/</outputDirectory>
 						</configuration>
 					</execution>
 				</executions>
@@ -67,4 +95,13 @@
 			<artifactId>jsonassert</artifactId>
 		</dependency>
 	</dependencies>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.cattech.homeAutomation</groupId>
+				<artifactId>HomeAutomationModules</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 </project>

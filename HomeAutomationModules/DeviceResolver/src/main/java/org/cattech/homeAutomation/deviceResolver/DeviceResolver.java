@@ -9,117 +9,111 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.cattech.homeAutomation.communicationHub.ChannelController;
+import org.cattech.homeAutomation.deviceHelpers.DeviceNameHelper;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationModule;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
+import org.cattech.homeAutomation.moduleBase.HomeAutomationPacketHelper;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class DeviceResolver extends HomeAutomationModule {
+	static Logger log = Logger.getLogger(DeviceResolver.class.getName());
 	Hashtable<JSONObject, JSONArray> lookupTable = new Hashtable<JSONObject, JSONArray>();
 
 	public DeviceResolver(ChannelController controller) {
 		super(controller);
-		loadDeviceMappings();
 	}
 
 	@Override
-	public void run() {
-		running = true;
-		while (running) {
-			String data = hubInterface.getDataFromController();
-			if (null != data) {
-				processMessage(data);
-			} else {
-				sleepNoThrow(1000);
-			}
-		}
+	public String getModuleChannelName() {
+		return "DeviceResolver";
 	}
 
-	private void processMessage(String packet) {
-		log.info("Message : " + packet);
-
-		HomeAutomationPacket hap = new HomeAutomationPacket(this.getModuleChannelName(), packet);
-
-		if (hap.getDataIn().has("resolution")) {
-			String resolution = hap.getDataIn().getString("resolution");
+	@Override
+	protected void processPacketRequest(HomeAutomationPacket incoming, List<HomeAutomationPacket> outgoing) {
+		if (incoming.hasData("resolution")) {
+			String resolution = incoming.getDataString("resolution");
 			if ("addLookup".equals(resolution)) {
-				JSONObject nativeDevice = hap.getDataIn().getJSONObject("nativeDevice");
-				JSONArray commonDevice = hap.getDataIn().getJSONArray("commonDevice");
+				JSONObject nativeDevice = incoming.getDataJObj(HomeAutomationPacket.FIELD_DATA_NATIVE_DEVICE);
+				JSONArray commonDevice = incoming.getDataJArr(HomeAutomationPacket.FIELD_DATA_DEVICE);
 
-				String result = addLookup(nativeDevice, commonDevice);
-				hap.getDataOut().put("addLookupResult", result);
+				String lookup = addLookup(nativeDevice, commonDevice);
+				HomeAutomationPacket reply = new HomeAutomationPacket();
+				reply.putData("addLookupResult", lookup);
+				outgoing.add(reply);
 			}
 			if ("toCommon".equals(resolution)) {
+				loadDeviceMappings();
+
+				log.debug("Resolving to common :"+incoming);
 				Set<JSONArray> cDevs = new HashSet<JSONArray>();
-				if (hap.getDataIn().has("nativeDevice")) {
-
-					// Copy data from In to Out as we want to send back most of it.
-					hap.setDataOut(hap.getDataIn());
-					// Remove output destinations, so we can set our own.
-					hap.getOut().remove("destination");
-					hap.addDestination(hap.getDataIn().getString("postResolv"));
-					// Clear fields we don't need to send back from the DataOut
-					hap.getDataOut().remove("postResolv");
-					hap.getDataOut().remove("resolution");
-
+				if (incoming.hasData(HomeAutomationPacket.FIELD_DATA_NATIVE_DEVICE)) {
 					// Resolve native devices, then clear it out of the data
-					cDevs = convertToCommonNames(hap.getDataIn().getJSONObject("nativeDevice"));
-					hap.getDataOut().remove("nativeDevice");
+					cDevs = convertToCommonNames(incoming.getDataJObj(HomeAutomationPacket.FIELD_DATA_NATIVE_DEVICE));
+					incoming.removeFromData(HomeAutomationPacket.FIELD_DATA_NATIVE_DEVICE);
 
 					for (JSONArray cDev : cDevs) {
-						hap.getDataOut().remove("device");
-						hap.getDataOut().put("device", cDev);
-						hubInterface.sendDataToController(hap.getReturnPacket());
-					}
-					hap.setDataOut(new JSONObject());
+						// Copy data from In to Out as we want to send back most of it.
+						HomeAutomationPacket reply = HomeAutomationPacketHelper.generateReplyPacket(incoming,getModuleChannelName());
 
+						// Remove output destinations, so we can set our own.
+						reply.removeDestination();
+						reply.addDestination(incoming.getDataString(HomeAutomationPacket.FIELD_DATA_POST_RESOLVE));
+						reply.removeFromData(HomeAutomationPacket.FIELD_DATA_POST_RESOLVE);
+
+						// Clear fields we don't need to send back from the DataOut
+						reply.removeFromData(HomeAutomationPacket.FIELD_RESOLUTION);
+						reply.removeFromData(HomeAutomationPacket.FIELD_DATA_DEVICE);
+						
+						reply.putData(HomeAutomationPacket.FIELD_DATA_DEVICE, cDev);
+						outgoing.add(reply);
+					}
 				}
 			}
 			if ("toNative".equals(resolution)) {
+				loadDeviceMappings();
+
 				Set<JSONObject> nDevs = new HashSet<JSONObject>();
-				if (hap.getDataIn().has("device")) {
+				if (incoming.hasData("device")) {
 
-					// Copy data from In to Out as we want to send back most of it.
-					hap.setDataOut(hap.getDataIn());
-					// Remove output destinations, so we can set our own.
-					hap.getOut().remove("destination");
-					String postResolv = null;
-					if (hap.getDataIn().has("postResolv")) {
-						postResolv = hap.getDataIn().getString("postResolv");
+					String postResolve = null;
+					if (incoming.hasData(HomeAutomationPacket.FIELD_DATA_POST_RESOLVE)) {
+						postResolve = incoming.getDataString(HomeAutomationPacket.FIELD_DATA_POST_RESOLVE);
 					}
-					// Clear fields we don't need to send back from the DataOut
-					hap.getDataOut().remove("postResolv");
-					hap.getDataOut().remove("resolution");
-
 					// Resolve native devices, then clear it out of the data
-					nDevs = convertToNativeNames(hap.getDataIn().getJSONArray("device"));
-					hap.getDataOut().remove("device");
+					nDevs = convertToNativeNames(incoming.getDataJArr("device"));
 
+					log.debug("Found " + nDevs.size() + " native Devices.");
 					for (JSONObject nDev : nDevs) {
-						if (null == postResolv) {
+						// Copy data from In to Out as we want to send back most of it.
+						HomeAutomationPacket reply = HomeAutomationPacketHelper.generateReplyPacket(incoming,getModuleChannelName());
+
+						// Clear fields we don't need to send back from the DataOut
+						reply.removeFromData(HomeAutomationPacket.FIELD_DATA_NATIVE_DEVICE);
+						reply.removeFromData("device");
+						reply.removeFromData("resolution");
+						
+						
+						reply.removeDestination();
+						if (null == postResolve) {
 							if (nDev.has("controlChannel")) {
 								String controlChannel = nDev.getString("controlChannel");
-								hap.remoteDestination();
-								hap.addDestination(controlChannel);
+								reply.addDestination(controlChannel);
 							} else {
 								log.error("Native device block doesn't have controChannel." + nDev);
 							}
 						} else {
-							hap.addDestination(postResolv);
+							reply.addDestination(postResolve);
 						}
-						hap.getDataOut().remove("nativeDevice");
-						hap.getDataOut().put("nativeDevice", nDev);
-						hubInterface.sendDataToController(hap.getReturnPacket());
+						reply.removeFromData(HomeAutomationPacket.FIELD_DATA_POST_RESOLVE);
+						reply.putData(HomeAutomationPacket.FIELD_DATA_NATIVE_DEVICE, nDev);
+						outgoing.add(reply);
 					}
-					hap.setDataOut(new JSONObject());
 				}
 			}
-		}
-
-		if (hap.hasReturnData()) {
-			hubInterface.sendDataToController(hap.getReturnPacket());
 		}
 	}
 
@@ -129,7 +123,7 @@ public class DeviceResolver extends HomeAutomationModule {
 		for (JSONObject nDev : lookupTable.keySet()) {
 			JSONArray cDev = lookupTable.get(nDev);
 
-			if (commonDescriptorsMatch(cDev, commonDevice)) {
+			if (DeviceNameHelper.commonDescriptorsMatch(cDev, commonDevice)) {
 				resultDevices.add(nDev);
 			}
 
@@ -143,58 +137,15 @@ public class DeviceResolver extends HomeAutomationModule {
 
 		for (JSONObject nDev : lookupTable.keySet()) {
 			JSONArray cDev = lookupTable.get(nDev);
-			if (nativeKeysMatch(nativeDevice, nDev)) {
+			if (DeviceNameHelper.nativeKeysMatch(nativeDevice, nDev)) {
 				resultDevices.add(cDev);
 			}
 		}
 		return resultDevices;
 	}
 
-	private boolean nativeKeysMatch(JSONObject mightMatch, JSONObject toMatch) {
-		int keysMismatched = 0;
-		for (String key : toMatch.keySet()) {
-			String mm = null;
-			String tm = null;
-			if (!key.equals("controlChannel")) {
-				if (mightMatch.has(key)) {
-					mm = mightMatch.getString(key).toUpperCase();
-				}
-				if (toMatch.has(key)) {
-					tm = toMatch.getString(key).toUpperCase();
-				}
-				if (! mightMatch.has(key) || ! mm.equals(tm)) {
-					keysMismatched++;
-//					log.debug("Didn't match " + key + " : " + mm + "::" + tm);
-				} else {
-//					log.debug("Matched " + key + " : " + mm + "::" + tm);
-				}
-			}
-		}
-		boolean matched = keysMismatched == 0;
-		if (matched) {
-//			log.debug("Match " + mightMatch + " <to> " + toMatch + "[" + keysMismatched + "/" + toMatch.length() + "]");
-		}else {
-//			log.debug("Differ " + mightMatch + " <to> " + toMatch + "[" + keysMismatched + "/" + toMatch.length() + "]");
-		}
-		return (matched);
-	}
-
-	private boolean commonDescriptorsMatch(JSONArray mightMatch, JSONArray toMatch) {
-		int keysMatched = 0;
-
-		for (Object entry : toMatch) {
-			List<Object> mightEntries = mightMatch.toList();
-			if (mightEntries.contains(entry)) {
-				keysMatched++;
-			}
-		}
-		// log.debug("Matching " + mightMatch + " <to> " + toMatch +
-		// "["+keysMatched+"/"+toMatch.length()+"]");
-		return (keysMatched == toMatch.length());
-	}
-
 	private String addLookup(JSONObject nativeDevice, JSONArray commonDevice) {
-		log.info("\tAdding loopup " + nativeDevice.toString() + " <--> " + commonDevice.toString());
+//		log.info("\tAdding lookup " + nativeDevice.toString() + " <--> " + commonDevice.toString());
 		lookupTable.put(nativeDevice, commonDevice);
 		return "successful";
 	}
@@ -206,6 +157,8 @@ public class DeviceResolver extends HomeAutomationModule {
 			return;
 		}
 
+		this.lookupTable = new Hashtable<JSONObject, JSONArray>();
+
 		Statement stmt;
 		ResultSet rs;
 		try {
@@ -214,13 +167,14 @@ public class DeviceResolver extends HomeAutomationModule {
 			rs = stmt.executeQuery(query);
 			while (rs.next()) {
 				try {
-					JSONObject nativeDevice = new JSONObject(rs.getString("nativeDevice"));
+					JSONObject nativeDevice = new JSONObject(rs.getString(HomeAutomationPacket.FIELD_DATA_NATIVE_DEVICE));
 					JSONArray commonDevice = new JSONArray(rs.getString("commonDevice"));
 					addLookup(nativeDevice, commonDevice);
 				} catch (JSONException je) {
-					log.error("Error loading device mapping", je);
-					log.error("nativeDevice : " + rs.getString("nativeDevice"));
-					log.error("commonDevice : " + rs.getString("commonDevice"));
+					log.error("Error loading device mapping\n" + 
+					"\tnativeDevice : " + rs.getString(HomeAutomationPacket.FIELD_DATA_NATIVE_DEVICE)+
+					"\tcommonDevice : " + rs.getString("commonDevice")
+					, je);
 				}
 			}
 		} catch (SQLException e) {
@@ -228,5 +182,7 @@ public class DeviceResolver extends HomeAutomationModule {
 			e.printStackTrace();
 		}
 
+		closeNoThrow(conn);
 	}
+
 }

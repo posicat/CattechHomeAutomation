@@ -35,10 +35,13 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<addClasspath>true</addClasspath>
-							<mainClass>org.cattech.homeAutomation.communicationHub.Hub</mainClass>
-							<classpathPrefix>lib/</classpathPrefix>
+							<addClasspath>false</addClasspath>
+							<mainClass>org.cattech.homeAutomation.commandLine.HomeAutomationHub</mainClass>
+							<classpathPrefix>../lib/*</classpathPrefix>
 						</manifest>
+						<manifestEntries>
+							<Class-Path>../lib/*</Class-Path>
+						</manifestEntries>
 					</archive>
 				</configuration>
 				<executions>
@@ -87,6 +90,11 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.3.5</version>
 		</dependency>
 	</dependencies>
 </project>

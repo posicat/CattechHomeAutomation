@@ -1,9 +1,11 @@
 package org.cattech.homeAutomation.communicationHub;
 
+import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
+
 public abstract class NodeInterface implements Runnable {
 
 	private boolean running = false;
-	private ChannelController controller = null;
+	protected ChannelController controller = null;
 	protected String nodeName;
 
 	public NodeInterface(ChannelController controller) {
@@ -23,7 +25,7 @@ public abstract class NodeInterface implements Runnable {
 		this.running = false;
 		shutdown();
 	}
-	
+
 	public void stop() {
 		this.running = false;
 	}
@@ -32,15 +34,14 @@ public abstract class NodeInterface implements Runnable {
 		return running;
 	}
 
-	public void sendDataToController(String data, NodeInterface fromNode) {
-		this.controller.processIncomingData(data, fromNode);
-		
+	public void sendDataPacketToController(HomeAutomationPacket hap, NodeInterface fromNode) {
+		this.controller.processIncomingDataPacket(hap, fromNode);
 	}
 
 	// Abstract Methods
 	public abstract void watchForData();
 
-	public abstract void sendDataToNode(String data) throws Exception;
+	public abstract void sendDataPacketToNode(HomeAutomationPacket hap) throws Exception;
 
 	public String getNodeName() {
 		return nodeName;
@@ -49,6 +50,9 @@ public abstract class NodeInterface implements Runnable {
 	public void setNodeName(String nodeName) {
 		this.nodeName = nodeName;
 	}
-
+	
+	public String toString() {
+		return("Node : " + this.getNodeName());
+	}
 
 }
