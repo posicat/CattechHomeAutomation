@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.cattech.homeAutomation</groupId>
-		<artifactId>HomeAutomationParent</artifactId>
+		<artifactId>CattechHomeAutomation</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>HomeAutomationModules</artifactId>

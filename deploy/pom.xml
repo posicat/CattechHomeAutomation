@@ -5,33 +5,10 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.cattech.homeAutomation</groupId>
-		<artifactId>HomeAutomationParent</artifactId>
+		<artifactId>CattechHomeAutomation</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>deploy</artifactId>
-	<packaging>pom</packaging>
-	<profiles>
-		<profile>
-			<id>deb</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>net.sf.debian-maven</groupId>
-						<artifactId>debian-maven-plugin</artifactId>
-						<version>1.0.6</version>
-						<configuration>
-							<packageName>CattechHomeAutomation</packageName>
-							<packageVersion>${project.version}</packageVersion>
-							<maintainerName>Mark Balliet</maintainerName>
-							<maintainerEmail>posicat@pobox.com</maintainerEmail>
-							<excludeAllArtifacts>true</excludeAllArtifacts>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
-
 	<build>
 		<plugins>
 			<plugin>
@@ -45,7 +22,7 @@
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${basedir}/target/deb/</outputDirectory>
+							<outputDirectory>${basedir}/target/root/</outputDirectory>
 							<includeEmptyDirs>true</includeEmptyDirs>
 							<resources>
 								<resource>
@@ -65,7 +42,7 @@
 							<outputDirectory>${basedir}/target/</outputDirectory>
 							<resources>
 								<resource>
-									<directory>${project.parent.basedir}target/deb/usr/lib/CattechHomeAutomation</directory>
+									<directory>${project.parent.basedir}/target/root/usr/bin/CattechHomeAutomation</directory>
 									<includes>
 										<indlude>HomeAutomationHub.jar</indlude>
 									</includes>
@@ -75,19 +52,44 @@
 						</configuration>
 					</execution>
 					<execution>
-						<id>copy-homeAutomation-hub-lib</id>
+						<id>copy-homeAutomation-hub-libs</id>
 						<phase>package</phase>
 						<goals>
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${basedir}/target/deb/usr/lib/CattechHomeAutomation/lib</outputDirectory>
+							<outputDirectory>${basedir}/target/root/usr/lib/CattechHomeAutomation</outputDirectory>
 							<resources>
 								<resource>
-									<directory>${project.parent.basedir}/target/lib/</directory>
+									<directory>${project.parent.basedir}/HomeAutomationHub/target/lib/</directory>
 									<includes>
 										<indlude>*.jar</indlude>
 									</includes>
+									<excludes>
+										<exclude>*HomeAutomationHub*</exclude>
+									</excludes>
+									<filtering>false</filtering>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-homeAutomation-hub-jar</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/target/root/usr/bin/CattechHomeAutomation</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.parent.basedir}/HomeAutomationHub/target/</directory>
+									<includes>
+										<indlude>*HomeAutomationHub*.jar</indlude>
+									</includes>
+									<excludes>
+										<exclude>*-tests*</exclude>
+									</excludes>
 									<filtering>false</filtering>
 								</resource>
 							</resources>
@@ -100,7 +102,7 @@
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${basedir}/target/deb/usr/lib/CattechHomeAutomation/modules</outputDirectory>
+							<outputDirectory>${basedir}/target/root/usr/bin/CattechHomeAutomation/modules</outputDirectory>
 							<resources>
 								<resource>
 									<directory>${project.parent.basedir}/HomeAutomationModules/target/</directory>
@@ -119,16 +121,48 @@
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${basedir}/target/deb/usr/lib/CattechHomeAutomation/lib</outputDirectory>
+							<outputDirectory>${basedir}/target/root/usr/lib/CattechHomeAutomation</outputDirectory>
 							<resources>
 								<resource>
 									<directory>${project.parent.basedir}/HomeAutomationModules/target/lib/</directory>
 									<includes>
 										<indlude>*.jar</indlude>
 									</includes>
+									<excludes>
+										<exclude>*HomeAutomationHub*</exclude>
+									</excludes>
 									<filtering>false</filtering>
 								</resource>
 							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>jdeb</artifactId>
+				<groupId>org.vafer</groupId>
+				<version>1.8</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>jdeb</goal>
+						</goals>
+						<configuration>
+							<deb>${project.build.directory}/CattechHomeAutomation_${project.version}_all.deb</deb>
+							<snapshotExpand>true</snapshotExpand>
+							<dataSet>
+								<data>
+									<src>${project.build.directory}/root/</src>
+									<type>directory</type>
+									<includes></includes>
+									<mapper>
+										<type>perm</type>
+										<user>cathomeauto</user>
+										<group>cathomeauto</group>
+									</mapper>
+								</data>
+							</dataSet>
 						</configuration>
 					</execution>
 				</executions>

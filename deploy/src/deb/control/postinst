@@ -5,7 +5,7 @@ set -e
 case "$1" in
     configure)
         echo "Creating/updating cathomeauto user account..."
-        addgroup -quiet cathomeauto
+        groupadd -f cathomeauto
         adduser --system --ingroup cathomeauto --home /var/lib/CattechHomeAutomation/ \
                 --gecos "Cattech HomeAutomation user" --shell /bin/false \
                 --quiet --disabled-password cathomeauto || {
@@ -18,8 +18,11 @@ case "$1" in
           exit 1
         }
               
-        chown cathomeauto:cathomeauto /usr/lib/CattechHomeAutomation/
-        chown cathomeauto:cathomeauto /var/log/CattechHomeAutomation/
+        chown cathomeauto:cathomeauto -R /usr/bin/CattechHomeAutomation/
+        chown cathomeauto:cathomeauto -R /usr/lib/CattechHomeAutomation/
+        chown cathomeauto:cathomeauto -R /var/log/CattechHomeAutomation/
+        chmod 644 /etc/CattechHomeAutomation/*
+        chmod 755 /usr/bin/CattechHomeAutomation/start_hub_debug.sh
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)

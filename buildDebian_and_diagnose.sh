@@ -2,7 +2,7 @@
 
 cd /home/homeauto/homeAutomation/deploy/
 
-mvn clean install -P deb deb:package
+mvn clean install
 
 
 rm -rf /home/homeauto/debianContents

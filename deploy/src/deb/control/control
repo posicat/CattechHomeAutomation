@@ -1,0 +1,10 @@
+Package: CattechHomeAutomation
+Version: [[version]]
+Section: misc
+Priority: optional
+Architecture: all
+Depends: java8-runtime
+Maintainer: Mark Balliet <posicat@pobox.com>
+Description: Hub for home automation and device integration.
+Distribution: development
+Homepage: https://github.com/posicat/HomeAutomation

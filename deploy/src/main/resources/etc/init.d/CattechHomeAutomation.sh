@@ -12,7 +12,7 @@
 
 NAME="CattechHomeAutomation"
 PATH="/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin"
-APPDIR="/usr/lib/CattechHomeAutomation/lib"
+APPDIR="/usr/bin/CattechHomeAutomation/"
 APPBIN="/usr/bin/java"
 APPARGS="-jar HomeAutomationHub-0.0.1-*.jar"
 USER="homeauto"

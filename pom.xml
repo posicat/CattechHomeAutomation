@@ -3,9 +3,9 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.cattech.homeAutomation</groupId>
-	<artifactId>HomeAutomationParent</artifactId>
+	<artifactId>CattechHomeAutomation</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<description>Cattech Home Automation Hub</description>
+	<description>Cattech Home Automation</description>
 	<packaging>pom</packaging>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -45,6 +45,7 @@
 				<configuration>
 					<source>${java.version}</source>
 					<target>${java.version}</target>
+					<release>8</release>
 				</configuration>
 			</plugin>
 			<!-- Copy project dependency -->
