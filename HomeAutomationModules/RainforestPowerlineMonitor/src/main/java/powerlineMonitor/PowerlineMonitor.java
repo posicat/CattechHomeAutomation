@@ -50,7 +50,7 @@ public class PowerlineMonitor extends HomeAutomationModule {
 				}
 			}
 		} catch (Exception e) {
-			log.error("Exception, shutting down",e);
+			log.error("Could not start Rainforest monitor.  rainforestEmuPort="+port,e);
 			callback.onShutdown(e);
 		} finally {
 			serialCommunication.shutDown();

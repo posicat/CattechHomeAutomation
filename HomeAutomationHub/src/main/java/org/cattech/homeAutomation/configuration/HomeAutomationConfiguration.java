@@ -13,6 +13,11 @@ import org.apache.log4j.Logger;
 
 public class HomeAutomationConfiguration {
 
+	private static final String CONFIG_DB_PASSWORD = "db.password";
+	private static final String CONFIG_DB_USERNAME = "db.username";
+	private static final String CONFIG_DB_DATABASE_NAME = "db.database";
+	private static final String CONFIG_DB_HOST = "db.host";
+	private static final String CONFIG_DB_PORT = "db.port";
 	private static final String ENV_FOLDER_CONFIG = "HOMEAUTOMATION_CONFIG";
 	private static final String ENV_FOLDER_MODULES = "HOMEAUTOMATION_MODULES";
 	private static final String ENV_FOLDER_LIBRARIES = "HOMEAUTOMATION_LIB";
@@ -165,9 +170,11 @@ public class HomeAutomationConfiguration {
 
 	public String getDBURL() {
 		String url = null;
-		if (null != props.getProperty("db.host")) {
-			url = "jdbc:mysql://" + props.getProperty("db.host") + "/" + props.getProperty("db.name") + "?" + "useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC" + "&user="
-					+ props.getProperty("db.username") + "&password=" + props.getProperty("db.password");
+		if (null != props.getProperty(CONFIG_DB_HOST)) {
+			//TODO Handle the db.port in here as well
+			//TODO if no db.host is set use localhost
+			url = "jdbc:mysql://" + props.getProperty(CONFIG_DB_HOST) + "/" + props.getProperty(CONFIG_DB_DATABASE_NAME) + "?" + "useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC" + "&user="
+					+ props.getProperty(CONFIG_DB_USERNAME) + "&password=" + props.getProperty(CONFIG_DB_PASSWORD);
 		} else {
 			log.info("No host set for SQL, returning null");
 		}

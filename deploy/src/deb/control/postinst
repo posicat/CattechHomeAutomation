@@ -17,12 +17,14 @@ case "$1" in
           # unknown adduser error, simply exit
           exit 1
         }
+        
+        ucf --three-way /usr/share/doc/CattechHomeAutomation/settings.conf.orig /etc/CattechHomeAutomation/settings.conf
               
         chown cathomeauto:cathomeauto -R /usr/bin/CattechHomeAutomation/
         chown cathomeauto:cathomeauto -R /usr/lib/CattechHomeAutomation/
         chown cathomeauto:cathomeauto -R /var/log/CattechHomeAutomation/
         chmod 644 /etc/CattechHomeAutomation/*
-        chmod 755 /usr/bin/CattechHomeAutomation/start_hub_debug.sh
+        chmod 755 /usr/bin/CattechHomeAutomation/start_hub.sh
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)

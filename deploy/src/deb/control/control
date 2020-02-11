@@ -3,7 +3,7 @@ Version: [[version]]
 Section: misc
 Priority: optional
 Architecture: all
-Depends: java8-runtime
+Depends: java8-runtime, librxtx-java, mysql-server (>= 5.6)
 Maintainer: Mark Balliet <posicat@pobox.com>
 Description: Hub for home automation and device integration.
 Distribution: development

@@ -23,7 +23,7 @@ public class ModuleManager {
 
 	public ModuleManager(HomeAutomationConfiguration config) throws Exception {
 		this.config = config;
-		addSoftwareLibrary(config.getLibFolder());
+		addSoftwareLibrary(config.getLibFolder()+"*");
 		log.info("Classpath:"+System.getProperty("java.class.path"));
 	}
 

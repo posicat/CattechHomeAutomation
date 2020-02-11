@@ -128,10 +128,9 @@ public abstract class HomeAutomationModule implements Runnable {
 		try {
 			conn = DriverManager.getConnection(configuration.getDBURL());
 		} catch (SQLException ex) {
-			// handle any errors
-			System.out.println("SQLException: " + ex.getMessage());
-			System.out.println("SQLState: " + ex.getSQLState());
-			System.out.println("VendorError: " + ex.getErrorCode());
+			log.error("Error getting sql connection to :"+configuration.getDBURL(),ex);
+			log.error("SQLState: " + ex.getSQLState());
+			log.error("VendorError: " + ex.getErrorCode());
 		}
 		return conn;
 	}
