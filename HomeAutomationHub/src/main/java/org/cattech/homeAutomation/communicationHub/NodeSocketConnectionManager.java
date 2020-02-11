@@ -8,15 +8,15 @@ import org.apache.log4j.Logger;
 
 public class NodeSocketConnectionManager implements Runnable {
 	private Logger log = Logger.getLogger(this.getClass());
-	
+
 	protected int serverPort;
 	protected ServerSocket serverSocket = null;
 	protected boolean isStopped = false;
 	protected Thread runningThread = null;
 	protected ChannelController controller;
 
-	public NodeSocketConnectionManager(int port, ChannelController controller) {
-		this.serverPort = port;
+	public NodeSocketConnectionManager(ChannelController controller) {
+		this.serverPort = controller.getConfig().getPort();
 		this.controller = controller;
 	}
 
@@ -37,13 +37,14 @@ public class NodeSocketConnectionManager implements Runnable {
 				}
 				throw new RuntimeException("Error accepting client connection", e);
 			}
-			new Thread(new NodeInterfaceSocket(clientSocket, controller),"Client "+clientSocket.getInetAddress()).start();
+			new Thread(new NodeInterfaceSocket(clientSocket, controller), "Client " + clientSocket.getInetAddress())
+					.start();
 		}
 		log.info("Server Stopped.");
 		this.stop();
 	}
 
-	synchronized boolean isStopped() {
+	public synchronized boolean isStopped() {
 		return this.isStopped;
 	}
 
@@ -58,7 +59,7 @@ public class NodeSocketConnectionManager implements Runnable {
 
 	private void openServerSocket() {
 		try {
-			log.info("Starting hub on port "+ this.serverPort);
+			log.info("Starting hub on port " + this.serverPort);
 			this.serverSocket = new ServerSocket(this.serverPort);
 		} catch (IOException e) {
 			throw new RuntimeException("Cannot open port " + this.serverPort, e);

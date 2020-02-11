@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<parent>
 		<groupId>org.cattech.homeAutomation</groupId>
-		<artifactId>HomeAutomationParent</artifactId>
+		<artifactId>CattechHomeAutomation</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
@@ -35,10 +35,13 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<addClasspath>true</addClasspath>
-							<mainClass>org.cattech.homeAutomation.communicationHub.Hub</mainClass>
-							<classpathPrefix>lib/</classpathPrefix>
+							<addClasspath>false</addClasspath>
+							<mainClass>org.cattech.homeAutomation.commandLine.HomeAutomationHub</mainClass>
+							<classpathPrefix>../lib/*</classpathPrefix>
 						</manifest>
+						<manifestEntries>
+							<Class-Path>../lib/*</Class-Path>
+						</manifestEntries>
 					</archive>
 				</configuration>
 				<executions>
@@ -79,6 +82,19 @@
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.3.5</version>
 		</dependency>
 	</dependencies>
 </project>
