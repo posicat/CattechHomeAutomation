@@ -13,10 +13,10 @@
 NAME="CattechHomeAutomation"
 PATH="/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin"
 APPDIR="/usr/bin/CattechHomeAutomation/"
-APPBIN="/usr/bin/java"
-APPARGS="-jar HomeAutomationHub-0.0.1-*.jar"
-USER="homeauto"
-GROUP="homeauto"
+APPBIN="/usr/bin/CattechHomeAutomation/start_hub.sh"
+APPARGS=""
+USER="cathomeauto"
+GROUP="cathomeauto"
 
 # Include functions 
 set -e
@@ -24,7 +24,7 @@ set -e
 
 start() {
   printf "Starting '$NAME'... "
-  start-stop-daemon --start --chuid "$USER:$GROUP" --background --make-pidfile --pidfile /var/run/$NAME.pid --chdir "$APPDIR" --exec "$APPBIN" -- $APPARGS || true
+  start-stop-daemon --start --chuid "$USER:$GROUP" --background --make-pidfile --pidfile /var/run/$NAME.pid --chdir "$APPDIR" --exec "$APPBIN > /var/log/CattechHomeAutomation script.log 2>&1" -- $APPARGS || true
   printf "done\n"
 }
 

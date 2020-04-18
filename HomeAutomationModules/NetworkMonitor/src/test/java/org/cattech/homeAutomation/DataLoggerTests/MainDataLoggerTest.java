@@ -1,6 +1,5 @@
 package org.cattech.homeAutomation.DataLoggerTests;
 
-import org.cattech.homeAutomation.DataLogger.DataLogger;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
 import org.cattech.homeAutomation.moduleBaseTest.BaseTestForModules;
 import org.json.JSONArray;

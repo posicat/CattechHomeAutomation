@@ -1,8 +1,8 @@
-package org.cattech.homeAutomation.CommandHandler;
+package org.cattech.homeAutomation.DataLogger;
 
 import org.json.JSONArray;
 
-public class LogLookup  {
+public class NetworkDataVO  {
 	public String deviceName;
 	public JSONArray commonDevice;
 	public String dataTable;

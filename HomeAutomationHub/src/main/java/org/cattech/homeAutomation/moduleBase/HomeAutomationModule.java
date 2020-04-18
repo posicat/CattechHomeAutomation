@@ -97,7 +97,7 @@ public abstract class HomeAutomationModule implements Runnable {
 		}
 	}
 
-	protected void processOutgoingPackets(List<HomeAutomationPacket> outgoing) {
+	public void processOutgoingPackets(List<HomeAutomationPacket> outgoing) {
 		for (HomeAutomationPacket reply : outgoing) {
 			try {
 				hubInterface.sendDataPacketToController(reply);

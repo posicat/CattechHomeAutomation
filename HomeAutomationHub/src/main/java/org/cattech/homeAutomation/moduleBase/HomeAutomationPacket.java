@@ -23,6 +23,7 @@ public class HomeAutomationPacket {
 	public static final String FIELD_DATA_DEVICE = "device";
 	public static final String FIELD_DATA_POST_RESOLVE = "postResolve";
 	public static final String FIELD_DATA_ACTION = "action";
+	public static final String FIELD_DATA_DELTA = "delta";
 
 	public static final String RESOLUTION_TO_COMMON = "toCommon";
 	public static final String RESOLUTION_TO_NATIVE = "toNative";
@@ -32,6 +33,7 @@ public class HomeAutomationPacket {
 	public static final String CHANNEL_CONTROLLER = "ChannelController";
 	public static final String CHANNEL_EVENT_HANDLER = "EventHandler";
 	public static final String CHANNEL_DEVICE_RESOLVER = "DeviceResolver";
+
 
 	private JSONObject wrapper = null;
 	private JSONObject data = null;

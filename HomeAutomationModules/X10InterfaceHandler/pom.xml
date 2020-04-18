@@ -32,5 +32,10 @@
 			<artifactId>HomeAutomationHub</artifactId>
 			<type>test-jar</type>
 		</dependency>
+		<dependency>
+			<groupId>org.cattech</groupId>
+			<artifactId>JavaHeyuWrapper</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 </project>

@@ -25,6 +25,7 @@ case "$1" in
         chown cathomeauto:cathomeauto -R /var/log/CattechHomeAutomation/
         chmod 644 /etc/CattechHomeAutomation/*
         chmod 755 /usr/bin/CattechHomeAutomation/start_hub.sh
+        chmod 755 /etc/init.d/CattechHomeAutomation.sh
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)

@@ -10,6 +10,8 @@ hub.host=127.0.0.1
 #db.host=
 #db.port=
 db.database=CattechHomeAutomation
+db.datalogDB=CattechHomeAutomation_DataLogging
+
 db.username=cathomeauto
 db.password=<db_password>
 

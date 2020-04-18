@@ -1,4 +1,4 @@
-package org.cattech.homeAutomation.CommandHandler;
+package org.cattech.homeAutomation.DataLogger;
 
 import java.sql.Connection;
 import java.sql.Date;
@@ -71,7 +71,7 @@ public class DataLogger extends HomeAutomationModule {
 		try {
 			log.info("Logging   : " + ll.deviceName);
 
-			query = "INSERT into HomeAutomation_DataLogging." + ll.dataTable + " (deviceMap_id,eventTime,value,data) VALUES(?,?,?,?)";
+			query = "INSERT into "+configuration.getDataLoggingDB()+"." + ll.dataTable + " (deviceMap_id,eventTime,value,data) VALUES(?,?,?,?)";
 
 			String eventTime = findStringInJsonByPath(data, ll.eventTime);
 			String val = findStringInJsonByPath(data, ll.numericValue);
@@ -178,12 +178,12 @@ public class DataLogger extends HomeAutomationModule {
 
 			try {
 				Statement stmt = conn.createStatement();
-				stmt.executeQuery("SELECT 1 FROM HomeAutomation_DataLogging." + ll.dataTable + " LIMIT 1");
+				stmt.executeQuery("SELECT 1 FROM "+configuration.getDataLoggingDB()+"." + ll.dataTable + " LIMIT 1");
 			} catch (SQLException e) {
 				// Exception happened, Table does not exist.
-				log.info("Creating table : HomeAutomation_DataLogging." + ll.dataTable);
+				log.info("Creating table : "+configuration.getDataLoggingDB()+"." + ll.dataTable);
 
-				String query = "CREATE TABLE HomeAutomation_DataLogging." + ll.dataTable + "( " + " "
+				String query = "CREATE TABLE "+configuration.getDataLoggingDB()+"." + ll.dataTable + "( " + " "
 						+ ll.dataTable + "_id INT NOT NULL AUTO_INCREMENT, "
 						+ " deviceMap_id INT NOT NULL, "
 						+ " eventTime DATETIME DEFAULT CURRENT_TIMESTAMP, "
