@@ -1,9 +1,11 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.cattech.homeAutomation</groupId>
-	<artifactId>HomeAutomationParent</artifactId>
+	<artifactId>CattechHomeAutomation</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<description>Cattech Home Automation</description>
 	<packaging>pom</packaging>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -15,8 +17,27 @@
 		<homeAutomation.modules>bin/HomeAutomationHub/modules/</homeAutomation.modules>
 		<homeAutomation.lib>bin/homeAutomationHub/lib/</homeAutomation.lib>
 	</properties>
+	<scm>
+		<connection>scm:git:http://git.cattech.org/posicat/homeAutomation.git</connection>
+	</scm>
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>buildnumber-maven-plugin</artifactId>
+				<version>1.4</version>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>create</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<shortRevisionLength>5</shortRevisionLength>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -24,6 +45,7 @@
 				<configuration>
 					<source>${java.version}</source>
 					<target>${java.version}</target>
+					<release>8</release>
 				</configuration>
 			</plugin>
 			<!-- Copy project dependency -->
@@ -41,6 +63,7 @@
 							<!-- exclude junit, we need runtime dependency only -->
 							<includeScope>runtime</includeScope>
 							<outputDirectory>${project.build.directory}/lib/</outputDirectory>
+							<stripVersion>true</stripVersion>
 						</configuration>
 					</execution>
 				</executions>
@@ -82,11 +105,32 @@
 				<version>0.0.1-SNAPSHOT</version>
 				<type>test-jar</type>
 			</dependency>
+			<dependency>
+				<groupId>commons-io</groupId>
+				<artifactId>commons-io</artifactId>
+				<version>2.5</version>
+			</dependency>
+			<dependency>
+				<groupId>mysql</groupId>
+				<artifactId>mysql-connector-java</artifactId>
+				<version>6.0.6</version>
+			</dependency>
+			<dependency>
+				<groupId>com.sun.mail</groupId>
+				<artifactId>javax.mail</artifactId>
+				<version>1.5.5</version>
+			</dependency>
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-core</artifactId>
+				<version>2.12.0</version>
+				<scope>test</scope>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	<modules>
 		<module>HomeAutomationModules</module>
 		<module>HomeAutomationHub</module>
-		<module>Deploy</module>
+		<module>deploy</module>
 	</modules>
 </project>

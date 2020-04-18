@@ -6,39 +6,23 @@ import java.util.Hashtable;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
-import org.cattech.homeAutomation.configuration.homeAutomationConfiguration;
+import org.cattech.homeAutomation.configuration.HomeAutomationConfiguration;
+import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-//import org.json.JSONArray;
-//import org.json.JSONObject;
-
 public class ChannelController {
-	private Logger						log			= Logger.getLogger(this.getClass());
-	
-	// Data packet field names 
-	public static final String NODE_DATA_SOURCE = "source";
-	public static final String NODE_DATA_DESTINATION = "destination";
-	public static final String NODE_DATA_BLOCK = "data";
-	public static final String NODE_REGISTER_CHANNELS = "register";
-	public static final String NODE_STATUS_BLOCK = "status";
-	public static final String NODE_ERROR_MESSAGE = "error";
-	public static final String NODE_NODE_NAME = "nodeName";
-	private static final String NODE_DATA_CHANNEL = "channel";
-
-	// Channel constants
-	public static final String NODE_CHANNEL_CONTROLLER = "ChannelController";
-	public static final String NODE_SEND_TO_ALL_ADDRESS = "all";
+	private Logger log = Logger.getLogger(this.getClass());
 
 	Hashtable<String, ArrayList<NodeInterface>> masterChannelList = new Hashtable<String, ArrayList<NodeInterface>>();
 	ArrayList<NodeInterface> masterNodeList = new ArrayList<NodeInterface>();
-	homeAutomationConfiguration config;
+	HomeAutomationConfiguration config;
 
-	public homeAutomationConfiguration getConfig() {
+	public HomeAutomationConfiguration getConfig() {
 		return config;
 	}
 
-	public ChannelController(homeAutomationConfiguration config) throws IOException {
+	public ChannelController(HomeAutomationConfiguration config) throws IOException {
 		this.config = config;
 	}
 
@@ -80,79 +64,90 @@ public class ChannelController {
 		return nodes;
 	}
 
-	public void processIncomingData(String data, NodeInterface fromNode) {
+
+	public void processIncomingDataPacket(HomeAutomationPacket hapIn, NodeInterface fromNode) {
 		String errors = "";
 		try {
+			log.debug("<--- FROM " + fromNode.getNodeName() + " " + hapIn.toString());
 
-			JSONObject jsonIn = new JSONObject(data);
-			JSONObject jsonOut = new JSONObject();
+			HomeAutomationPacket hapOut = new HomeAutomationPacket();
 
-			if (jsonIn.has(NODE_REGISTER_CHANNELS)) {
-				if (jsonIn.has(NODE_NODE_NAME)) {
-					fromNode.setNodeName(jsonIn.getString(NODE_NODE_NAME));
+			if (hapIn.hasWrapper(HomeAutomationPacket.FIELD_REGISTER)) {
+				if (hapIn.hasWrapper(HomeAutomationPacket.FIELD_NODE_NAME)) {
+					fromNode.setNodeName(hapIn.getWrapperString(HomeAutomationPacket.FIELD_NODE_NAME));
 				} else {
 					fromNode.setNodeName(UUID.randomUUID().toString());
 				}
 
-				JSONArray registerChannels = jsonIn.getJSONArray(NODE_REGISTER_CHANNELS);
+				JSONArray registerChannels = hapIn.getWrapperJArr(HomeAutomationPacket.FIELD_REGISTER);
 				for (int i = 0; i < registerChannels.length(); i++) {
 					addNodeToChannel(registerChannels.getString(i), fromNode);
 					// log.info("Registered "+registerChannels.getString(i)+" to
 					// "+fromNode);
 				}
 
-				jsonOut.put(NODE_STATUS_BLOCK, "registered");
-				jsonOut.put(NODE_DATA_SOURCE, NODE_CHANNEL_CONTROLLER);
-				jsonOut.put(NODE_DATA_CHANNEL, registerChannels);
-				jsonOut.put(NODE_NODE_NAME, fromNode.getNodeName());
-				fromNode.sendDataToNode(jsonOut.toString());
+				hapOut.putWrapper(HomeAutomationPacket.FIELD_STATUS, "registered");
+				hapOut.putWrapper(HomeAutomationPacket.FIELD_SOURCE, HomeAutomationPacket.CHANNEL_CONTROLLER);
+				hapOut.putWrapper(HomeAutomationPacket.FIELD_CHANNEL, registerChannels);
+				hapOut.putWrapper(HomeAutomationPacket.FIELD_NODE_NAME , fromNode.getNodeName());
+				fromNode.sendDataPacketToNode(hapOut);
+				log.debug("---> TO " + registerChannels + " " + hapOut);
+
 			}
 
-			if (jsonIn.has(NODE_DATA_DESTINATION) && jsonIn.has(NODE_DATA_BLOCK)) {
-				JSONArray destinations = jsonIn.getJSONArray(NODE_DATA_DESTINATION);
-				destinations.put("all"); // Also send to channel all
-				JSONObject channelData = jsonIn.getJSONObject(NODE_DATA_BLOCK);
-				jsonOut.put(NODE_NODE_NAME, fromNode.getNodeName());
-				jsonOut.put(NODE_DATA_SOURCE, jsonIn.get(NODE_DATA_SOURCE));
-				jsonOut.put(NODE_DATA_BLOCK, channelData);
+			if (hapIn.hasWrapper(HomeAutomationPacket.FIELD_DESTINATION) && hapIn.hasData()) {
+				JSONObject channelData = hapIn.getData();
+				hapOut.putWrapper(HomeAutomationPacket.FIELD_NODE_NAME, fromNode.getNodeName());
+				hapOut.putWrapper(HomeAutomationPacket.FIELD_SOURCE, hapIn.getWrapperString(HomeAutomationPacket.FIELD_SOURCE));
+				hapOut.setData(channelData);
+				
+				JSONArray destinations = hapIn.getWrapperJArr(HomeAutomationPacket.FIELD_DESTINATION);
 				for (int i = 0; i < destinations.length(); i++) {
 					String channel = destinations.getString(i);
-					jsonOut.put(NODE_DATA_CHANNEL, channel);
-					sendToChannel(channel, jsonOut.toString());
+					hapOut.putWrapper(HomeAutomationPacket.FIELD_CHANNEL, channel);
+					log.debug("---> TO " + channel + " " + hapOut);
+					sendToChannel(channel, hapOut, true);
 				}
+				hapOut.removeFromWrapper(HomeAutomationPacket.FIELD_CHANNEL);
+				hapOut.putWrapper(HomeAutomationPacket.FIELD_ALL_CHANNELS, destinations.toString());
+				sendToChannel("all", hapOut, false);
 			}
 		} catch (Exception e) {
+			log.debug("Error processing packet : "+hapIn,e);
 			errors += e.getMessage();
 		}
 
 		if (errors != "") {
 			try {
-				JSONObject jsonOut = new JSONObject();
-				jsonOut.put(NODE_ERROR_MESSAGE, errors);
+				HomeAutomationPacket hapOut = new HomeAutomationPacket();
+				hapOut.setDestination(hapIn.getWrapperString(HomeAutomationPacket.FIELD_SOURCE));
+				hapOut.putWrapper(HomeAutomationPacket.FIELD_ERROR, errors);
+				hapOut.putWrapper(HomeAutomationPacket.FIELD_SOURCE, HomeAutomationPacket.CHANNEL_CONTROLLER);
 				log.error("Error :" + errors);
-				log.error(data);
-				fromNode.sendDataToNode(jsonOut.toString());
+				log.error("IN:"+hapIn);
+				log.error("OUT:"+hapOut);
+				fromNode.sendDataPacketToNode(hapOut);
 			} catch (Exception e) {
-				e.printStackTrace();
+				log.error("Could not build output packet",e);
 			}
 		}
 	}
 
-	private void sendToChannel(String channel, String data) throws Exception {
+	private void sendToChannel(String channel, HomeAutomationPacket hapOut, boolean throwNoChannel) throws Exception {
 		ArrayList<NodeInterface> nodes;
-		// if (NODE_SEND_TO_ALL_ADDRESS.equals(channel)) {
+		// if (HomeAutomationPacket.SEND_TO_ALL_ADDRESS.equals(channel)) {
 		// nodes = allNodes;
 		// } else {
 		nodes = masterChannelList.get(channel);
 		// }
 		if (nodes != null) {
 			for (NodeInterface node : nodes) {
-				node.sendDataToNode(data);
+				node.sendDataPacketToNode(hapOut);
 			}
 		} else {
-			if (NODE_SEND_TO_ALL_ADDRESS != channel) {
+			if (throwNoChannel) {
 				log.error("No node registered for channel : " + channel);
-				log.error(data);
+				log.error(hapOut);
 			}
 		}
 	}

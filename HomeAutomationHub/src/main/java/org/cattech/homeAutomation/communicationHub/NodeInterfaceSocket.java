@@ -1,15 +1,17 @@
 package org.cattech.homeAutomation.communicationHub;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.Socket;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
+import org.apache.log4j.Logger;
+import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
+
 public class NodeInterfaceSocket extends NodeInterface {
+	private Logger log = Logger.getLogger(this.getClass());
 
 	protected Socket clientSocket = null;
-	private OutputStream output;
 	private Scanner input;
 
 	public NodeInterfaceSocket(Socket clientSocket, ChannelController controller) {
@@ -20,22 +22,23 @@ public class NodeInterfaceSocket extends NodeInterface {
 	@Override
 	public void watchForData() {
 		try {
-			output = clientSocket.getOutputStream();
 			input = new Scanner(clientSocket.getInputStream());
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.error("IOException",e);
 		}
 		while (super.isRunning()) {
 			try {
-				super.sendDataToController(input.nextLine(), this);
+				super.sendDataPacketToController(new HomeAutomationPacket(input.nextLine()), this);
 			} catch (NoSuchElementException e) {
+				// Ok if there are no more elements, just return.
 				return;
 			}
 		}
 	}
 
 	@Override
-	public void sendDataToNode(String data) throws IOException {
-		output.write((data+"\r\n").getBytes());
+	public void sendDataPacketToNode(HomeAutomationPacket hap) throws Exception {
+		// TODO Auto-generated method stub
+
 	}
 }
