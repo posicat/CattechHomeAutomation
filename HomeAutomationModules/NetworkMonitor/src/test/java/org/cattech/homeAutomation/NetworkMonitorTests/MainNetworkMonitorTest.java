@@ -1,4 +1,4 @@
-package org.cattech.homeAutomation.DataLoggerTests;
+package org.cattech.homeAutomation.NetworkMonitorTests;
 
 import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
 import org.cattech.homeAutomation.moduleBaseTest.BaseTestForModules;
@@ -8,15 +8,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 
-public class MainDataLoggerTest extends BaseTestForModules {
-	DataLogger dataLogger;
+public class MainNetworkMonitorTest extends BaseTestForModules {
 
 	@Override
 	@Before
 	public void setUp() throws Exception {
 		super.setUp();
-		dataLogger = new DataLogger(controller);
-		new Thread(dataLogger, "Testing DeviceCommandHandler").start();
 		registerChannel(testInterface, new String[] { HomeAutomationPacket.CHANNEL_DEVICE_RESOLVER, HomeAutomationPacket.CHANNEL_EVENT_HANDLER });
 	}
 
@@ -24,7 +21,6 @@ public class MainDataLoggerTest extends BaseTestForModules {
 	@After
 	public void tearDown() throws Exception {
 		super.tearDown();
-		dataLogger.setRunning(false);
 	}
 	
 //	@Test
