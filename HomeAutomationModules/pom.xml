@@ -23,6 +23,7 @@
 		<module>RainforestPowerlineMonitor</module>
 		<module>WatchCat</module>
 		<module>X10InterfaceHandler</module>
+		<module>IkeaTradfriInterfaceHandler</module>
 	</modules>
 	<build>
 		<plugins>

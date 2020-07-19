@@ -24,6 +24,7 @@ public class HomeAutomationConfiguration {
 	private static final String ENV_FOLDER_LIBRARIES = "HOMEAUTOMATION_LIB";
 	private static final String ENV_FOLDER_HOME = "HOMEAUTOMATION_HOME";
 	private static final String ENV_FOLDER_LOGS = "HOMEAUTOMATION_LOG";
+	private static final String CONFIG_SKIP_PREFIX = "skip_module";
 
 	private static Properties props = new Properties();
 	private Logger log = Logger.getLogger(this.getClass());
@@ -51,11 +52,12 @@ public class HomeAutomationConfiguration {
 		overridePropsWithEnvironment("homeAutomation.modules", ENV_FOLDER_MODULES);
 		overridePropsWithEnvironment("homeAutomation.lib", ENV_FOLDER_LIBRARIES);
 		overridePropsWithEnvironment("homeAutomation.log", ENV_FOLDER_LOGS);
-	
-		setLogFileForAppender("console", "org.cattech", "HomeautomationHub.log", null);
-		StdOutErrLog.tieSystemOutAndErrToLog();
 
 		loadConfiguration();
+	
+		setLogFileForAppender("console", "org.cattech", "HomeautomationHub.log", null);
+
+		StdOutErrLog.tieSystemOutAndErrToLog();
 	}
 
 	public void setLogFileForAppender(String loggerName, String clazz, String logFile, Level level) {
@@ -117,7 +119,7 @@ public class HomeAutomationConfiguration {
 			log.info("Loading config from " + settings);
 			props.load(new FileInputStream(settings));
 		} catch (IOException e) {
-			log.error("Could not find configuration file, please set " + ENV_FOLDER_CONFIG, e);
+			log.error("Could not find configuration file, please set environment variable " + ENV_FOLDER_CONFIG, e);
 		}
 	}
 	// ====================================================================================================
@@ -146,7 +148,11 @@ public class HomeAutomationConfiguration {
 	}
 
 	public String getConfigFolder() {
-		return props.getProperty("homeAutomation.config");
+		String configFolder = System.getenv(ENV_FOLDER_CONFIG);
+		if(configFolder == null) {
+			configFolder = "/etc/CattechhomeAutomation/";
+		}
+		return configFolder;
 	}
 
 	public String getModulesFolder() {
@@ -193,6 +199,10 @@ public class HomeAutomationConfiguration {
 
 	public String getHost() {
 		return props.getProperty("hub.host", "localhost");
+	}
+
+	public boolean isSkipModule(String moduleChannelName) {
+		return (props.containsKey(CONFIG_SKIP_PREFIX+"."+moduleChannelName));
 	}
 
 	// ================================================================================

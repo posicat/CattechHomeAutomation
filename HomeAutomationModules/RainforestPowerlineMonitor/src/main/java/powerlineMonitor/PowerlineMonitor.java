@@ -9,7 +9,6 @@ import org.apache.log4j.Logger;
 import org.cattech.homeAutomation.communicationHub.ChannelController;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationModule;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
-import org.cattech.rainforestEMU2.commandLine.RainforestEMU2;
 import org.cattech.rainforestEMU2.serialInterface.SerialRainforestCommunications;
 import org.cattech.rainforestEMU2.xmlCommunications.RainforestCommunicationsInterface;
 import org.cattech.rainforestEMU2.xmlCommunications.RainforestTranslate;
@@ -78,6 +77,7 @@ public class PowerlineMonitor extends HomeAutomationModule {
 		public RainforestEMU2Callback() {
 		}
 
+		@Override
 		public void readReplyXML(String xmlData) {
 //			log.debug("Read:\n" + xmlData.replaceAll("[\\r\\n ]", ""));
 
@@ -127,6 +127,7 @@ public class PowerlineMonitor extends HomeAutomationModule {
 			}
 		}
 
+		@Override
 		public void onShutdown(Exception e) {
 			if (null != e) {
 				log.debug("Bailing on error : " + e.getMessage());
@@ -136,6 +137,7 @@ public class PowerlineMonitor extends HomeAutomationModule {
 			// We die, any last requests?
 		}
 
+		@Override
 		public void onNonFatalException(Exception e) {
 			e.printStackTrace();
 		}

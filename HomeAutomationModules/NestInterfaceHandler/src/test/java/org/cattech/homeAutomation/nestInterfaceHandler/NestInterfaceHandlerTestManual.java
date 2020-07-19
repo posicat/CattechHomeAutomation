@@ -9,7 +9,6 @@ import org.cattech.homeAutomation.configuration.HomeAutomationConfiguration;
 import org.cattech.homeAutomation.moduleBaseTest.BaseTestForModules;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
 
 public class NestInterfaceHandlerTestManual extends BaseTestForModules {
 	

@@ -1,11 +1,9 @@
 package org.cattech.homeAutomation.DataLogger;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.SQLType;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -176,14 +174,15 @@ public class DataLogger extends HomeAutomationModule {
 		for (Iterator<LogLookup> iterator = logLookup.iterator(); iterator.hasNext();) {
 			LogLookup ll = iterator.next();
 
+			String dataLoggingDB = configuration.getDataLoggingDB();
 			try {
 				Statement stmt = conn.createStatement();
-				stmt.executeQuery("SELECT 1 FROM "+configuration.getDataLoggingDB()+"." + ll.dataTable + " LIMIT 1");
+				stmt.executeQuery("SELECT 1 FROM "+dataLoggingDB+"." + ll.dataTable + " LIMIT 1");
 			} catch (SQLException e) {
 				// Exception happened, Table does not exist.
-				log.info("Creating table : "+configuration.getDataLoggingDB()+"." + ll.dataTable);
+				log.info("Creating table : "+dataLoggingDB+"." + ll.dataTable);
 
-				String query = "CREATE TABLE "+configuration.getDataLoggingDB()+"." + ll.dataTable + "( " + " "
+				String query = "CREATE TABLE "+dataLoggingDB+"." + ll.dataTable + "( " + " "
 						+ ll.dataTable + "_id INT NOT NULL AUTO_INCREMENT, "
 						+ " deviceMap_id INT NOT NULL, "
 						+ " eventTime DATETIME DEFAULT CURRENT_TIMESTAMP, "

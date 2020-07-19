@@ -2,11 +2,8 @@ package org.cattech.homeAutomation.NetworkMonitorTests;
 
 import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
 import org.cattech.homeAutomation.moduleBaseTest.BaseTestForModules;
-import org.json.JSONArray;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
-import org.skyscreamer.jsonassert.JSONAssert;
 
 public class MainNetworkMonitorTest extends BaseTestForModules {
 

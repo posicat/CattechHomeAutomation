@@ -11,7 +11,6 @@ import org.cattech.homeAutomation.configuration.HomeAutomationConfiguration;
 import org.cattech.homeAutomation.configuration.HomeAutomationConfigurationException;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationModule;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -51,6 +50,7 @@ public class NestInterfaceHandler extends HomeAutomationModule {
 
 	@Override
 	public boolean autoStartModule() {
+		log.debug("Testing override autostart");
 		return true;
 	}
 

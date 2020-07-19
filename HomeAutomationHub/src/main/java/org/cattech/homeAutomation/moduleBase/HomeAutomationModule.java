@@ -12,12 +12,6 @@ import java.util.List;
 import java.util.Stack;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.log4j.Logger;
 import org.cattech.homeAutomation.communicationHub.ChannelController;
 import org.cattech.homeAutomation.communicationHub.NodeInterfaceString;
@@ -34,31 +28,31 @@ public abstract class HomeAutomationModule implements Runnable {
 	protected HomeAutomationConfiguration configuration;
 
 	protected HomeAutomationModule(ChannelController controller) {
-		if (autoStartModule()) {
-			log.info("--- Initializing module, channels : " + getModuleChannelName() + " ---");
-			hubInterface = new NodeInterfaceString(controller);
-			HomeAutomationPacket hap = new HomeAutomationPacket("{\"register\":[\"" + getModuleChannelName() + "\"],\"nodeName\":\"" + getModuleChannelName() + "\"}");
-			hubInterface.sendDataPacketToController(hap);
+		configuration = controller.getConfig();
 
-			HomeAutomationPacket response = null;
-			while (null == response) {
-				log.info(getModuleChannelName() + " waiting");
-				sleepNoThrow(100);
-				response = hubInterface.getDataPacketFromController();
-			}
-			log.info(getModuleChannelName() + " started");
-			configuration = controller.getConfig();
-		} else {
-			log.info(" ! ! ! ! Module " + getModuleChannelName() + "was not set to autoStart");
+		log.info("--- Initializing module, channels : " + getModuleChannelName() + " ---");
+		hubInterface = new NodeInterfaceString(controller);
+		HomeAutomationPacket hap = new HomeAutomationPacket(
+				"{\"register\":[\"" + getModuleChannelName() + "\"],\"nodeName\":\"" + getModuleChannelName() + "\"}");
+		hubInterface.sendDataPacketToController(hap);
+
+		HomeAutomationPacket response = null;
+		while (null == response) {
+			log.info(getModuleChannelName() + " waiting");
+			sleepNoThrow(100);
+			response = hubInterface.getDataPacketFromController();
 		}
+		log.info(getModuleChannelName() + " started");
+
 	}
 
 	protected abstract void processPacketRequest(HomeAutomationPacket incoming, List<HomeAutomationPacket> outgoing);
 
 	public abstract String getModuleChannelName();
 
+	@Override
 	public void run() {
-		running = autoStartModule();
+		running = true;
 		while (this.running) {
 			checkForIncomingPacket();
 		}
@@ -66,6 +60,10 @@ public abstract class HomeAutomationModule implements Runnable {
 	}
 
 	public boolean autoStartModule() {
+		if (configuration.isSkipModule(this.getModuleChannelName())) {
+			log.debug("Skipping " + this.getModuleChannelName() + " due to skip in configuration file");
+			return false;
+		}
 		return true;
 	}
 
@@ -80,15 +78,14 @@ public abstract class HomeAutomationModule implements Runnable {
 
 	protected void checkForIncomingPacket() {
 		HomeAutomationPacket incoming = hubInterface.getDataPacketFromController();
-		
-		
+
 		if (null != incoming) {
-			log.debug("Incoming packet:"+incoming.toString());
+			log.debug("Incoming packet:" + incoming.toString());
 			List<HomeAutomationPacket> outgoing = new ArrayList<HomeAutomationPacket>();
 			try {
 				processPacketRequest(incoming, outgoing);
-			}catch (Exception e) {
-				log.error("Error occured while processing packet",e);
+			} catch (Exception e) {
+				log.error("Error occured while processing packet", e);
 			} finally {
 				processOutgoingPackets(outgoing);
 			}
@@ -128,7 +125,7 @@ public abstract class HomeAutomationModule implements Runnable {
 		try {
 			conn = DriverManager.getConnection(configuration.getDBURL());
 		} catch (SQLException ex) {
-			log.error("Error getting sql connection to :"+configuration.getDBURL(),ex);
+			log.error("Error getting sql connection to :" + configuration.getDBURL(), ex);
 			log.error("SQLState: " + ex.getSQLState());
 			log.error("VendorError: " + ex.getErrorCode());
 		}

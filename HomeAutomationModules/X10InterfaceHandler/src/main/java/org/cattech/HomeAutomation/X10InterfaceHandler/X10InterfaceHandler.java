@@ -4,22 +4,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.cattech.HeyuWrapper.HeyuWrapper;
+import org.cattech.HeyuWrapper.HeyuWrapperCallback;
+import org.cattech.HeyuWrapper.HeyuWrapperException;
+import org.cattech.HeyuWrapper.X10Action;
 import org.cattech.homeAutomation.communicationHub.ChannelController;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationModule;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import HeyuWrapper.HeyuWrapper;
-import HeyuWrapper.HeyuWrapperCallback;
-import HeyuWrapper.HeyuWrapperException;
-import HeyuWrapper.X10Action;
-
 public class X10InterfaceHandler extends HomeAutomationModule {
 	static Logger log = Logger.getLogger(X10InterfaceHandler.class.getName());
 
-	public X10InterfaceHandler(ChannelController controller) {
+	X10InterfaceHandler(ChannelController controller) {
 		super(controller);
+		log.info("Post Super");
 
 		startX10Monitor();
 	}
@@ -50,8 +50,12 @@ public class X10InterfaceHandler extends HomeAutomationModule {
 	}
 
 	private void startX10Monitor() {
+		log.info("Starting Heyu wrapper");
+		
 		Thread wrapperThread = new Thread(new WrapperCallback(this));
 		wrapperThread.start();
+		
+		log.info("Started Heyu wrapper");
 	}
 
 }
@@ -66,8 +70,12 @@ class WrapperCallback implements HeyuWrapperCallback, Runnable {
 
 	@Override
 	public void heyuEventReceiver(X10Action receiveEvent) {
+		Logger log = Logger.getLogger(X10InterfaceHandler.class.getName() + ":" + WrapperCallback.class.getName());
+		
 		List<HomeAutomationPacket> outgoing = new ArrayList<HomeAutomationPacket>();
 
+		log.info("Received packet from heyu : "+ receiveEvent.toString());
+		
 		HomeAutomationPacket hap = new HomeAutomationPacket();
 		hap.setSource(x10InterfaceHandler.getModuleChannelName());
 		hap.setDestination(HomeAutomationPacket.CHANNEL_EVENT_HANDLER);
@@ -84,6 +92,8 @@ class WrapperCallback implements HeyuWrapperCallback, Runnable {
 
 		outgoing.add(hap);
 
+		log.info("Sending X10 message to eventHandler : " + hap.toString());
+		
 		x10InterfaceHandler.processOutgoingPackets(outgoing);
 	}
 

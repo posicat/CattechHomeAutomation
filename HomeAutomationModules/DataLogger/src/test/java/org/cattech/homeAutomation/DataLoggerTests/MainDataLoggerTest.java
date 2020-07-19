@@ -3,11 +3,8 @@ package org.cattech.homeAutomation.DataLoggerTests;
 import org.cattech.homeAutomation.DataLogger.DataLogger;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
 import org.cattech.homeAutomation.moduleBaseTest.BaseTestForModules;
-import org.json.JSONArray;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
-import org.skyscreamer.jsonassert.JSONAssert;
 
 public class MainDataLoggerTest extends BaseTestForModules {
 	DataLogger dataLogger;

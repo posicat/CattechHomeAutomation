@@ -4,7 +4,6 @@ cd /home/homeauto/homeAutomation/deploy/
 
 mvn clean install
 
-
 rm -rf /home/homeauto/debianContents
 mkdir /home/homeauto/debianContents
 cd /home/homeauto/debianContents
