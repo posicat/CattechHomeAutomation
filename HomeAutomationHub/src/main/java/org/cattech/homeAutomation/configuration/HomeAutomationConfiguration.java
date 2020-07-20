@@ -96,6 +96,7 @@ public class HomeAutomationConfiguration {
 
 		public static PrintStream createLoggingProxy(final PrintStream realPrintStream) {
 			return new PrintStream(realPrintStream) {
+				@Override
 				public void print(final String string) {
 					realPrintStream.print(string);
 					logger.info(string);
@@ -150,7 +151,7 @@ public class HomeAutomationConfiguration {
 	public String getConfigFolder() {
 		String configFolder = System.getenv(ENV_FOLDER_CONFIG);
 		if(configFolder == null) {
-			configFolder = "/etc/CattechhomeAutomation/";
+			configFolder = "/etc/CattechHomeAutomation/";
 		}
 		return configFolder;
 	}
