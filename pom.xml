@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.cattech.homeAutomation</groupId>
 	<artifactId>CattechHomeAutomation</artifactId>
@@ -11,10 +13,10 @@
 		<java.version>1.8</java.version>
 		<homeAutomationVersion>${project.version}</homeAutomationVersion>
 		<homeAutomation.parent>${project.build.directory}/..</homeAutomation.parent>
-		<homeAutomation.bin>bin/HomeAutomationHub/</homeAutomation.bin>
-		<homeAutomation.config>bin/HomeAutomationHub/etc/</homeAutomation.config>
-		<homeAutomation.modules>bin/HomeAutomationHub/modules/</homeAutomation.modules>
-		<homeAutomation.lib>bin/homeAutomationHub/lib/</homeAutomation.lib>
+		<homeAutomation.bin>bin/Hub/</homeAutomation.bin>
+		<homeAutomation.config>bin/Hub/etc/</homeAutomation.config>
+		<homeAutomation.modules>bin/Hub/modules/</homeAutomation.modules>
+		<homeAutomation.lib>bin/Hub/lib/</homeAutomation.lib>
 	</properties>
 	<scm>
 		<connection>scm:git:http://git.cattech.org/posicat/homeAutomation.git</connection>
@@ -81,6 +83,12 @@
 				<artifactId>jsonassert</artifactId>
 				<version>1.5.0</version>
 				<scope>test</scope>
+				<exclusions>
+					<exclusion>
+						<groupId>com.vaadin.external.google</groupId>
+						<artifactId>android-json</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>junit</groupId>
@@ -95,12 +103,12 @@
 			</dependency>
 			<dependency>
 				<groupId>org.cattech.homeAutomation</groupId>
-				<artifactId>HomeAutomationHub</artifactId>
+				<artifactId>Hub</artifactId>
 				<version>0.0.1-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>org.cattech.homeAutomation</groupId>
-				<artifactId>HomeAutomationHub</artifactId>
+				<artifactId>Hub</artifactId>
 				<version>0.0.1-SNAPSHOT</version>
 				<type>test-jar</type>
 			</dependency>
@@ -125,13 +133,28 @@
 				<version>2.12.0</version>
 				<scope>test</scope>
 			</dependency>
+			<dependency>
+				<groupId>javax.servlet</groupId>
+				<artifactId>javax.servlet-api</artifactId>
+				<version>3.1.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpclient</artifactId>
+				<version>4.3.5</version>
+			</dependency>
+			<dependency>
+				<groupId>org.cattech.homeAutomation</groupId>
+				<artifactId>Common</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	<modules>
-		<module>HomeAutomationModules</module>
-		<module>HomeAutomationHub</module>
+		<module>Common</module>
+		<module>Hub</module>
+		<module>Modules</module>
+		<module>WebContent</module>
 		<module>deploy</module>
-    <module>org.cattech.homeAutomation.common</module>
-    <module>HomeAutomationCommon</module>
-  </modules>
+	</modules>
 </project>

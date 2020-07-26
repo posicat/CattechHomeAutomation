@@ -16,6 +16,9 @@ db.username=cathomeauto
 db.password=<db_password>
 
 # Path to the web-interface portion of the HomeAutomationHub
-baseUrl=http://<your_servername>/CattechHomeAutomation
+webServer.Name=<your server DNS name>
+webServer.Port=11080
+webServer.warFolder=./war/
+
 
 ### Additional settings below this point

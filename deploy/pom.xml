@@ -44,7 +44,7 @@
 								<resource>
 									<directory>${project.parent.basedir}/target/root/usr/bin/CattechHomeAutomation</directory>
 									<includes>
-										<indlude>HomeAutomationHub.jar</indlude>
+										<indlude>Hub.jar</indlude>
 									</includes>
 									<filtering>false</filtering>
 								</resource>
@@ -61,12 +61,12 @@
 							<outputDirectory>${basedir}/target/root/usr/lib/CattechHomeAutomation</outputDirectory>
 							<resources>
 								<resource>
-									<directory>${project.parent.basedir}/HomeAutomationHub/target/lib/</directory>
+									<directory>${project.parent.basedir}/Hub/target/lib/</directory>
 									<includes>
 										<indlude>*.jar</indlude>
 									</includes>
 									<excludes>
-										<exclude>*HomeAutomationHub*</exclude>
+										<exclude>*Hub*</exclude>
 									</excludes>
 									<filtering>false</filtering>
 								</resource>
@@ -83,9 +83,9 @@
 							<outputDirectory>${basedir}/target/root/usr/bin/CattechHomeAutomation</outputDirectory>
 							<resources>
 								<resource>
-									<directory>${project.parent.basedir}/HomeAutomationHub/target/</directory>
+									<directory>${project.parent.basedir}/Hub/target/</directory>
 									<includes>
-										<indlude>*HomeAutomationHub*.jar</indlude>
+										<indlude>*Hub*.jar</indlude>
 									</includes>
 									<excludes>
 										<exclude>*-tests*</exclude>
@@ -105,7 +105,7 @@
 							<outputDirectory>${basedir}/target/root/usr/bin/CattechHomeAutomation/modules</outputDirectory>
 							<resources>
 								<resource>
-									<directory>${project.parent.basedir}/HomeAutomationModules/target/</directory>
+									<directory>${project.parent.basedir}/Modules/target/</directory>
 									<includes>
 										<indlude>*.jar</indlude>
 									</includes>
@@ -124,12 +124,12 @@
 							<outputDirectory>${basedir}/target/root/usr/lib/CattechHomeAutomation</outputDirectory>
 							<resources>
 								<resource>
-									<directory>${project.parent.basedir}/HomeAutomationModules/target/lib/</directory>
+									<directory>${project.parent.basedir}/Modules/target/lib/</directory>
 									<includes>
 										<indlude>*.jar</indlude>
 									</includes>
 									<excludes>
-										<exclude>*HomeAutomationHub*</exclude>
+										<exclude>*Hub*</exclude>
 									</excludes>
 									<filtering>false</filtering>
 								</resource>
