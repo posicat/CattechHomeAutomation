@@ -30,9 +30,12 @@ import nl.stijngroenen.tradfri.util.Credentials;
 
 public class TradfriInterfaceHandler extends HomeAutomationModule {
 	private static final String TRADFRI_HANDLER = "TradfriInterfaceHandler";
+	private static final String TRAFFRI_PROTOCOL = "tradfri";
 	private static final String DATA_FIELD_NATIVE_NAME = "name";
 	private static final String DATA_FIELD_NATIVE_ID = "ID";
 	private static final String DATA_FIELD_NATIVE_TYPE = "type";
+	private static final String DATA_FIELD_CONTROL_CHANNEL = "controlChannel";
+	private static final String DATA_FIELD_PROTOCOL = "protocol";
 	private static final String TYPE_MOTION_SENSOR = "MotionSensor";
 	private static final String TYPE_REMOTE = "Remote";
 	private static final String TYPE_PLUG = "Plug";
@@ -92,6 +95,8 @@ public class TradfriInterfaceHandler extends HomeAutomationModule {
 		JSONObject nativeDevice = new JSONObject();
 		JSONObject action = new JSONObject();
 
+		nativeDevice.put(DATA_FIELD_CONTROL_CHANNEL,this.getModuleChannelName());
+		nativeDevice.put(DATA_FIELD_PROTOCOL,TRAFFRI_PROTOCOL);
 
 		System.out.println(device.getName() + " produced an event");
 		if (event.getClass() == LightChangeEvent.class) {

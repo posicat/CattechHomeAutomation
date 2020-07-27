@@ -1,0 +1,24 @@
+#Settings configuration file for the CattechHomeAutomation Hub
+
+#Port and host settings the CattechHomeAutomation Hub project
+hub.port=10042
+hub.host=127.0.0.1
+#For access off-server, change hub.host to the public IP address you wish to access.
+#hub.host=<server_name_or_ip>
+
+#Database settings for HomeAutomation MySQL database
+#db.host=
+#db.port=
+db.database=CattechHomeAutomation
+db.datalogDB=CattechHomeAutomation_DataLogging
+
+db.username=cathomeauto
+db.password=<db_password>
+
+# Path to the web-interface portion of the HomeAutomationHub
+webServer.Name=<your server DNS name>
+webServer.Port=11080
+webServer.warFolder=./war/
+
+
+### Additional settings below this point

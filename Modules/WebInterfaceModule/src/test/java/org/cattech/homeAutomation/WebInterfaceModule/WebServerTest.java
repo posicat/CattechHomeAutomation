@@ -16,7 +16,7 @@ public class WebServerTest extends BaseTestForModules{
 		
 		controller.getConfig().loadConfiguration();
 		
-		controller.getConfig().getProps().put(WebServer.CONFIG_WEBSERVER_WAR_FOLDER, "../../HomeAutomationWars/target/");
+		controller.getConfig().getProps().put(WebServer.CONFIG_WEBSERVER_WAR_FOLDER, "../../WebContent/target/");
 
 		webServer = new WebServer(controller);
 		new Thread(webServer, "Testing WebServer").start();

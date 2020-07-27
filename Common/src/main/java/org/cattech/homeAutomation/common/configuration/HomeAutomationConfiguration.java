@@ -27,15 +27,20 @@ public class HomeAutomationConfiguration {
 	private static final String CONFIG_SKIP_PREFIX = "skip_module";
 
 	private static Properties props = new Properties();
+	
 	private Logger log = Logger.getLogger(this.getClass());
 
 	public HomeAutomationConfiguration() throws HomeAutomationConfigurationException {
 		initialize();
 	}
 
-	public HomeAutomationConfiguration(boolean initialize) throws HomeAutomationConfigurationException {
+	public HomeAutomationConfiguration(boolean initialize, boolean configureLogging) throws HomeAutomationConfigurationException {
 		if (initialize) {
 			initialize();
+		}
+		if (configureLogging) {
+			setLogFileForAppender("console", "org.cattech", "HomeautomationHub.log", null);
+			StdOutErrLog.tieSystemOutAndErrToLog();
 		}
 	}
 
@@ -54,10 +59,6 @@ public class HomeAutomationConfiguration {
 		overridePropsWithEnvironment("homeAutomation.log", ENV_FOLDER_LOGS);
 
 		loadConfiguration();
-	
-		setLogFileForAppender("console", "org.cattech", "HomeautomationHub.log", null);
-
-		StdOutErrLog.tieSystemOutAndErrToLog();
 	}
 
 	public void setLogFileForAppender(String loggerName, String clazz, String logFile, Level level) {
@@ -66,7 +67,8 @@ public class HomeAutomationConfiguration {
 
 		FileAppender fileAppender;
 		try {
-			fileAppender = new FileAppender(consoleAppender.getLayout(), getLogFolder() + "/" + logFile);
+			String logPath = getLogFolder() + "/" + logFile;
+			fileAppender = new FileAppender(consoleAppender.getLayout(), logPath);
 			fileAppender.setName(loggerName);
 			fileAppender.activateOptions();
 			Logger classLogger = org.apache.log4j.Logger.getLogger(clazz);
@@ -186,16 +188,24 @@ public class HomeAutomationConfiguration {
 
 	public String getDBURL() {
 		String url = null;
-		if (null != props.getProperty(CONFIG_DB_HOST)) {
-			//TODO Handle the db.port in here as well
-			//TODO if no db.host is set use localhost
-			url = "jdbc:mysql://" + props.getProperty(CONFIG_DB_HOST) + "/" + getDatabaseName() + "?" + 
-					"useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC" + "&user=" +
-					props.getProperty(CONFIG_DB_USERNAME) + "&password=" + props.getProperty(CONFIG_DB_PASSWORD);
-		} else {
-			log.info("No host set for SQL, returning null");
+		// TODO Handle the db.port in here as well
+		String host = getDBHost();
+		String port = getDBPort();
+		if (port !=null) {
+			host += ":" + port;
 		}
+		url = "jdbc:mysql://" + host + "/" + getDatabaseName() + "?" 
+				+ "useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC" 
+				+ "&user=" + props.getProperty(CONFIG_DB_USERNAME) + "&password=" + props.getProperty(CONFIG_DB_PASSWORD);
 		return url;
+	}
+
+	private String getDBPort() {
+		return props.getProperty("db.port", "3306");
+	}
+
+	private String getDBHost() {
+		return props.getProperty("db.host", "localhost");
 	}
 
 	public String getHost() {

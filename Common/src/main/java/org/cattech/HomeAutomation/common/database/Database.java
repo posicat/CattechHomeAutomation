@@ -19,13 +19,14 @@ public class Database {
 
 	public Connection getHomeAutomationDBConnection() {
 		Connection conn = null;
-		try {
-			conn = DriverManager.getConnection(configuration.getDBURL());
-		} catch (SQLException ex) {
-			log.error("Error getting sql connection to :" + configuration.getDBURL(), ex);
-			log.error("SQLState: " + ex.getSQLState());
-			log.error("VendorError: " + ex.getErrorCode());
-		}
+		String dburl = configuration.getDBURL();
+			try {
+				conn = DriverManager.getConnection(dburl);
+			} catch (SQLException ex) {
+				log.error("Error getting sql connection to :" + dburl, ex);
+				log.error("SQLState: " + ex.getSQLState());
+				log.error("VendorError: " + ex.getErrorCode());
+			}
 		return conn;
 	}
 

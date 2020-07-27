@@ -31,6 +31,7 @@ public class TradfriManualTest extends BaseTestForModules {
 		tradfreeHandler.setRunning(false);
 	}
 
+//	@Ignore
 	@Test
 	public void testCanTalkToLocalTradfriHub() throws HomeAutomationConfigurationException, InterruptedException {
 		boolean onOff = false;
@@ -47,7 +48,7 @@ public class TradfriManualTest extends BaseTestForModules {
 			HomeAutomationPacket hap = new HomeAutomationPacket(
 					"{\"destination\":[\"TradfriInterfaceHandler\"]," + testPacketSource + ","
 							+ "\"data\":{"
-									+"\"nativeDevice\":{\"name\":\"5w spot\",\"ID\":65538,\"type\":\"Light\"}"
+									+"\"nativeDevice\":{\"protocol\":\"tradfri\",\"controlChannel\":\"TradfriInterfaceHandler\",\"name\":\"5w spot\",\"ID\":65538,\"type\":\"Light\"}"
 									+",\"action\":{\"on\":\""+onOff+"\",\"colourTemperature\":\""+colorTemps[colIdx]+"\"}"
 							+"}"
 					+"}");

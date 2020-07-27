@@ -20,7 +20,7 @@ public class NestInterfaceHandlerTestManual extends BaseTestForModules {
 	@Override
 	@Before
 	public void setUp() throws Exception {
-		controller = new ChannelController(new HomeAutomationConfiguration(true));
+		controller = new ChannelController(new HomeAutomationConfiguration(true, false));
 
 		testInterface = new NodeInterfaceString(controller);
 		registerChannel(testInterface, new String[] { TESTCHANNEL });

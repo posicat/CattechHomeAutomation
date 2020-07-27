@@ -16,10 +16,14 @@
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
-			</dependency>
+		</dependency>
 		<dependency>
 			<groupId>org.cattech.homeAutomation</groupId>
 			<artifactId>Common</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
 		</dependency>
 	</dependencies>
 </project>

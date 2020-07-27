@@ -8,7 +8,7 @@
 		<artifactId>CattechHomeAutomation</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<artifactId>deploy</artifactId>
+	<artifactId>Deploy</artifactId>
 	<build>
 		<plugins>
 			<plugin>

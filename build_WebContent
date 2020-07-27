@@ -1,0 +1,5 @@
+#!/bin/sh
+
+cd /home/homeauto/CattechHomeAutomation/WebContent
+
+mvn clean install

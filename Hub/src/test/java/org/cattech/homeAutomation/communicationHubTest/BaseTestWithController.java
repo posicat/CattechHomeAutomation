@@ -17,18 +17,17 @@ import org.skyscreamer.jsonassert.JSONCompareResult;
 
 public class BaseTestWithController {
 	private Logger log = Logger.getLogger(this.getClass());
-	public static final int MAX_TEST_WAIT = 5000;
+	public static final int MAX_TEST_WAIT = 15000;
 
 	protected static final String TESTCHANNEL = "testResult";
 	protected ChannelController controller;
 	protected NodeInterfaceString testInterface;
 
-	// @Deprecated
 	protected String testPacketSource = "\"source\":\"" + TESTCHANNEL + "\"";
 
 	@Before
 	protected void setUp() throws Exception {
-		controller = new ChannelController(new HomeAutomationConfiguration(false));
+		controller = new ChannelController(new HomeAutomationConfiguration(false, false));
 
 		testInterface = new NodeInterfaceString(controller);
 		registerChannel(testInterface, new String[] { TESTCHANNEL });
