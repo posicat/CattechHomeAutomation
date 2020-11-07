@@ -17,9 +17,5 @@
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.cattech.homeAutomation</groupId>
-			<artifactId>Common</artifactId>
-			</dependency>
 	</dependencies>
 </project>

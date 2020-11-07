@@ -10,7 +10,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import org.apache.log4j.Logger;
-import org.cattech.homeAutomation.common.configuration.HomeAutomationConfiguration;
+import org.cattech.homeAutomation.configuration.HomeAutomationConfiguration;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationModule;
 
 public class ModuleManager {

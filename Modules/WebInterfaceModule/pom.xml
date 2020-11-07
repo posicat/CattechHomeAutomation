@@ -46,6 +46,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-deploy</artifactId>
+			<version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>apache-jsp</artifactId>
 			<version>${jetty.version}</version>
 			<type>jar</type>
@@ -58,7 +63,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.cattech.homeAutomation</groupId>
-			<artifactId>Common</artifactId>
+			<artifactId>Hub</artifactId>
 		</dependency>
 	</dependencies>
 </project>

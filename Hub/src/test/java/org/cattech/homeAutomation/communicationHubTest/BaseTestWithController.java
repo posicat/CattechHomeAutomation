@@ -3,9 +3,9 @@ package org.cattech.homeAutomation.communicationHubTest;
 import static org.junit.Assert.fail;
 
 import org.apache.log4j.Logger;
-import org.cattech.homeAutomation.common.configuration.HomeAutomationConfiguration;
 import org.cattech.homeAutomation.communicationHub.ChannelController;
 import org.cattech.homeAutomation.communicationHub.NodeInterfaceString;
+import org.cattech.homeAutomation.configuration.HomeAutomationConfiguration;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
 import org.json.JSONArray;
 import org.junit.After;

@@ -3,9 +3,9 @@ package org.cattech.homeAutomation.nestInterfaceHandler;
 import java.io.File;
 import java.util.Properties;
 
-import org.cattech.homeAutomation.common.configuration.HomeAutomationConfiguration;
 import org.cattech.homeAutomation.communicationHub.ChannelController;
 import org.cattech.homeAutomation.communicationHub.NodeInterfaceString;
+import org.cattech.homeAutomation.configuration.HomeAutomationConfiguration;
 import org.cattech.homeAutomation.moduleBaseTest.BaseTestForModules;
 import org.junit.After;
 import org.junit.Before;

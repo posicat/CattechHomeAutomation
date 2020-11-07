@@ -3,11 +3,11 @@ package org.cattech.homeAutomation.commandLine;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.cattech.homeAutomation.common.configuration.HomeAutomationConfiguration;
-import org.cattech.homeAutomation.common.configuration.HomeAutomationConfigurationException;
 import org.cattech.homeAutomation.communicationHub.ChannelController;
 import org.cattech.homeAutomation.communicationHub.ModuleManager;
 import org.cattech.homeAutomation.communicationHub.NodeSocketConnectionManager;
+import org.cattech.homeAutomation.configuration.HomeAutomationConfiguration;
+import org.cattech.homeAutomation.configuration.HomeAutomationConfigurationException;
 
 public class HomeAutomationHub {
 	private static Logger log = Logger.getLogger(HomeAutomationHub.class);

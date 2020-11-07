@@ -1,6 +1,6 @@
 package org.cattech.homeAutomation.deviceResolverTest;
 
-import org.cattech.homeAutomation.common.configuration.HomeAutomationConfigurationException;
+import org.cattech.homeAutomation.configuration.HomeAutomationConfigurationException;
 import org.cattech.homeAutomation.deviceResolver.DeviceResolver;
 import org.cattech.homeAutomation.moduleBaseTest.BaseTestForModules;
 import org.junit.After;

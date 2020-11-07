@@ -6,7 +6,7 @@ import java.util.Hashtable;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
-import org.cattech.homeAutomation.common.configuration.HomeAutomationConfiguration;
+import org.cattech.homeAutomation.configuration.HomeAutomationConfiguration;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
 import org.json.JSONArray;
 import org.json.JSONObject;

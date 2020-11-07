@@ -4,8 +4,6 @@ mvn clean install -DskipTests
 
 cd /home/homeauto/CattechHomeAutomation/deploy/
 
-mvn clean install -DskipTests
-
 rm -rf /home/homeauto/debianContents
 mkdir /home/homeauto/debianContents
 cd /home/homeauto/debianContents

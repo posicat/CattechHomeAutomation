@@ -144,11 +144,6 @@
 				<version>4.3.5</version>
 			</dependency>
 			<dependency>
-				<groupId>org.cattech.homeAutomation</groupId>
-				<artifactId>Common</artifactId>
-				<version>0.0.1-SNAPSHOT</version>
-			</dependency>
-			<dependency>
 				<groupId>org.webjars</groupId>
 				<artifactId>jquery</artifactId>
 				<version>3.5.1</version>
@@ -166,7 +161,6 @@
 		</dependencies>
 	</dependencyManagement>
 	<modules>
-		<module>Common</module>
 		<module>Hub</module>
 		<module>Modules</module>
 		<module>WebContent</module>

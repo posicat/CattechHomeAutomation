@@ -7,6 +7,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.cattech.homeAutomation.communicationHub.ChannelController;
+import org.cattech.homeAutomation.configuration.HomeAutomationConfiguration;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationModule;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
 import org.cattech.rainforestEMU2.serialInterface.SerialRainforestCommunications;
@@ -24,9 +25,11 @@ public class PowerlineMonitor extends HomeAutomationModule {
 	RainforestCommunicationsInterface callback;
 	String port = null;
 	String rainforestMAC;
+	private HomeAutomationConfiguration configuration;
 
 	public PowerlineMonitor(ChannelController controller) {
 		super(controller);
+		configuration=controller.getConfig();
 	}
 
 	@Override

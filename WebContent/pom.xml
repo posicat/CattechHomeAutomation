@@ -10,7 +10,7 @@
 	<artifactId>WebContent</artifactId>
 	<packaging>pom</packaging>
 	<modules>
-		<module>rootInterface</module>
+		<module>RootInterface</module>
 	</modules>
 	<dependencies>
 		<dependency>
@@ -18,12 +18,13 @@
 			<artifactId>javax.servlet-api</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.cattech.homeAutomation</groupId>
-			<artifactId>Common</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+		</dependency>
+
 	</dependencies>
 </project>

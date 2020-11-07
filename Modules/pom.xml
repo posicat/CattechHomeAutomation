@@ -108,11 +108,6 @@
 				<artifactId>Modules</artifactId>
 				<version>0.0.1-SNAPSHOT</version>
 			</dependency>
-			<dependency>
-				<groupId>org.cattech.homeAutomation</groupId>
-				<artifactId>Common</artifactId>
-				<version>0.0.1-SNAPSHOT</version>
-			</dependency>
 		</dependencies>
 	</dependencyManagement>
 </project>

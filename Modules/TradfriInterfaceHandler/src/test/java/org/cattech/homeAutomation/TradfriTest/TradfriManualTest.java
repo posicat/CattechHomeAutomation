@@ -1,7 +1,7 @@
 package org.cattech.homeAutomation.TradfriTest;
 
 import org.cattech.HomeAutomation.TradfriInterfaceHandler.TradfriInterfaceHandler;
-import org.cattech.homeAutomation.common.configuration.HomeAutomationConfigurationException;
+import org.cattech.homeAutomation.configuration.HomeAutomationConfigurationException;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
 import org.cattech.homeAutomation.moduleBaseTest.BaseTestForModules;
 import org.junit.After;
@@ -48,12 +48,12 @@ public class TradfriManualTest extends BaseTestForModules {
 			HomeAutomationPacket hap = new HomeAutomationPacket(
 					"{\"destination\":[\"TradfriInterfaceHandler\"]," + testPacketSource + ","
 							+ "\"data\":{"
-									+"\"nativeDevice\":{\"protocol\":\"tradfri\",\"controlChannel\":\"TradfriInterfaceHandler\",\"name\":\"5w spot\",\"ID\":65538,\"type\":\"Light\"}"
+									+"\"nativeDevice\":{\"protocol\":\"tradfri\",\"controlChannel\":\"TradfriInterfaceHandler\",\"name\":\"6w Spot\",\"ID\":65538,\"type\":\"Light\"}"
 									+",\"action\":{\"on\":\""+onOff+"\",\"colourTemperature\":\""+colorTemps[colIdx]+"\"}"
 							+"}"
 					+"}");
 			testInterface.sendDataPacketToController(hap);
-			Thread.sleep(1000);
+			Thread.sleep(2000);
 		}
 
 	}

@@ -12,7 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.cattech.HomeAutomation.common.database.Database;
+import org.cattech.HomeAutomation.database.Database;
 import org.cattech.homeAutomation.communicationHub.ChannelController;
 import org.cattech.homeAutomation.deviceHelpers.DeviceNameHelper;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationModule;

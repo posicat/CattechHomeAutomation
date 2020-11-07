@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
-import org.cattech.homeAutomation.common.configuration.HomeAutomationConfiguration;
-import org.cattech.homeAutomation.common.configuration.HomeAutomationConfigurationException;
 import org.cattech.homeAutomation.communicationHub.ChannelController;
+import org.cattech.homeAutomation.configuration.HomeAutomationConfiguration;
+import org.cattech.homeAutomation.configuration.HomeAutomationConfigurationException;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationModule;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
 import org.json.JSONException;
@@ -40,6 +40,9 @@ public class NestInterfaceHandler extends HomeAutomationModule {
 
 	public NestInterfaceHandler(ChannelController controller) {
 		super(controller);
+		
+		HomeAutomationConfiguration configuration = controller.getConfig();
+		
 		authCache = new File(configuration.getLogFolder() + "authenticationCache.json");
 		try {
 			authData = new JSONObject(loadFile(authCache));

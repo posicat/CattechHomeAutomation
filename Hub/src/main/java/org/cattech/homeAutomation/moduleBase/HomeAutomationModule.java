@@ -12,10 +12,10 @@ import java.util.Stack;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-import org.cattech.HomeAutomation.common.database.Database;
-import org.cattech.homeAutomation.common.configuration.HomeAutomationConfiguration;
+import org.cattech.HomeAutomation.database.Database;
 import org.cattech.homeAutomation.communicationHub.ChannelController;
 import org.cattech.homeAutomation.communicationHub.NodeInterfaceString;
+import org.cattech.homeAutomation.configuration.HomeAutomationConfiguration;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -26,7 +26,8 @@ public abstract class HomeAutomationModule implements Runnable {
 	protected NodeInterfaceString hubInterface;
 	protected boolean running = false;
 	protected HomeAutomationConfiguration configuration;
-	Database db  =new Database(configuration);
+
+	Database db = null;
 	
 	protected HomeAutomationModule(ChannelController controller) {
 		configuration = controller.getConfig();
