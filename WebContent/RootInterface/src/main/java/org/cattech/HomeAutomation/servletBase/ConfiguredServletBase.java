@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.cattech.HomeAutomation.database.Database;
 import org.cattech.HomeAutomation.homeAutomationContext.HomeAutomationContextListener;
-import org.cattech.HomeAutomation.homeAutomationContext.HomeAutomationControllerRunnable;
+import org.cattech.homeAutomation.communicationHub.ChannelController;
 import org.cattech.homeAutomation.configuration.HomeAutomationConfiguration;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,17 +24,18 @@ public class ConfiguredServletBase {
 
 	
 	protected HomeAutomationConfiguration configuration;
+	HomeAutomationContextListener homeAutoConfig; 
 	protected Connection conn = null;
 
 	private Cookie[] cookies;
 	
 	public void setupServletState(HttpServletRequest request, HttpServletResponse response) {
-		HomeAutomationControllerRunnable homeAutoConfig = (HomeAutomationControllerRunnable) 
-				request.getServletContext().getAttribute(HomeAutomationContextListener.INTERFACE_CONTROLLER);
 		
-		configuration = homeAutoConfig.getConfiguration();
+		this.homeAutoConfig = (HomeAutomationContextListener) request.getServletContext().getAttribute(HomeAutomationContextListener.INTERFACE_CONTROLLER);
+
+		ChannelController controller = homeAutoConfig.getChannelController();
 		
-		Database db = new Database(configuration);
+		Database db = new Database(controller.getConfig());
 		conn = db.getHomeAutomationDBConnection();
 		
 		cookies = request.getCookies();

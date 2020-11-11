@@ -46,5 +46,9 @@ public class HomeAutomationContextListener implements ServletContextListener {
 		haControlerRunnable.terminate();
 		haControllerThread.interrupt();
 	}
+	
+	public ChannelController getChannelController() {
+		return controller;
+	}
 
 }
