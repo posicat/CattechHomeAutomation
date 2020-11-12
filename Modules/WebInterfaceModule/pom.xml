@@ -13,7 +13,6 @@
 	<name>WebInterfaceModule</name>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<jetty.version>9.4.30.v20200611</jetty.version>
 	</properties>
 	<build>
 		<plugins>
@@ -58,6 +57,12 @@
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>apache-jstl</artifactId>
+			<version>${jetty.version}</version>
+			<type>pom</type>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty.websocket</groupId>
+			<artifactId>websocket-server</artifactId>
 			<version>${jetty.version}</version>
 			<type>pom</type>
 		</dependency>
