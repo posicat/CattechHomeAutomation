@@ -17,7 +17,7 @@ import org.json.JSONObject;
 public class X10InterfaceHandler extends HomeAutomationModule {
 	static Logger log = Logger.getLogger(X10InterfaceHandler.class.getName());
 
-	X10InterfaceHandler(ChannelController controller) {
+	public X10InterfaceHandler(ChannelController controller) {
 		super(controller);
 		log.info("Post Super");
 

@@ -39,7 +39,7 @@ public class WebServer extends HomeAutomationModule {
 		return WEB_SERVER_MODULE;
 	}
 	
-	protected WebServer(ChannelController controller) {
+	public WebServer(ChannelController controller) {
 		super(controller);
 
 		Properties props = controller.getConfig().getProps();

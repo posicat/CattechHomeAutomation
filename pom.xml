@@ -17,6 +17,7 @@
 		<homeAutomation.config>bin/Hub/etc/</homeAutomation.config>
 		<homeAutomation.modules>bin/Hub/modules/</homeAutomation.modules>
 		<homeAutomation.lib>bin/Hub/lib/</homeAutomation.lib>
+		<jetty.version>9.4.30.v20200611</jetty.version>
 	</properties>
 	<scm>
 		<connection>scm:git:http://git.cattech.org/posicat/homeAutomation.git</connection>

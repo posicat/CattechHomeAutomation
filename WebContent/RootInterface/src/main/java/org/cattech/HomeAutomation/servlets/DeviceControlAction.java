@@ -18,6 +18,11 @@ public class DeviceControlAction  extends ConfiguredServletBase {
     }
 
     @Override
+	public String getModuleChannelName() {
+		return "DeviceControlAction";
+	}
+    
+    @Override
 	public void setupServletState(HttpServletRequest request, HttpServletResponse response) {
     	super.setupServletState(request, response);
     	
@@ -26,9 +31,23 @@ public class DeviceControlAction  extends ConfiguredServletBase {
     }
 
     public void processDeviceAction() {
-    	JSONObject device = loadDevice(deviceID);
+    	JSONObject deviceTarget = loadDevice(deviceID);
+    	
+    	
+    	//{"interfaceType":"lamp_dimbri","nativeDevice":"{\"house\":\"B\",\"unit\":\"14\",\"protocol\":\"x10\",\"controlChannel\":\"x10Controller\"}"}
     	
     	HomeAutomationPacket hap = new HomeAutomationPacket();
+    	
+    	if (deviceTarget.has(HomeAutomationPacket.FIELD_DATA_NATIVE_DEVICE)) {
+    		JSONObject nativeDevice = deviceTarget.getJSONObject(HomeAutomationPacket.FIELD_DATA_NATIVE_DEVICE);
+    		hap.setSource(getModuleChannelName());
+    		hap.setDestination(nativeDevice.getString(HomeAutomationPacket.FIELD_NATIVE_CONTROL_CHANNEL));
+    		hap.setData(nativeDevice);
+    		hap.getData().put(HomeAutomationPacket.FIELD_DATA_ACTION, action);
+    	}
+//    	JSONObject device = deviceTarget.getJSONObject(HomeAutomationPacket.FIELD_DATA_DEVICE);
+
+		hubInterface.sendDataPacketToController(hap);
     }
     
 	public String displayStatus() {

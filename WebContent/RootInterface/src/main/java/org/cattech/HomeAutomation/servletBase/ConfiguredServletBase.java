@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 import org.cattech.HomeAutomation.database.Database;
 import org.cattech.HomeAutomation.homeAutomationContext.HomeAutomationContextListener;
 import org.cattech.homeAutomation.communicationHub.ChannelController;
+import org.cattech.homeAutomation.communicationHub.NodeInterfaceString;
 import org.cattech.homeAutomation.configuration.HomeAutomationConfiguration;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,11 +22,12 @@ public class ConfiguredServletBase {
 
 	private static final long serialVersionUID = 1L;
 	private static Logger log = Logger.getLogger(ConfiguredServletBase.class.getName());
-
+	protected ChannelController controller; 
 	
 	protected HomeAutomationConfiguration configuration;
-	HomeAutomationContextListener homeAutoConfig; 
+	protected HomeAutomationContextListener homeAutoConfig; 
 	protected Connection conn = null;
+	protected NodeInterfaceString hubInterface = null;
 
 	private Cookie[] cookies;
 	
@@ -33,8 +35,10 @@ public class ConfiguredServletBase {
 		
 		this.homeAutoConfig = (HomeAutomationContextListener) request.getServletContext().getAttribute(HomeAutomationContextListener.INTERFACE_CONTROLLER);
 
-		ChannelController controller = homeAutoConfig.getChannelController();
-		
+		controller = homeAutoConfig.getChannelController();
+
+		hubInterface = new NodeInterfaceString(controller);
+
 		Database db = new Database(controller.getConfig());
 		conn = db.getHomeAutomationDBConnection();
 		
@@ -58,8 +62,8 @@ public class ConfiguredServletBase {
 			if (rs.next()) {
 				try {
 					device = new JSONObject();
-					device.put("nativeDevice", rs.getString("nativeDevice"));
-					device.put("interfaceType", rs.getString("interfaceType"));
+					device.put("nativeDevice", new JSONObject(rs.getString("nativeDevice")));
+					device.put("interfaceType", new JSONObject(rs.getString("interfaceType")));
 				} catch (JSONException je) {
 					log.error("Error loading device mappings", je);
 				}
@@ -75,5 +79,7 @@ public class ConfiguredServletBase {
     	return device;
 	}
 	
-
+	public String getModuleChannelName() {
+		return "ConfiguredServletBase";
+	}
 }

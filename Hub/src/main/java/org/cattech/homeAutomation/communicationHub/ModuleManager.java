@@ -55,7 +55,7 @@ public class ModuleManager {
 				log.info("Enumerating " + listOfFiles.length + " modules from " + config.getModulesFolder());
 
 				for (File jarName : listOfFiles) {
-					log.info("Searching for modules in : " + jarName);
+					log.info("===== Scanning jar for module capabilities : " + jarName.getName());
 
 					JarFile jarFile;
 					URLClassLoader classLoader;
@@ -70,7 +70,6 @@ public class ModuleManager {
 						jarFile = new JarFile(jarName);
 						Enumeration<JarEntry> e = jarFile.entries();
 
-						log.info("===== Scanning jar for module : " + jarName.getName());
 						
 						while (e.hasMoreElements()) {
 							JarEntry je = e.nextElement();
@@ -84,7 +83,7 @@ public class ModuleManager {
 							try {
 								mod = classLoader.loadClass(className);
 								if (mod != null && HomeAutomationModule.class.isAssignableFrom((Class<?>) mod)) {
-									log.info("Jar contains loadable module, loading : " + je.getName());
+									log.debug("Jar contains loadable module, loading : " + je.getName());
 									
 									mod = ((Class<?>) mod).getConstructor(ChannelController.class).newInstance(controller);
 
@@ -92,18 +91,20 @@ public class ModuleManager {
 									if (hMod.autoStartModule()) {
 										new Thread(hMod, hMod.getModuleChannelName()).start();
 									} else {
-										log.info("! ! ! Did not autostart " + hMod.getModuleChannelName() + " ! ! !");
+										log.info("###!!! Did not autostart " + hMod.getModuleChannelName() + " !!!###");
 									}
 
 								}
 							} catch (Throwable e1) {
 								log.error("Could not create instance of " + className, e1);
-								log.info("Classpath : " + System.getProperty("java.class.path"));
+								log.debug("Classpath : " + System.getProperty("java.class.path"));
 							}
 						}
 					} catch (IOException e2) {
 						log.error("Could not load jar : " + rawURL + "(" + e2.getMessage() + ")");
 					}
+					log.info("===== Completed scanning : " + jarName.getName());
+
 				}
 			}
 		} catch (Throwable e) {

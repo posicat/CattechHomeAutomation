@@ -26,6 +26,8 @@ public class HomeAutomationPacket {
 	public static final String FIELD_DATA_DELTA = "delta";
 	public static final String FIELD_DATA_STATE = "state";
 
+	public static final String FIELD_NATIVE_CONTROL_CHANNEL = "controlChannel";
+	
 	public static final String RESOLUTION_TO_COMMON = "toCommon";
 	public static final String RESOLUTION_TO_NATIVE = "toNative";
 

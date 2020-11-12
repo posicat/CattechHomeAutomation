@@ -26,7 +26,7 @@ public class NodeInterfaceString extends NodeInterface {
 	public void watchForData() {
 		while (super.isRunning()) {
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(10000);
 			} catch (InterruptedException e) {
 				// OK to ignore, exiting.
 			}
