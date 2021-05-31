@@ -2,13 +2,14 @@ package org.cattech.homeAutomation.communicationHub;
 
 import java.util.ArrayList;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
 
 // Used for loadable module communications and testing.
 
 public class NodeInterfaceString extends NodeInterface {
-	private Logger log = Logger.getLogger(this.getClass());
+	private Logger log = LogManager.getLogger(this.getClass());
 
 	boolean fullTrace = false;
 

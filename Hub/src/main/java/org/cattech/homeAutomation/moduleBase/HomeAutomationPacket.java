@@ -1,12 +1,13 @@
 package org.cattech.homeAutomation.moduleBase;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class HomeAutomationPacket {
-	static Logger log = Logger.getLogger(HomeAutomationPacket.class.getName());
+	static Logger log = LogManager.getLogger(HomeAutomationPacket.class.getName());
 
 	// Data packet field names - lowercase first letter by convention
 	public static final String FIELD_REGISTER = "register";
@@ -22,7 +23,9 @@ public class HomeAutomationPacket {
 	public static final String FIELD_DATA_NATIVE_DEVICE = "nativeDevice";
 	public static final String FIELD_DATA_DEVICE = "device";
 	public static final String FIELD_DATA_POST_RESOLVE = "postResolve";
+	@Deprecated
 	public static final String FIELD_DATA_ACTION = "action";
+	public static final String FIELD_DATA_ACTIONS = "actions";
 	public static final String FIELD_DATA_DELTA = "delta";
 	public static final String FIELD_DATA_STATE = "state";
 
@@ -37,7 +40,7 @@ public class HomeAutomationPacket {
 	public static final String CHANNEL_EVENT_HANDLER = "EventHandler";
 	public static final String CHANNEL_DEVICE_RESOLVER = "DeviceResolver";
 
-	
+	public static final String FIELD_DATA_MODULE_COMMAND = "moduleCommand";
 
 	private JSONObject wrapper = null;
 	private JSONObject data = null;

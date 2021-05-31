@@ -3,7 +3,7 @@ package org.cattech.homeAutomation.WatchCat;
 import java.sql.Connection;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.cattech.homeAutomation.communicationHub.ChannelController;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationModule;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
@@ -13,7 +13,7 @@ import org.json.JSONObject;
 
 public class WatchCat extends HomeAutomationModule {
 	private static final int WAIT_BETWEEN_WATCHCAT_POLING = 1000 * 60;
-	static Logger log = Logger.getLogger(WatchCat.class.getName());
+	static org.apache.logging.log4j.Logger log = LogManager.getLogger(WatchCat.class.getName());
 
 	public WatchCat(ChannelController controller) {
 		super(controller);

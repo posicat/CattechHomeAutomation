@@ -5,7 +5,8 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.cattech.homeAutomation.communicationHub.ChannelController;
 import org.cattech.homeAutomation.configuration.HomeAutomationConfiguration;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationModule;
@@ -19,7 +20,7 @@ import org.xml.sax.SAXException;
 public class PowerlineMonitor extends HomeAutomationModule {
 
 	private static final String RAINFOREST_EMU_PORT = "rainforestEmuPort";
-	Logger log = Logger.getLogger(PowerlineMonitor.class);
+	Logger log = LogManager.getLogger(PowerlineMonitor.class);
 
 	private SerialRainforestCommunications serialCommunication;
 	RainforestCommunicationsInterface callback;

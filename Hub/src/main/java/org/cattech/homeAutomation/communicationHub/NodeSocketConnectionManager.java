@@ -4,10 +4,11 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class NodeSocketConnectionManager implements Runnable {
-	private Logger log = Logger.getLogger(this.getClass());
+	private Logger log = LogManager.getLogger(this.getClass());
 
 	protected int serverPort;
 	protected ServerSocket serverSocket = null;

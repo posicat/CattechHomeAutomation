@@ -2,7 +2,8 @@ package org.cattech.homeAutomation.communicationHubTest;
 
 import static org.junit.Assert.fail;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.cattech.homeAutomation.communicationHub.ChannelController;
 import org.cattech.homeAutomation.communicationHub.NodeInterfaceString;
 import org.cattech.homeAutomation.configuration.HomeAutomationConfiguration;
@@ -16,7 +17,7 @@ import org.skyscreamer.jsonassert.JSONCompareResult;
 
 
 public class BaseTestWithController {
-	private Logger log = Logger.getLogger(this.getClass());
+	private Logger log = LogManager.getLogger(this.getClass());
 	public static final int MAX_TEST_WAIT = 15000;
 
 	protected static final String TESTCHANNEL = "testResult";

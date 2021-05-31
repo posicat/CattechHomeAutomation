@@ -9,7 +9,8 @@ import java.sql.Statement;
 import java.util.HashMap;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.cattech.homeAutomation.communicationHub.ChannelController;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationModule;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
@@ -18,7 +19,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class NetworkMonitor extends HomeAutomationModule {
-	static Logger log = Logger.getLogger(NetworkMonitor.class.getName());
+	static Logger log = LogManager.getLogger(NetworkMonitor.class.getName());
 	private HashMap<String, NetworkDataVO> logLookup = new HashMap<String, NetworkDataVO>();
 
 	public NetworkMonitor(ChannelController controller) {

@@ -6,10 +6,11 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class RestartableProcess {
-	private Logger log = Logger.getLogger(this.getClass());
+	private Logger log = LogManager.getLogger(this.getClass());
 	private int maxRestartsInWindow = 3;
 	private int windowMillis = 1000 * 60 * 5;
 

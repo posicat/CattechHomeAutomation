@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Configuration>
+	<Appenders>
+		<Console name="Console">
+			<PatternLayout
+				pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+		</Console>
+		<RollingFile  name="File" fileName="/var/log/CattechHomeAutomation/hub.log"	filePattern="/var/log/CattechHomeAutomation/%d{ddMMyyyy}_hub.log">
+			<PatternLayout	pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+				<Policies>
+        <TimeBasedTriggeringPolicy interval="1"/>
+      </Policies> 
+		</RollingFile >
+	</Appenders>
+	<Loggers>
+		<Root level="info">
+			<appenderRef ref="Console" />
+			<appenderRef ref="File" />
+		</Root>
+	</Loggers>
+</Configuration>

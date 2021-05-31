@@ -5,14 +5,15 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.UUID;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.cattech.homeAutomation.configuration.HomeAutomationConfiguration;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class ChannelController {
-	private Logger log = Logger.getLogger(this.getClass());
+	private Logger log = LogManager.getLogger(this.getClass());
 
 	Hashtable<String, ArrayList<NodeInterface>> masterChannelList = new Hashtable<String, ArrayList<NodeInterface>>();
 	ArrayList<NodeInterface> masterNodeList = new ArrayList<NodeInterface>();
@@ -109,7 +110,7 @@ public class ChannelController {
 					sendToChannel(channel, hapOut, true);
 				}
 				hapOut.removeFromWrapper(HomeAutomationPacket.FIELD_CHANNEL);
-				hapOut.putWrapper(HomeAutomationPacket.FIELD_ALL_CHANNELS, destinations.toString());
+				hapOut.putWrapper(HomeAutomationPacket.FIELD_ALL_CHANNELS, destinations);
 				sendToChannel("all", hapOut, false);
 			}
 		} catch (Exception e) {

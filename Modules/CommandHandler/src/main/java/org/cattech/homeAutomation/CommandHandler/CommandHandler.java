@@ -2,14 +2,15 @@ package org.cattech.homeAutomation.CommandHandler;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.cattech.homeAutomation.communicationHub.ChannelController;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationModule;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationPacketHelper;
 
 public class CommandHandler extends HomeAutomationModule {
-	static Logger log = Logger.getLogger(CommandHandler.class.getName());
+	static Logger log = LogManager.getLogger(CommandHandler.class.getName());
 
 	public CommandHandler(ChannelController controller) {
 		super(controller);

@@ -7,27 +7,29 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
-import org.cattech.HomeAutomation.database.Database;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.cattech.homeAutomation.communicationHub.ChannelController;
 import org.cattech.homeAutomation.communicationHub.NodeInterfaceString;
 import org.cattech.homeAutomation.configuration.HomeAutomationConfiguration;
+import org.cattech.homeAutomation.database.Database;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public abstract class HomeAutomationModule implements Runnable {
 	private static final int WAIT_TIME_BETWEEN_PACKET_CHECKS = 100;
-	private Logger log = Logger.getLogger("HomeAutomationModule");
+	private Logger log = LogManager.getLogger("HomeAutomationModule");
 	protected NodeInterfaceString hubInterface;
 	protected boolean running = false;
 	protected HomeAutomationConfiguration configuration;
-
-	Database db = null;
+	protected Database db = null;
+	protected HashMap<String,String> manifest = new HashMap<String, String>();
 	
 	protected HomeAutomationModule(ChannelController controller) {
 		configuration = controller.getConfig();
@@ -180,4 +182,7 @@ public abstract class HomeAutomationModule implements Runnable {
 		db.closeNoThrow(conn);
 	}
 
+	public void setManifest(HashMap<String, String> manifest2) {
+		this.manifest=manifest2;		
+	}
 }

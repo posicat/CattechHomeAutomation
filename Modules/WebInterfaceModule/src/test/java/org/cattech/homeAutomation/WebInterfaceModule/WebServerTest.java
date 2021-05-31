@@ -1,5 +1,7 @@
 package org.cattech.homeAutomation.WebInterfaceModule;
 
+import java.util.HashMap;
+
 import org.cattech.homeAutomation.moduleBaseTest.BaseTestForModules;
 import org.junit.After;
 import org.junit.Before;
@@ -18,10 +20,28 @@ public class WebServerTest extends BaseTestForModules{
 		
 		controller.getConfig().getProps().put(WebServer.CONFIG_WEBSERVER_WAR_FOLDER, "../../WebContent/target/");
 
-		webServer = new WebServer(controller);
-		new Thread(webServer, "Testing WebServer").start();
+		HashMap<String, String> manifest = new HashMap<String, String>();
+		manifest.put("Implementation-Title", "WebServerTest");
+		manifest.put("Implementation-Version", "manual_test");
 
+		webServer = new WebServer(controller);
+		webServer.setManifest(manifest);
+
+		new Thread(webServer, "Testing WebServer").start();
+		
 		registerChannel(testInterface, new String[] { "testEventHandler" });
+		
+		while(webServer.isRunning()) {
+			sleepNoThrow(1000);
+		}
+	}
+	
+	public static void sleepNoThrow(int delay) {
+		try {
+			Thread.sleep(delay);
+		} catch (InterruptedException e1) {
+			// We don't care, just go on.
+		}
 	}
 
 	@Override

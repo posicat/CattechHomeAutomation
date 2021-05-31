@@ -1,11 +1,9 @@
 package org.cattech.homeAutomation.deviceResolverTest;
 
-import org.cattech.homeAutomation.configuration.HomeAutomationConfigurationException;
 import org.cattech.homeAutomation.deviceResolver.DeviceResolver;
 import org.cattech.homeAutomation.moduleBaseTest.BaseTestForModules;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
 
 public class DeviceResolverManualTest extends BaseTestForModules {
 	DeviceResolver deviceResolver;
@@ -25,14 +23,6 @@ public class DeviceResolverManualTest extends BaseTestForModules {
 	@After
 	public void tearDown() throws Exception {
 		deviceResolver.setRunning(false);
-	}
-
-	@Test
-	public void testCanTalkToLocalMySQL() throws HomeAutomationConfigurationException {
-		controller.getConfig().getProps().setProperty("homeAutomation.config", "/etc/homeAutomation");
-		controller.getConfig().loadConfiguration();
-
-		deviceResolver.loadDeviceMappings();
 	}
 
 }

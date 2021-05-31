@@ -6,10 +6,8 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Properties;
 
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class HomeAutomationConfiguration {
 
@@ -28,7 +26,7 @@ public class HomeAutomationConfiguration {
 
 	private static Properties props = new Properties();
 	
-	private Logger log = Logger.getLogger(this.getClass());
+	private Logger log = LogManager.getLogger(this.getClass());
 
 	public HomeAutomationConfiguration() throws HomeAutomationConfigurationException {
 		initialize();
@@ -39,7 +37,6 @@ public class HomeAutomationConfiguration {
 			initialize();
 		}
 		if (configureLogging) {
-			setLogFileForAppender("console", "org.cattech", "HomeautomationHub.log", null);
 			StdOutErrLog.tieSystemOutAndErrToLog();
 		}
 	}
@@ -52,7 +49,7 @@ public class HomeAutomationConfiguration {
 		}
 
 		props.getProperty("mail.smtp.host", "localhost");
-		overridePropsWithEnvironment("homeAutomation.config", ENV_FOLDER_HOME);
+		overridePropsWithEnvironment("homeAutomation.home", ENV_FOLDER_HOME);
 		overridePropsWithEnvironment("homeAutomation.config", ENV_FOLDER_CONFIG);
 		overridePropsWithEnvironment("homeAutomation.modules", ENV_FOLDER_MODULES);
 		overridePropsWithEnvironment("homeAutomation.lib", ENV_FOLDER_LIBRARIES);
@@ -61,35 +58,13 @@ public class HomeAutomationConfiguration {
 		loadConfiguration();
 	}
 
-	public void setLogFileForAppender(String loggerName, String clazz, String logFile, Level level) {
-		Logger rootLogger = Logger.getRootLogger();
-		ConsoleAppender consoleAppender = (ConsoleAppender) rootLogger.getAppender("console"); // Matching format to original appender.
-
-		FileAppender fileAppender;
-		try {
-			String logPath = getLogFolder() + "/" + logFile;
-			fileAppender = new FileAppender(consoleAppender.getLayout(), logPath);
-			fileAppender.setName(loggerName);
-			fileAppender.activateOptions();
-			Logger classLogger = org.apache.log4j.Logger.getLogger(clazz);
-			classLogger.setAdditivity(false);
-			if (level != null) {
-				classLogger.setLevel(level);
-			}
-			classLogger.addAppender(fileAppender);
-		} catch (IOException e) {
-			log.error("Failed to add log file", e);
-		}
-
-	}
-
 	// ====================================================================================================
 	// Helper Methods
 	// ====================================================================================================
 
 	public static class StdOutErrLog {
 
-		private static final Logger logger = Logger.getLogger(StdOutErrLog.class);
+		private static final Logger logger = LogManager.getLogger(StdOutErrLog.class);
 
 		public static void tieSystemOutAndErrToLog() {
 			System.setOut(createLoggingProxy(System.out));
@@ -107,7 +82,7 @@ public class HomeAutomationConfiguration {
 		}
 	}
 
-	private static String overridePropsWithEnvironment(String propName, String envName) throws HomeAutomationConfigurationException {
+	private String overridePropsWithEnvironment(String propName, String envName) throws HomeAutomationConfigurationException {
 		if (null != System.getenv(envName)) {
 			props.setProperty(propName, System.getenv(envName));
 		}
@@ -135,10 +110,10 @@ public class HomeAutomationConfiguration {
 		File f = new File(dir);
 
 		if (!f.exists()) {
-			throw (new HomeAutomationConfigurationException(prop + " : Folder " + dir + " does not exist"));
+			throw (new HomeAutomationConfigurationException(prop + " : Folder " + dir + " does not exist (while running at path : " + System.getProperty("user.dir")+")"));
 		}
 		if (!f.isDirectory()) {
-			throw (new HomeAutomationConfigurationException(prop + " : Path " + dir + " is not a folder"));
+			throw (new HomeAutomationConfigurationException(prop + " : Path " + dir + " is not a folder (while running at path : " + System.getProperty("user.dir")+")"));
 		}
 
 	}
@@ -214,6 +189,16 @@ public class HomeAutomationConfiguration {
 
 	public boolean isSkipModule(String moduleChannelName) {
 		return (props.containsKey(CONFIG_SKIP_PREFIX+"."+moduleChannelName));
+	}
+
+	public String getWebserverURL() {
+		return
+				"http://" + props.getProperty("webServer.name","localhost") + ":" +
+				props.getProperty("webServer.port")+"/";
+	}
+
+	public String getHomeFolder() {
+		return props.getProperty("homeAutomation.home", "./"); // If we don't have a home, assume we're running from it.
 	}
 
 	// ================================================================================

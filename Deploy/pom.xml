@@ -115,6 +115,25 @@
 						</configuration>
 					</execution>
 					<execution>
+						<id>copy-homeAutomation-wars</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/target/root/usr/bin/CattechHomeAutomation/war</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.parent.basedir}/WebContent/target/</directory>
+									<includes>
+										<indlude>*.war</indlude>
+									</includes>
+									<filtering>false</filtering>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+					<execution>
 						<id>copy-homeAutomation-modules-libs</id>
 						<phase>package</phase>
 						<goals>

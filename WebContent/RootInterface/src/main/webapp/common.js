@@ -1,6 +1,6 @@
 function renderInterface() {
-	for (var i = 0; i < currentDevices.length; i++) {
-		var dev = currentDevices [i];
+	for (let i = 0; i < currentDevices.length; i++) {
+		var dev = currentDevices[i];
 		var id = "deviceID_" + dev.deviceMap_id;
 	
 		
@@ -33,10 +33,9 @@ function renderInterface() {
 		$('#menuInferface').append(deviceControl);
 	
 		if (setOnClick) {
-			var idx = 0 + i;
-			$('#' + id).click(function() {
-				loadInterface(idx);
-			});
+			$('#' + id).click(
+					function(idx){  return function(){loadInterface(idx)}  }(i)
+			);
 		}
 	}
 }

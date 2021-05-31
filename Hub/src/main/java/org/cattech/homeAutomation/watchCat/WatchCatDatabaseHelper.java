@@ -9,12 +9,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class WatchCatDatabaseHelper {
-	static Logger log = Logger.getLogger(WatchCatDatabaseHelper.class.getName());
+	static Logger log = LogManager.getLogger(WatchCatDatabaseHelper.class.getName());
 
 	public static String generateEventSignature(String server, JSONObject data) {
 		return jsonElementByType(null, data) + "@" + server;

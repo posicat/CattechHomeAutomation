@@ -7,7 +7,8 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.Stack;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.cattech.homeAutomation.communicationHub.ChannelController;
 import org.cattech.homeAutomation.deviceHelpers.DeviceNameHelper;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationModule;
@@ -18,7 +19,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class EventHandler extends HomeAutomationModule {
-	static Logger log = Logger.getLogger(EventHandler.class.getName());
+	static Logger log = LogManager.getLogger(EventHandler.class.getName());
 
 	public EventHandler(ChannelController controller) {
 		super(controller);

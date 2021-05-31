@@ -23,9 +23,12 @@ case "$1" in
         chown cathomeauto:cathomeauto -R /usr/bin/CattechHomeAutomation/
         chown cathomeauto:cathomeauto -R /usr/lib/CattechHomeAutomation/
         chown cathomeauto:cathomeauto -R /var/log/CattechHomeAutomation/
+        chown cathomeauto:cathomeauto -R /var/run/CattechHomeAutomation/
+        chown root:root -R /etc/CattechHomeAutomation
         chmod 644 /etc/CattechHomeAutomation/*
-        chmod 755 /usr/bin/CattechHomeAutomation/start_hub.sh
-        chmod 755 /etc/init.d/CattechHomeAutomation.sh
+        chmod 775 /usr/bin/CattechHomeAutomation/start_hub.sh
+        chmod 775 /etc/init.d/CattechHomeAutomation.sh
+        chmod 775 /var/run/CattechHomeAutomation/
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)

@@ -7,9 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
-import org.cattech.HomeAutomation.homeAutomationContext.HomeAutomationContextListener;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.cattech.homeAutomation.communicationHub.ChannelController;
+import org.cattech.homeAutomation.homeAutomationContext.HomeAutomationContextListener;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationModule;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
 import org.eclipse.jetty.deploy.App;
@@ -29,11 +30,10 @@ public class WebServer extends HomeAutomationModule {
 	private static final String CONFIG_WEBSERVER_PORT = "webServer.port";
 	static final String CONFIG_WEBSERVER_WAR_FOLDER = "webServer.warFolder";
 
-	static Logger log = Logger.getLogger(WebServer.class.getName());
+	static Logger log = LogManager.getLogger(WebServer.class.getName());
 	public static ClassLoader classLoader = HomeAutomationModule.class.getClassLoader();
+	private ChannelController controller;
 
-	Server server;
-	
 	@Override
 	public String getModuleChannelName() {
 		return WEB_SERVER_MODULE;
@@ -41,11 +41,17 @@ public class WebServer extends HomeAutomationModule {
 	
 	public WebServer(ChannelController controller) {
 		super(controller);
+		this.controller = controller;
+	}
+	
+	@Override
+	public void run() {
+		running = true;
 
-		Properties props = controller.getConfig().getProps();
+		Properties props = configuration.getProps();
 		int port = Integer.valueOf(props.getProperty(CONFIG_WEBSERVER_PORT));
 
-		server = new Server(port);
+		Server server = new Server(port);
 
 		// Add to allow JSPs to work
 		Configuration.ClassList classlist = Configuration.ClassList.setServerDefault(server);
@@ -58,25 +64,27 @@ public class WebServer extends HomeAutomationModule {
 		
 		webAppProvider.setParentLoaderPriority(true);
 
-		File warFolder = new File(props.getProperty(CONFIG_WEBSERVER_WAR_FOLDER, System.getProperty("user.dir") + "/../"));
+		File warFolder = new File(props.getProperty(CONFIG_WEBSERVER_WAR_FOLDER, configuration.getHomeFolder() + "/war/"));
         
 		try {
 			webAppProvider.setMonitoredDirName(warFolder.getCanonicalPath());
 		} catch (IOException e1) {
 			log.error("Error setting monitored folder : " + warFolder.toString(),e1);
 		}
-        webAppProvider.setScanInterval(1);
+        webAppProvider.setScanInterval(5);
         webAppProvider.setConfigurationManager(new PropertiesConfigurationManager());
         webAppProvider.setExtractWars(true); 
 
         //Generic about page
         ContextHandler aboutContext = new ContextHandler("/about/");
 		aboutContext.setHandler(new AboutPage());
+		aboutContext.setAttribute(HomeAutomationContextListener.SERVER_MANIFEST, manifest);
 		contextCollection.addHandler(aboutContext);
 		
 		// Setup the deployment manager to include our class for all deployments
         ContextAttributeCustomizer contextAttributeCustomizer = new ContextAttributeCustomizer();
         contextAttributeCustomizer.setAttribute(HomeAutomationContextListener.INTERFACE_CONTROLLER, new HomeAutomationContextListener(controller));
+        contextAttributeCustomizer.setAttribute(HomeAutomationContextListener.SERVER_MANIFEST, manifest);
 
 		DeploymentManager deployer = new DeploymentManager();
         deployer.addAppProvider(webAppProvider);
@@ -93,7 +101,7 @@ public class WebServer extends HomeAutomationModule {
         
 		try {
 			server.start();
-			server.join();
+			super.run();
 		} catch (Exception e) {
 			log.error("Webserver terminated.", e);
 		} // Wait until the server stop serving, should be when the app closes.

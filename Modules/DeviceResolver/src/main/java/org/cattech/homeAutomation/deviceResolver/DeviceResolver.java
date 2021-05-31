@@ -1,26 +1,22 @@
 package org.cattech.homeAutomation.deviceResolver;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.cattech.homeAutomation.communicationHub.ChannelController;
 import org.cattech.homeAutomation.deviceHelpers.DeviceNameHelper;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationModule;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationPacketHelper;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 public class DeviceResolver extends HomeAutomationModule {
-	static Logger log = Logger.getLogger(DeviceResolver.class.getName());
+	static Logger log = LogManager.getLogger(DeviceResolver.class.getName());
 	Hashtable<JSONObject, JSONArray> lookupTable = new Hashtable<JSONObject, JSONArray>();
 
 	public DeviceResolver(ChannelController controller) {
@@ -40,13 +36,14 @@ public class DeviceResolver extends HomeAutomationModule {
 				JSONObject nativeDevice = incoming.getDataJObj(HomeAutomationPacket.FIELD_DATA_NATIVE_DEVICE);
 				JSONArray commonDevice = incoming.getDataJArr(HomeAutomationPacket.FIELD_DATA_DEVICE);
 
-				String lookup = addLookup(nativeDevice, commonDevice);
+				String lookup = DeviceNameHelper.addLookup(nativeDevice, commonDevice,lookupTable);
 				HomeAutomationPacket reply = new HomeAutomationPacket();
 				reply.putData("addLookupResult", lookup);
 				outgoing.add(reply);
 			}
 			if ("toCommon".equals(resolution)) {
-				loadDeviceMappings();
+				lookupTable = new Hashtable<JSONObject, JSONArray>();
+				DeviceNameHelper.loadDeviceMappings(db,lookupTable);
 
 				log.debug("Resolving to common :"+incoming);
 				Set<JSONArray> cDevs = new HashSet<JSONArray>();
@@ -74,7 +71,8 @@ public class DeviceResolver extends HomeAutomationModule {
 				}
 			}
 			if ("toNative".equals(resolution)) {
-				loadDeviceMappings();
+				lookupTable = new Hashtable<JSONObject, JSONArray>();
+				DeviceNameHelper.loadDeviceMappings(db,lookupTable);
 
 				Set<JSONObject> nDevs = new HashSet<JSONObject>();
 				if (incoming.hasData("device")) {
@@ -143,46 +141,4 @@ public class DeviceResolver extends HomeAutomationModule {
 		}
 		return resultDevices;
 	}
-
-	private String addLookup(JSONObject nativeDevice, JSONArray commonDevice) {
-//		log.info("\tAdding lookup " + nativeDevice.toString() + " <--> " + commonDevice.toString());
-		lookupTable.put(nativeDevice, commonDevice);
-		return "successful";
-	}
-
-	public void loadDeviceMappings() {
-		Connection conn = getHomeAutomationDBConnection();
-		if (null == conn) {
-			log.error("Could not obtain connection to HomeAutomation database");
-			return;
-		}
-
-		this.lookupTable = new Hashtable<JSONObject, JSONArray>();
-
-		Statement stmt;
-		ResultSet rs;
-		try {
-			stmt = conn.createStatement();
-			String query = "SELECT commonDevice,nativeDevice FROM deviceMap";
-			rs = stmt.executeQuery(query);
-			while (rs.next()) {
-				try {
-					JSONObject nativeDevice = new JSONObject(rs.getString(HomeAutomationPacket.FIELD_DATA_NATIVE_DEVICE));
-					JSONArray commonDevice = new JSONArray(rs.getString("commonDevice"));
-					addLookup(nativeDevice, commonDevice);
-				} catch (JSONException je) {
-					log.error("Error loading device mapping\n" + 
-					"\tnativeDevice : " + rs.getString(HomeAutomationPacket.FIELD_DATA_NATIVE_DEVICE)+
-					"\tcommonDevice : " + rs.getString("commonDevice")
-					, je);
-				}
-			}
-		} catch (SQLException e) {
-			log.error("Error occured while loading device mappings from datbase", e);
-			e.printStackTrace();
-		}
-
-		closeNoThrow(conn);
-	}
-
 }

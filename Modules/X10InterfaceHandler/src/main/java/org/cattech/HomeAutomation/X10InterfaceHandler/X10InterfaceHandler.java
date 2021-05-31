@@ -3,7 +3,8 @@ package org.cattech.HomeAutomation.X10InterfaceHandler;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.cattech.HeyuWrapper.HeyuWrapper;
 import org.cattech.HeyuWrapper.HeyuWrapperCallback;
 import org.cattech.HeyuWrapper.HeyuWrapperException;
@@ -15,7 +16,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class X10InterfaceHandler extends HomeAutomationModule {
-	static Logger log = Logger.getLogger(X10InterfaceHandler.class.getName());
+	static Logger log = LogManager.getLogger(X10InterfaceHandler.class.getName());
 
 	public X10InterfaceHandler(ChannelController controller) {
 		super(controller);
@@ -70,7 +71,7 @@ class WrapperCallback implements HeyuWrapperCallback, Runnable {
 
 	@Override
 	public void heyuEventReceiver(X10Action receiveEvent) {
-		Logger log = Logger.getLogger(X10InterfaceHandler.class.getName() + ":" + WrapperCallback.class.getName());
+		Logger log = LogManager.getLogger(X10InterfaceHandler.class.getName() + ":" + WrapperCallback.class.getName());
 		
 		List<HomeAutomationPacket> outgoing = new ArrayList<HomeAutomationPacket>();
 

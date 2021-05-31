@@ -5,26 +5,29 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.cattech.homeAutomation.communicationHub.ChannelController;
 import org.cattech.homeAutomation.communicationHub.NodeInterfaceString;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationModule;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
 import org.json.JSONObject;
 
+import io.moquette.BrokerConstants;
 import io.moquette.interception.AbstractInterceptHandler;
 import io.moquette.interception.InterceptHandler;
 import io.moquette.interception.messages.InterceptPublishMessage;
 import io.moquette.proto.messages.AbstractMessage.QOSType;
 import io.moquette.proto.messages.PublishMessage;
 import io.moquette.server.Server;
-import io.moquette.server.config.FilesystemConfig;
+import io.moquette.server.config.MemoryConfig;
 
 public class MQTTBroker extends HomeAutomationModule {
 	private static final String PAYLOAD = "payload";
 	private static final String MQTT_BROKER = "MQTTBroker";
-	static Logger log = Logger.getLogger(MQTTBroker.class.getName());
+	static Logger log = LogManager.getLogger(MQTTBroker.class.getName());
 	final Server mqttBroker = new Server();
 
 	public MQTTBroker(ChannelController controller) {
@@ -34,9 +37,16 @@ public class MQTTBroker extends HomeAutomationModule {
 
 		final List<? extends InterceptHandler> userHandlers = Arrays.asList(new PublisherListener(controller));
 		try {
-			File configFile = new File(controller.getConfig().getConfigFolder() + "/moquette.conf");
-			FilesystemConfig classPathConfig = new FilesystemConfig(configFile);
-			mqttBroker.startServer(classPathConfig, userHandlers);
+
+			final Properties mqttConfig = new Properties();
+
+			File mapdbPath = new File(controller.getConfig().getConfigFolder() + "/moquette/");
+			if (!mapdbPath.exists()) {
+				mapdbPath.mkdirs();
+			}
+			
+			mqttConfig.setProperty(BrokerConstants.PERSISTENT_STORE_PROPERTY_NAME,mapdbPath.getCanonicalPath()+"/moquette_store.mapdb");
+			mqttBroker.startServer(new MemoryConfig(mqttConfig), userHandlers);
 
 			System.out.println("moquette mqtt broker started, press ctrl-c to shutdown..");
 			Runtime.getRuntime().addShutdownHook(new Thread() {

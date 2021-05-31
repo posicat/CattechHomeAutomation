@@ -11,9 +11,10 @@ import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-import org.cattech.HomeAutomation.database.Database;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.cattech.homeAutomation.communicationHub.ChannelController;
+import org.cattech.homeAutomation.database.Database;
 import org.cattech.homeAutomation.deviceHelpers.DeviceNameHelper;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationModule;
 import org.cattech.homeAutomation.moduleBase.HomeAutomationPacket;
@@ -22,7 +23,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class DataLogger extends HomeAutomationModule {
-	static Logger log = Logger.getLogger(DataLogger.class.getName());
+	static Logger log = LogManager.getLogger(DataLogger.class.getName());
 	private ArrayList<LogLookup> logLookup;
 
 	public DataLogger(ChannelController controller) {
