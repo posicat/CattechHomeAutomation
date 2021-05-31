@@ -15,7 +15,7 @@ sub loadDevices {
     
     foreach my $table (@$dataTables) {
         my $data={};
-        $LogDB->{SH}->execute_raw_sql($data,"SELECT DISTINCT dm.deviceMap_id,deviceName FROM HomeAutomation_DataLogging.".$table." t ".
+        $LogDB->{SH}->execute_raw_sql($data,"SELECT DISTINCT dm.deviceMap_id,deviceName FROM "+configuration.getDataLoggingDB()+".".$table." t ".
             " LEFT JOIN HomeAutomation.deviceMap dm ON dm.deviceMap_id=t.deviceMap_id ");
         while ($LogDB->{SH}->next_row($data)) {
             if ($data->{deviceName}) {
@@ -33,7 +33,7 @@ sub returnSensorData {
 	$ret.="\t<div class=\"nodeName\">$sensor</div>\n";
 
 	my $data={};
-	$LogDB->{SH}->execute_raw_sql($data,"SELECT value,CONVERT_TZ(eventTime,'GMT','CST') FROM HomeAutomation_DataLogging.$section WHERE deviceMap_id=$id ORDER BY eventTime DESC LIMIT 1");
+	$LogDB->{SH}->execute_raw_sql($data,"SELECT value,CONVERT_TZ(eventTime,'GMT','CST') FROM "+configuration.getDataLoggingDB()+".$section WHERE deviceMap_id=$id ORDER BY eventTime DESC LIMIT 1");
 	if ($LogDB->{SH}->next_row($data)) {
 		$ret.="\t\t<div>$data->{value}</div>\n";
 		$ret.="\t<div style=\"font-size:60%;float:right;\">".ageFormat($data->{eventTime})."</div>\n";
@@ -102,7 +102,7 @@ sub getGraphDataQuery {
 		if ($tableNum>1) {
 			$unions .= "UNION\n";
 		}
-		$unions .= "SELECT *,'$section' AS tbl FROM HomeAutomation_DataLogging.".$section. " \n";
+		$unions .= "SELECT *,'$section' AS tbl FROM "+configuration.getDataLoggingDB()+".".$section. " \n";
 
 		push @d,keys( %{$devices->{$section}} );
 	}

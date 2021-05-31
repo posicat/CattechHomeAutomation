@@ -68,6 +68,8 @@ local.properties
 
 *.jar
 
-Deploy/target/
-
 target/
+
+.settings/
+
+Hub/authenticationCache.json

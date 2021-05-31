@@ -1,0 +1,41 @@
+#! /bin/sh
+
+set -e
+
+case "$1" in
+    configure)
+        echo "Creating/updating cathomeauto user account..."
+        groupadd -f cathomeauto
+        adduser --system --ingroup cathomeauto --home /var/lib/CattechHomeAutomation/ \
+                --gecos "Cattech HomeAutomation user" --shell /bin/false \
+                --quiet --disabled-password cathomeauto || {
+          # adduser failed. Why?
+          if getent passwd cathomeauto >/dev/null ; then
+             echo "Non-system user cathomeauto found. This user must be removed manually before re-install." >&2
+             exit 1
+          fi
+          # unknown adduser error, simply exit
+          exit 1
+        }
+        
+        ucf --three-way /usr/share/doc/CattechHomeAutomation/settings.conf.orig /etc/CattechHomeAutomation/settings.conf
+              
+        chown cathomeauto:cathomeauto -R /usr/bin/CattechHomeAutomation/
+        chown cathomeauto:cathomeauto -R /usr/lib/CattechHomeAutomation/
+        chown cathomeauto:cathomeauto -R /var/log/CattechHomeAutomation/
+        chown cathomeauto:cathomeauto -R /var/run/CattechHomeAutomation/
+        chown root:root -R /etc/CattechHomeAutomation
+        chmod 644 /etc/CattechHomeAutomation/*
+        chmod 775 /usr/bin/CattechHomeAutomation/start_hub.sh
+        chmod 775 /etc/init.d/CattechHomeAutomation.sh
+        chmod 775 /var/run/CattechHomeAutomation/
+    ;;
+
+    abort-upgrade|abort-remove|abort-deconfigure)
+    ;;
+
+    *)
+        echo "postinst called with unknown argument \`$1'" >&2
+        exit 1
+    ;;
+esac

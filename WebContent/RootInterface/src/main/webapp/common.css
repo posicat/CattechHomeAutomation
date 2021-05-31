@@ -1,0 +1,72 @@
+body {
+	margin:0;
+	width:100%;
+	heigth:100%;	
+}
+
+.device {
+	position:absolute;
+	border:2px inset #444;
+	display:block;
+	background-color:#555;
+}
+.deviceName {
+	text-align:center;
+	color:#FFF;
+	text-decoration:none;
+	text-shadow: 3px 3px 2px #000;
+}
+.deviceStatus {
+	position:absolute;
+	z-index:100;
+	width:100%;
+	height:100%;
+}
+.group {
+	position:fixed;
+	top:0;
+	left:0;
+	width:100%;
+}
+.groupName {
+	text-align:center;
+	color:#FFF;
+	background-color:#33F;
+	padding:.5em;
+}
+
+.menuInterface {
+	width:100%;
+	height:100%;
+	position:absolute;
+}
+.wholePage {
+	position:fixed;
+	z-index:1000;
+
+	width:100%;
+	height:100%;
+	display:none;
+	background: rgba(0, 0, 0, 0.4); /*can be anything, of course*/
+}
+.controls {
+	position:fixed;
+	top:50%;
+	left:50%;
+	width:50%;
+	height:50%;
+	transform: translate(-50%, -50%);
+	
+	border:5px groove #CCC;
+	margin:auto;
+}
+.controlBlock {
+	width:100%;
+	height:100%;
+	padding:0px;
+	border:0px;
+	vertical-align:middle;
+	text-align:center;
+	background-color:#656;
+}
+

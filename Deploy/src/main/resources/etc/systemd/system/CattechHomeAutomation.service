@@ -1,0 +1,16 @@
+[Unit]
+Description=Cattech Home Automation Hub
+
+[Service]
+User=homeauto
+
+WorkingDirectory=/usr/bin/CattechHomeAutomation/
+
+ExecStart=/usr/bin/CattechHomeAutomation/start_hub.sh
+
+TimeoutStopSec=30
+Restart=on-failure
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target
